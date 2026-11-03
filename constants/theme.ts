@@ -1,0 +1,20 @@
+/** Paleta usada fora do Tailwind (SVG, gradientes, ícones). Mantenha em sincronia com tailwind.config.js. */
+export const COLORS = {
+  akita: '#F28C28',
+  akitaDark: '#D9721A',
+  akitaLight: '#FFB866',
+  urajiro: '#FFF8EE',
+  hero: '#1E5BD8',
+  heroDark: '#0F3480',
+  heroRed: '#E53935',
+  leaf: '#58CC02',
+  leafDark: '#46A302',
+  flame: '#FF6B1A',
+  ice: '#1CB0F6',
+  gold: '#FFC800',
+  locked: '#E5E5E5',
+  lockedDark: '#AFAFAF',
+  ink: '#1F2937',
+  inkSoft: '#6B7280',
+  white: '#FFFFFF',
+} as const;

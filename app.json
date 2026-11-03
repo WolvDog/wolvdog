@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "WolverBark",
+    "slug": "wolverbark",
+    "scheme": "wolverbark",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.wolverbark.app" },
+    "android": { "package": "com.wolverbark.app" },
+    "web": { "bundler": "metro", "output": "single" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}
