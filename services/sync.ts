@@ -54,6 +54,7 @@ export function startAutoSync(): () => void {
       state.progress !== prev.progress ||
       state.streak !== prev.streak ||
       state.reviews !== prev.reviews ||
+      state.behaviorLog !== prev.behaviorLog ||
       state.pet !== prev.pet ||
       state.user !== prev.user ||
       state.hasOnboarded !== prev.hasOnboarded;

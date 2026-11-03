@@ -23,6 +23,7 @@ import {
 } from '@/constants/labels';
 import { WEEKLY_GOAL_OPTIONS } from '@/constants/gamification';
 import { COLORS, FONTS } from '@/constants/theme';
+import { findPartner } from '@/constants/partners';
 import { MODULES } from '@/data/mockData';
 import { formatTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
 import { isSupabaseConfigured } from '@/services/supabase';
@@ -57,6 +58,8 @@ export default function OnboardingScreen() {
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>([]);
   const [goal, setGoal] = useState<User['dailyGoalMinutes']>(10);
   const [weeklyDays, setWeeklyDays] = useState<WeeklyGoalDays>(4);
+  const [partnerInput, setPartnerInput] = useState('');
+  const partner = findPartner(partnerInput);
   const [reminderTime, setReminderTime] = useState<{ hour: number; minute: number } | null>(REMINDER_TIMES[3]);
   const [askingPermission, setAskingPermission] = useState(false);
 
@@ -102,6 +105,7 @@ export default function OnboardingScreen() {
         tutorName: tutor,
         dailyGoalMinutes: goal,
         weeklyGoalDays: weeklyDays,
+        partnerCode: partner?.code ?? null,
         reminder: reminderTime
           ? { enabled: true, hour: reminderTime.hour, minute: reminderTime.minute }
           : { enabled: false, hour: 19, minute: 0 },
@@ -378,6 +382,26 @@ export default function OnboardingScreen() {
                   )}
                 </View>
               </View>
+              <Field label="Código de parceiro (opcional)" hint="Veio por indicação de uma creche, hotel ou adestrador?">
+                <TextField
+                  value={partnerInput}
+                  onChangeText={setPartnerInput}
+                  placeholder="Ex.: GARRIDOSP"
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                />
+              </Field>
+              {partner ? (
+                <View className="mt-2 rounded-lg border-2 border-ink-900 bg-claw-100 p-3">
+                  <Text className="text-sm font-bold text-ink-900">🎁 {partner.name}</Text>
+                  <Text className="text-xs text-ink-600">Benefício no Pro: {partner.perk}</Text>
+                </View>
+              ) : partnerInput.trim().length >= 4 ? (
+                <Text className="mt-2 text-xs" style={{ color: COLORS.danger }}>
+                  Código não encontrado. Confira com quem te indicou.
+                </Text>
+              ) : null}
+
               <Text className="mt-3 text-center text-xs text-ink-400">
                 Cada {TERMS.lesson.toLowerCase()} cumprida rende {TERMS.points.toLowerCase()} e mantém sua {TERMS.streak.toLowerCase()}.
               </Text>

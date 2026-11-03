@@ -17,6 +17,8 @@ export interface User {
   /** Meta de dias de treino por semana — a sequência conta semanas cumpridas. */
   weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
+  /** Código do parceiro que indicou o app (ex.: creche), se houver. */
+  partnerCode: string | null;
 }
 
 export type WeeklyGoalDays = 3 | 4 | 5 | 7;
@@ -183,6 +185,12 @@ export interface Streak {
   /** Última semana já fechada e avaliada (segunda-feira YYYY-MM-DD). */
   lastEvaluatedWeek: string | null;
 }
+
+/** Nota de 1 (fora de controle) a 5 (sob controle) para cada desafio do cão. */
+export type BehaviorRating = 1 | 2 | 3 | 4 | 5;
+
+/** Diário de comportamento: semana (segunda-feira YYYY-MM-DD) → nota por desafio. */
+export type BehaviorLog = Record<string, Partial<Record<BehaviorChallenge, BehaviorRating>>>;
 
 /** Agenda de reforço (repetição espaçada) de uma missão já cumprida. */
 export interface ReviewItem {

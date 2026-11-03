@@ -69,6 +69,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="lesson/[id]" options={{ presentation: 'fullScreenModal', gestureEnabled: false }} />
           <Stack.Screen name="pet-edit" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="diary" options={{ presentation: 'modal' }} />
         </Stack.Protected>
         {/* Antes do onboarding, o login só fica disponível sob pedido (o router escolhe a 1ª rota em ordem alfabética). */}
         <Stack.Protected guard={isSupabaseConfigured && !authUserId && (hasOnboarded || loginRequested)}>

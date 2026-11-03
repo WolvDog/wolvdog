@@ -5,6 +5,7 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
+import { findPartner } from '@/constants/partners';
 import { COLORS, FONTS } from '@/constants/theme';
 import { PRO_BENEFITS, SUBSCRIPTION_PLANS } from '@/data/mockData';
 import { showAlert } from '@/services/dialog';
@@ -36,13 +37,14 @@ const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
 
 export function PaywallModal() {
   const insets = useSafeAreaInsets();
-  const { visible, source, close, setPro, userId } = useAppStore(
+  const { visible, source, close, setPro, userId, partnerCode } = useAppStore(
     useShallow((s) => ({
       visible: s.paywall.visible,
       source: s.paywall.source,
       close: s.closePaywall,
       setPro: s.setPro,
       userId: s.user.id,
+      partnerCode: s.user.partnerCode,
     })),
   );
 
@@ -57,6 +59,7 @@ export function PaywallModal() {
   }, [visible, userId]);
 
   const headline = HEADLINES[source ?? 'profile'];
+  const partner = findPartner(partnerCode);
   const selected = plans.find((p) => p.id === selectedId) ?? plans[0]!;
 
   async function handlePurchase() {
@@ -116,6 +119,14 @@ export function PaywallModal() {
           </LinearGradient>
 
           <View className="px-5 pt-6">
+            {partner && (
+              <View className="mb-5 rounded-xl border-2 border-ink-900 bg-claw-100 p-4">
+                <Text style={{ fontFamily: FONTS.display, fontSize: 15, color: COLORS.ink }}>🎁 BENEFÍCIO {partner.name.toUpperCase()}</Text>
+                <Text className="mt-1 text-sm text-ink-600">
+                  Código {partner.code}: {partner.perk}. O desconto é aplicado na tela de pagamento da loja.
+                </Text>
+              </View>
+            )}
             {PRO_BENEFITS.map((b) => (
               <View key={b.title} className="mb-4 flex-row items-start">
                 <View className="h-11 w-11 items-center justify-center rounded-lg border-2 border-ink-900 bg-claw-100">

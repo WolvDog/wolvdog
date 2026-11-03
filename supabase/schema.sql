@@ -8,6 +8,8 @@ create table if not exists public.profiles (
   daily_goal_minutes smallint not null default 10,
   weekly_goal_days smallint not null default 3,
   review_queue jsonb not null default '{}'::jsonb,
+  partner_code text,
+  behavior_log jsonb not null default '{}'::jsonb,
   total_xp integer not null default 0,
   has_onboarded boolean not null default false,
   reminder_enabled boolean not null default false,
@@ -83,7 +85,7 @@ create policy "own streak" on public.streaks for all using (auth.uid() = user_id
 
 -- Impede que o app marque a si mesmo como Pro: o cliente só escreve as colunas abaixo.
 revoke insert, update on public.profiles from authenticated;
-grant insert (id, name, daily_goal_minutes, weekly_goal_days, review_queue, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant insert (id, name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;
-grant update (name, daily_goal_minutes, weekly_goal_days, review_queue, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant update (name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;

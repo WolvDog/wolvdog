@@ -4,6 +4,7 @@ import type {
   LessonCompletion,
   Pet,
   PetSize,
+  BehaviorLog,
   ReviewItem,
   Streak,
   User,
@@ -16,11 +17,12 @@ import { supabase } from './supabase';
 export interface CloudSnapshot {
   hasOnboarded: boolean;
   isPro: boolean;
-  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'weeklyGoalDays' | 'reminder'>;
+  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'weeklyGoalDays' | 'reminder' | 'partnerCode'>;
   pet: Pet | null;
   progress: UserProgress;
   streak: Streak;
   reviews: Record<string, ReviewItem>;
+  behaviorLog: BehaviorLog;
 }
 
 /**
@@ -52,6 +54,7 @@ export const repository = {
         name: p.name,
         dailyGoalMinutes: p.daily_goal_minutes,
         weeklyGoalDays: p.weekly_goal_days ?? 3,
+        partnerCode: p.partner_code ?? null,
         reminder: { enabled: p.reminder_enabled, hour: p.reminder_hour, minute: p.reminder_minute },
       },
       pet: petRow
@@ -95,6 +98,7 @@ export const repository = {
           }
         : { current: 0, longest: 0, lastActiveDate: null, freezesAvailable: 1, frozenWeeks: [], lastEvaluatedWeek: null },
       reviews: (p.review_queue as Record<string, ReviewItem> | null) ?? {},
+      behaviorLog: (p.behavior_log as BehaviorLog | null) ?? {},
     };
   },
 
@@ -109,6 +113,8 @@ export const repository = {
       daily_goal_minutes: snap.user.dailyGoalMinutes,
       weekly_goal_days: snap.user.weeklyGoalDays,
       review_queue: snap.reviews,
+      partner_code: snap.user.partnerCode,
+      behavior_log: snap.behaviorLog,
       total_xp: snap.progress.totalXp,
       has_onboarded: snap.hasOnboarded,
       reminder_enabled: snap.user.reminder.enabled,

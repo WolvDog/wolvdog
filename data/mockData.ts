@@ -772,6 +772,7 @@ export const MOCK_USER: User = {
   dailyGoalMinutes: 10,
   weeklyGoalDays: 3,
   reminder: { enabled: false, hour: 19, minute: 0 },
+  partnerCode: null,
 };
 
 export const MOCK_PET: Pet = {

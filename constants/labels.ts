@@ -80,3 +80,12 @@ export function formatAge(months: number): string {
   const y = `${years} ${years === 1 ? 'ano' : 'anos'}`;
   return rest ? `${y} e ${rest} ${rest === 1 ? 'mês' : 'meses'}` : y;
 }
+
+/** Escala do diário de comportamento: 1 = fora de controle, 5 = sob controle. */
+export const RATING_LABELS = {
+  1: { emoji: '😣', label: 'Fora de controle' },
+  2: { emoji: '😕', label: 'Difícil' },
+  3: { emoji: '😐', label: 'Médio' },
+  4: { emoji: '🙂', label: 'Quase lá' },
+  5: { emoji: '😎', label: 'Sob controle' },
+} as const;

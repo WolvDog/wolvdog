@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
 import { AccountSettings } from '@/components/AccountSettings';
+import { BehaviorChart } from '@/components/BehaviorChart';
 import { HeroButton } from '@/components/HeroButton';
 import { ClawMarks } from '@/components/icons';
 import { Logan } from '@/components/Logan';
@@ -27,9 +28,10 @@ const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export default function ProfileScreen() {
   const { modules, snapshot, level, totalXp, completedCount, totalLessons } = useProgression();
-  const { tutorName, pet, streak, isPro, xpHistory, completedLessons, openPaywall, setPro, resetProgress, restartOnboarding } =
+  const { behaviorLog, tutorName, pet, streak, isPro, xpHistory, completedLessons, openPaywall, setPro, resetProgress, restartOnboarding } =
     useAppStore(
     useShallow((s) => ({
+      behaviorLog: s.behaviorLog,
       tutorName: s.user.name,
       pet: s.pet,
       streak: s.streak,
@@ -161,6 +163,28 @@ export default function ProfileScreen() {
             );
           })}
         </View>
+
+        {/* Diário de comportamento */}
+        {pet && (
+          <View className="mt-4 rounded-xl border-2 border-ink-900 bg-white p-5">
+            <Text className="mb-1" style={SECTION_TITLE}>
+              EVOLUÇÃO DO COMPORTAMENTO
+            </Text>
+            <Text className="mb-3 text-sm text-ink-600">
+              De 1 (fora de controle) a 5 (sob controle), pelo check-in semanal.
+            </Text>
+            {pet.challenges.map((c) => (
+              <View key={c} className="mb-4">
+                <BehaviorChart challenge={c} log={behaviorLog} />
+              </View>
+            ))}
+            <HeroButton
+              label={pet.challenges.length ? 'Fazer check-in da semana' : 'Escolher desafios'}
+              variant="secondary"
+              onPress={() => router.push(pet.challenges.length ? '/diary' : '/pet-edit')}
+            />
+          </View>
+        )}
 
         {/* Histórico */}
         <View className="mt-4 rounded-xl border-2 border-ink-900 bg-white p-5">

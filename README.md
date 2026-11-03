@@ -46,6 +46,8 @@ Paleta do uniforme do Wolverine (amarelo `#FFC72C`, azul `#1E3A8A`, preto e bran
 - **Osso Reserva:** salva uma semana abaixo da meta. Ganha-se 1 a cada 4 semanas seguidas (Pro: a cada 2), máx. 2.
 - **Treino de Reforço (repetição espaçada):** toda missão cumprida volta para revisão — "difícil" no dia seguinte, "médio" em 3 dias, "fácil" em 7, com intervalos crescentes. Até 3 reforços por dia no Mapa de Missões; o reforço abre direto no treino prático.
 - **Clicker digital** na etapa de treino: som + vibração no exato momento do acerto; cada clique conta uma repetição.
+- **Diário de comportamento:** check-in semanal (1 = fora de controle, 5 = sob controle) para cada desafio do cão, com gráfico das últimas 8 semanas (`app/diary.tsx`).
+- **Código de parceiro:** creches/hotéis indicam com um código (ex.: `GARRIDOSP`, em `constants/partners.ts`); fica salvo no perfil (`profiles.partner_code`) para medir aquisição e conversão do piloto.
 - Fase 1 é gratuita; demais fases exigem Pro e a conclusão da fase anterior.
 - Primeiro acesso passa pelo onboarding (`app/onboarding.tsx`): tutor, cão, raça, peso/porte, idade, foco, meta semanal e lembrete.
 

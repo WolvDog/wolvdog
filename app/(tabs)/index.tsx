@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
 import { HeroButton } from '@/components/HeroButton';
+import { DiaryPrompt } from '@/components/DiaryPrompt';
 import { ClawMarks } from '@/components/icons';
 import { LoganSays } from '@/components/LoganSays';
 import { MissionRow } from '@/components/MissionRow';
@@ -95,16 +96,24 @@ export default function MissionMapScreen() {
             </View>
             <ProgressBar progress={completedCount / totalLessons} height={10} color={COLORS.hero} />
           </View>
-          {currentLesson && (
+          {dueReviews[0] ? (
+            // Reforço pendente vem antes de conteúdo novo.
+            <HeroButton
+              className="mt-4"
+              label="Reforço de hoje"
+              onPress={() => router.push({ pathname: '/lesson/[id]', params: { id: dueReviews[0]!.lessonId, review: '1' } })}
+            />
+          ) : currentLesson ? (
             <HeroButton
               className="mt-4"
               label={trainedToday ? 'Mais uma missão' : 'Missão de hoje'}
               onPress={() => router.push({ pathname: '/lesson/[id]', params: { id: currentLesson.id } })}
             />
-          )}
+          ) : null}
         </View>
 
         <ReviewCard items={dueReviews} />
+        <DiaryPrompt />
 
         {modules.map((module) => {
           const moduleState = getModuleState(module, modules, snapshot);

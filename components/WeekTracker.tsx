@@ -28,12 +28,12 @@ export function WeekTracker({ week }: { week: WeekStatus }) {
             <View
               className="h-9 w-9 items-center justify-center rounded-lg border-2"
               style={{
-                backgroundColor: day.trained ? COLORS.claw : COLORS.white,
+                backgroundColor: day.trained ? COLORS.akita : COLORS.white,
                 borderColor: day.trained || day.isToday ? COLORS.ink : COLORS.locked,
                 borderStyle: day.isFuture ? 'dashed' : 'solid',
               }}
             >
-              {day.trained && <Check size={18} color={COLORS.ink} strokeWidth={3.5} />}
+              {day.trained && <Check size={18} color={COLORS.white} strokeWidth={3.5} />}
             </View>
             <Text className="mt-1 text-[11px] font-bold" style={{ color: day.isToday ? COLORS.ink : COLORS.lockedDark }}>
               {LABELS[i]}

@@ -15,6 +15,9 @@ import {
 } from '@/services/gamification';
 import { scheduleReview } from '@/services/review';
 import type {
+  BehaviorChallenge,
+  BehaviorLog,
+  BehaviorRating,
   Difficulty,
   LessonCompletion,
   Pet,
@@ -54,6 +57,7 @@ export interface OnboardingInput {
   dailyGoalMinutes: User['dailyGoalMinutes'];
   weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
+  partnerCode: string | null;
   pet: PetInput;
 }
 
@@ -69,6 +73,8 @@ interface AppState {
   streak: Streak;
   /** Fila de reforço adaptativo (missões cumpridas que voltam para revisão). */
   reviews: Record<string, ReviewItem>;
+  /** Diário de comportamento semanal. */
+  behaviorLog: BehaviorLog;
   lessonDrafts: Record<string, number>;
 
   // --- estado efêmero ---
@@ -89,6 +95,8 @@ interface AppState {
   savePet: (pet: PetInput) => void;
   setReminder: (reminder: ReminderSettings) => void;
   setWeeklyGoal: (days: WeeklyGoalDays) => void;
+  setPartnerCode: (code: string | null) => void;
+  setBehaviorRating: (week: string, challenge: BehaviorChallenge, rating: BehaviorRating) => void;
   completeLesson: (lessonId: string, difficulty: Difficulty) => LessonCompletionResult | null;
   saveLessonDraft: (lessonId: string, stepIndex: number) => void;
   clearLessonDraft: (lessonId: string) => void;
@@ -131,6 +139,7 @@ export const useAppStore = create<AppState>()(
       progress: initialProgress,
       streak: initialStreak,
       reviews: {},
+      behaviorLog: {},
       lessonDrafts: {},
 
       hasHydrated: false,
@@ -142,8 +151,8 @@ export const useAppStore = create<AppState>()(
       paywall: { visible: false, source: null },
       lastStreakEvent: null,
 
-      completeOnboarding: ({ tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, pet }) => {
-        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes, weeklyGoalDays, reminder } }));
+      completeOnboarding: ({ tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, partnerCode, pet }) => {
+        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, partnerCode } }));
         get().savePet(pet);
         set({ hasOnboarded: true });
       },
@@ -164,6 +173,11 @@ export const useAppStore = create<AppState>()(
       setReminder: (reminder) => set((s) => ({ user: { ...s.user, reminder } })),
 
       setWeeklyGoal: (weeklyGoalDays) => set((s) => ({ user: { ...s.user, weeklyGoalDays } })),
+
+      setPartnerCode: (partnerCode) => set((s) => ({ user: { ...s.user, partnerCode } })),
+
+      setBehaviorRating: (week, challenge, rating) =>
+        set((s) => ({ behaviorLog: { ...s.behaviorLog, [week]: { ...s.behaviorLog[week], [challenge]: rating } } })),
 
       completeLesson: (lessonId, difficulty) => {
         const lesson = getLessonById(lessonId);
@@ -274,11 +288,13 @@ export const useAppStore = create<AppState>()(
             dailyGoalMinutes: s.user.dailyGoalMinutes,
             weeklyGoalDays: s.user.weeklyGoalDays,
             reminder: s.user.reminder,
+            partnerCode: s.user.partnerCode,
           },
           pet: s.pet,
           progress: s.progress,
           streak: s.streak,
           reviews: s.reviews,
+          behaviorLog: s.behaviorLog,
         };
       },
 
@@ -293,6 +309,7 @@ export const useAppStore = create<AppState>()(
           progress: snap.progress,
           streak: snap.streak,
           reviews: snap.reviews,
+          behaviorLog: snap.behaviorLog,
         })),
 
       clearLocalData: () =>
@@ -305,6 +322,7 @@ export const useAppStore = create<AppState>()(
           progress: initialProgress,
           streak: initialStreak,
           reviews: {},
+          behaviorLog: {},
           lessonDrafts: {},
           lastStreakEvent: null,
           syncStatus: 'idle',
@@ -312,7 +330,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'wolverbark-store',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({
         hasOnboarded: s.hasOnboarded,
@@ -323,6 +341,7 @@ export const useAppStore = create<AppState>()(
         progress: s.progress,
         streak: s.streak,
         reviews: s.reviews,
+        behaviorLog: s.behaviorLog,
         lessonDrafts: s.lessonDrafts,
       }),
       migrate: (persisted, version) => {
@@ -341,6 +360,11 @@ export const useAppStore = create<AppState>()(
           state.reviews = Object.fromEntries(
             Object.values(state.progress?.completedLessons ?? {}).map((c) => [c.lessonId, scheduleReview(undefined, c.lessonId, c.difficulty, today)]),
           );
+        }
+        // v4: código de parceiro + diário de comportamento.
+        if (version < 4) {
+          if (state.user) state.user = { ...state.user, partnerCode: state.user.partnerCode ?? null };
+          state.behaviorLog = state.behaviorLog ?? {};
         }
         return state as AppState;
       },
