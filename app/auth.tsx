@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Cloud } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ArrowLeft, Mail } from 'lucide-react-native';
+import { type ComponentRef, useEffect, useRef, useState } from 'react';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Field, TextField } from '@/components/form';
@@ -11,10 +11,18 @@ import { COLORS, FONTS } from '@/constants/theme';
 import { authErrorMessage, supabase } from '@/services/supabase';
 import { useAppStore } from '@/store/useAppStore';
 
-type Mode = 'signup' | 'login';
+/** Deve bater com "Email OTP Length" em Authentication → Providers → Email no Supabase. */
+const CODE_LENGTH = 6;
+const RESEND_SECONDS = 60;
 
+type Step = 'email' | 'code';
+
+/**
+ * Login sem senha: o tutor informa o e-mail, recebe um código de 6 dígitos e entra.
+ * O mesmo fluxo cria a conta na primeira vez.
+ */
 export default function AuthScreen() {
-  const params = useLocalSearchParams<{ mode?: Mode }>();
+  const params = useLocalSearchParams<{ mode?: 'signup' | 'login' }>();
   const hasOnboarded = useAppStore((s) => s.hasOnboarded);
   const petName = useAppStore((s) => s.pet?.name);
   const skipAuth = useAppStore((s) => s.skipAuth);
@@ -22,51 +30,82 @@ export default function AuthScreen() {
 
   useEffect(() => () => requestLogin(false), [requestLogin]);
 
-  const [mode, setMode] = useState<Mode>(params.mode ?? (hasOnboarded ? 'signup' : 'login'));
+  const isSignup = (params.mode ?? (hasOnboarded ? 'signup' : 'login')) === 'signup';
+
+  const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [resendIn, setResendIn] = useState(0);
 
-  const validEmail = /^\S+@\S+\.\S+$/.test(email.trim());
-  const canSubmit = validEmail && password.length >= 6;
+  const normalizedEmail = email.trim().toLowerCase();
+  const validEmail = /^\S+@\S+\.\S+$/.test(normalizedEmail);
 
-  async function submit() {
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const id = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [resendIn]);
+
+  async function sendCode() {
     if (!supabase) return;
     setLoading(true);
     setError(null);
-    setInfo(null);
-    const credentials = { email: email.trim().toLowerCase(), password };
-    const { data, error: authError } =
-      mode === 'signup' ? await supabase.auth.signUp(credentials) : await supabase.auth.signInWithPassword(credentials);
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email: normalizedEmail,
+      options: { shouldCreateUser: true },
+    });
     setLoading(false);
+    if (otpError) return setError(authErrorMessage(otpError.message));
+    setCode('');
+    setStep('code');
+    setResendIn(RESEND_SECONDS);
+  }
 
-    if (authError) return setError(authErrorMessage(authError.message));
-    // Projetos com confirmação de e-mail ativa não devolvem sessão no cadastro.
-    if (mode === 'signup' && !data.session) {
-      setMode('login');
-      setInfo(`Enviamos um link de confirmação para ${credentials.email}. Confirme e depois entre aqui.`);
+  async function verifyCode(token: string) {
+    if (!supabase) return;
+    setLoading(true);
+    setError(null);
+    const { error: verifyError } = await supabase.auth.verifyOtp({ email: normalizedEmail, token, type: 'email' });
+    setLoading(false);
+    if (verifyError) {
+      setCode('');
+      return setError(authErrorMessage(verifyError.message));
     }
-    // Com sessão, o listener de auth sincroniza os dados e as rotas protegidas trocam de tela sozinhas.
+    // Com a sessão criada, o listener de auth sincroniza os dados e as rotas protegidas trocam de tela sozinhas.
+  }
+
+  function handleCodeChange(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, CODE_LENGTH);
+    setCode(digits);
+    if (digits.length === CODE_LENGTH && !loading) void verifyCode(digits);
+  }
+
+  const showBack = step === 'code' || router.canGoBack() || !hasOnboarded;
+  function goBack() {
+    if (step === 'code') {
+      setStep('email');
+      setError(null);
+      return;
+    }
+    // Antes do onboarding, desligar o pedido de login já devolve o tutor para as boas-vindas.
+    if (router.canGoBack()) router.back();
+    else requestLogin(false);
   }
 
   const loganText =
-    mode === 'signup'
-      ? `Crie sua conta para guardar a jornada${petName ? ` de ${petName}` : ''} na nuvem. Troca de celular? Nada se perde!`
-      : 'Que bom te ver de novo! Entre para recuperar sua jornada.';
+    step === 'code'
+      ? `Mandei um código de ${CODE_LENGTH} dígitos para ${normalizedEmail}. Dá uma farejada na caixa de entrada (e no spam)!`
+      : isSignup
+        ? `Salve a jornada${petName ? ` de ${petName}` : ''} na nuvem. Sem senha pra decorar: é só confirmar um código no seu e-mail.`
+        : 'Que bom te ver de novo! Informe seu e-mail e eu te mando um código para entrar.';
 
   return (
     <SafeAreaView className="flex-1 bg-cloud">
       <View className="flex-row items-center px-4 pb-2 pt-2" style={{ minHeight: 40 }}>
-        {(router.canGoBack() || !hasOnboarded) && (
-          <Pressable
-            // Antes do onboarding, desligar o pedido de login já devolve o tutor para as boas-vindas.
-            onPress={() => (router.canGoBack() ? router.back() : requestLogin(false))}
-            accessibilityRole="button"
-            accessibilityLabel="Voltar"
-            hitSlop={12}
-          >
+        {showBack && (
+          <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel="Voltar" hitSlop={12}>
             <ArrowLeft size={26} color={COLORS.ink} strokeWidth={2.5} />
           </Pressable>
         )}
@@ -75,32 +114,57 @@ export default function AuthScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
           <Text style={{ fontFamily: FONTS.display, fontSize: 30, color: COLORS.ink, marginBottom: 16 }}>
-            {mode === 'signup' ? 'SALVE SUA JORNADA' : 'ENTRAR'}
+            {step === 'code' ? 'CONFIRA SEU E-MAIL' : isSignup ? 'SALVE SUA JORNADA' : 'ENTRAR'}
           </Text>
-          <LoganSays mood={mode === 'signup' ? 'hero' : 'happy'} text={loganText} />
+          <LoganSays mood={step === 'code' ? 'thinking' : isSignup ? 'hero' : 'happy'} text={loganText} />
 
-          <Field label="E-mail">
-            <TextField
-              value={email}
-              onChangeText={setEmail}
-              placeholder="voce@email.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-            />
-          </Field>
-          <Field label="Senha" hint={mode === 'signup' ? 'Mínimo de 6 caracteres.' : undefined}>
-            <TextField
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••"
-              secureTextEntry
-              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-              textContentType={mode === 'signup' ? 'newPassword' : 'password'}
-              onSubmitEditing={() => canSubmit && void submit()}
-            />
-          </Field>
+          {step === 'email' ? (
+            <>
+              <Field label="E-mail">
+                <TextField
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="voce@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  returnKeyType="send"
+                  onSubmitEditing={() => validEmail && void sendCode()}
+                />
+              </Field>
+              <HeroButton
+                className="mt-6"
+                label="Receber código"
+                disabled={!validEmail}
+                loading={loading}
+                icon={<Mail size={18} color={validEmail ? COLORS.ink : COLORS.lockedDark} />}
+                onPress={sendCode}
+              />
+            </>
+          ) : (
+            <>
+              <Field label="Código">
+                <CodeInput value={code} onChange={handleCodeChange} disabled={loading} />
+              </Field>
+              <HeroButton
+                className="mt-6"
+                label="Entrar"
+                variant="hero"
+                disabled={code.length !== CODE_LENGTH}
+                loading={loading}
+                onPress={() => verifyCode(code)}
+              />
+              <Pressable onPress={() => resendIn === 0 && void sendCode()} disabled={resendIn > 0 || loading} className="mt-5 py-1">
+                <Text className="text-center text-sm font-bold" style={{ color: resendIn > 0 ? COLORS.lockedDark : COLORS.hero }}>
+                  {resendIn > 0 ? `Reenviar código em ${resendIn}s` : 'Reenviar código'}
+                </Text>
+              </Pressable>
+              <Pressable onPress={goBack} className="mt-1 py-1">
+                <Text className="text-center text-sm text-ink-400">Usar outro e-mail</Text>
+              </Pressable>
+            </>
+          )}
 
           {error && (
             <View className="mt-4 rounded-lg border-2 p-3" style={{ borderColor: COLORS.danger, backgroundColor: '#FDECEC' }}>
@@ -109,42 +173,14 @@ export default function AuthScreen() {
               </Text>
             </View>
           )}
-          {info && (
-            <View className="mt-4 rounded-lg border-2 border-hero-500 bg-hero-50 p-3">
-              <Text className="text-sm text-hero-500">{info}</Text>
-            </View>
-          )}
 
-          <HeroButton
-            className="mt-6"
-            label={mode === 'signup' ? 'Criar conta' : 'Entrar'}
-            variant={mode === 'signup' ? 'primary' : 'hero'}
-            disabled={!canSubmit}
-            loading={loading}
-            icon={mode === 'signup' ? <Cloud size={18} color={canSubmit ? COLORS.ink : COLORS.lockedDark} /> : undefined}
-            onPress={submit}
-          />
-
-          <Pressable
-            onPress={() => {
-              setMode(mode === 'signup' ? 'login' : 'signup');
-              setError(null);
-              setInfo(null);
-            }}
-            className="mt-5 py-1"
-          >
-            <Text className="text-center text-sm font-bold text-hero-500">
-              {mode === 'signup' ? 'Já tenho conta — entrar' : 'Ainda não tenho conta — criar'}
-            </Text>
-          </Pressable>
-
-          {hasOnboarded && (
+          {hasOnboarded && step === 'email' && (
             <Pressable
               onPress={() => {
                 skipAuth();
                 router.replace('/');
               }}
-              className="mt-2 py-1"
+              className="mt-4 py-1"
             >
               <Text className="text-center text-sm text-ink-400">Continuar sem conta (progresso só neste aparelho)</Text>
             </Pressable>
@@ -152,5 +188,50 @@ export default function AuthScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+/** Caixas de dígitos sobre um TextInput invisível (mantém colar e o autopreenchimento do teclado). */
+function CodeInput({ value, onChange, disabled }: { value: string; onChange: (v: string) => void; disabled?: boolean }) {
+  const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
+  const [focused, setFocused] = useState(true);
+
+  return (
+    <Pressable onPress={() => inputRef.current?.focus()} accessibilityLabel="Código de verificação">
+      <View className="flex-row justify-between">
+        {Array.from({ length: CODE_LENGTH }, (_, i) => {
+          const char = value[i];
+          const active = focused && i === Math.min(value.length, CODE_LENGTH - 1);
+          return (
+            <View
+              key={i}
+              className="h-14 items-center justify-center rounded-xl border-2 bg-white"
+              style={{
+                width: `${100 / CODE_LENGTH - 2}%`,
+                borderColor: active ? COLORS.hero : char ? COLORS.ink : '#D5D8DE',
+                borderWidth: active ? 2.5 : 2,
+              }}
+            >
+              <Text style={{ fontFamily: FONTS.display, fontSize: 26, color: COLORS.ink }}>{char ?? ''}</Text>
+            </View>
+          );
+        })}
+      </View>
+      <TextInput
+        ref={inputRef}
+        value={value}
+        onChangeText={onChange}
+        editable={!disabled}
+        autoFocus
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        autoComplete="one-time-code"
+        maxLength={CODE_LENGTH}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.01 }}
+        caretHidden
+      />
+    </Pressable>
   );
 }

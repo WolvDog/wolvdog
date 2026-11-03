@@ -32,11 +32,11 @@ if (supabase && Platform.OS !== 'web') {
 /** Traduz os erros mais comuns do Supabase Auth para o usuário. */
 export function authErrorMessage(message: string): string {
   const m = message.toLowerCase();
-  if (m.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
-  if (m.includes('already registered') || m.includes('already been registered')) return 'Este e-mail já tem conta. Tente entrar.';
-  if (m.includes('password should be at least')) return 'A senha precisa ter pelo menos 6 caracteres.';
-  if (m.includes('email not confirmed')) return 'Confirme seu e-mail pelo link que enviamos antes de entrar.';
   if (m.includes('unable to validate email') || m.includes('invalid email')) return 'Esse e-mail não parece válido.';
+  if (m.includes('expired') || (m.includes('invalid') && m.includes('token'))) return 'Código inválido ou expirado. Confira o e-mail ou peça um novo.';
+  if (m.includes('rate limit')) return 'Muitos e-mails enviados em pouco tempo. Aguarde alguns minutos e tente de novo.';
+  if (m.includes('security purposes')) return 'Aguarde alguns segundos antes de pedir outro código.';
+  if (m.includes('signups not allowed')) return 'Cadastros estão temporariamente desativados.';
   if (m.includes('network')) return 'Sem conexão. Verifique sua internet.';
   return message;
 }

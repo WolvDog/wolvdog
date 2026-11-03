@@ -53,9 +53,12 @@ Sem `.env` o app roda 100% local (sem login). Para ativar:
 
 1. Crie um projeto em [supabase.com](https://supabase.com) (plano grátis).
 2. **SQL Editor →** cole e rode `supabase/schema.sql`.
-3. **Authentication → Providers → Email:** para testes, desligue "Confirm email".
-4. **Project Settings → API:** copie a *Project URL* e a *anon public key* para um arquivo `.env` (veja `.env.example`).
-5. Reinicie o Expo com `--clear`.
+3. **Authentication → Sign In / Providers → Email:** desligue "Confirm email" e confirme que **Email OTP Length = 6**.
+4. **Authentication → Emails → Magic Link** (e **Confirm signup**): cole o conteúdo de `supabase/email-codigo.html` (assunto: `Seu código WolverBark: {{ .Token }}`). Sem isso o e-mail chega com um link em vez do código.
+5. **Project Settings → API:** copie a *Project URL* e a *anon public key* para um arquivo `.env` (veja `.env.example`).
+6. Reinicie o Expo com `--clear`.
+
+Login **sem senha**: o tutor informa o e-mail e digita o código de 6 dígitos recebido (o mesmo fluxo cria a conta). O código só é pedido em aparelho novo ou após sair da conta. ⚠️ O e-mail padrão do Supabase tem limite baixo de envios por hora — para produção, configure um SMTP próprio (ex.: Resend) em Authentication → Emails → SMTP.
 
 Fluxo: o onboarding acontece primeiro; depois o tutor cria conta (ou continua sem conta). Login em conta existente restaura a jornada da nuvem; conta nova envia o que já foi feito no aparelho. Alterações são sincronizadas em segundo plano (`services/sync.ts`).
 
