@@ -8,6 +8,8 @@ export const COLORS = {
   heroDark: '#0F1F4D',
   heroMid: '#3B5CC4',
   heroLight: '#DCE6FB',
+  /** Azul do ícone e da tela de abertura (app.json). */
+  splash: '#1850BE',
   ink: '#111111',
   inkSoft: '#4A4F5C',
   white: '#FFFFFF',

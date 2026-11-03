@@ -8,3 +8,6 @@ expo-env.d.ts
 .env*.local
 ios/
 android/
+
+# Arquivos pessoais com credenciais — nunca versionar
+Gamil Google/
