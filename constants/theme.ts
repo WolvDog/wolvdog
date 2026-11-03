@@ -1,20 +1,30 @@
 /** Paleta usada fora do Tailwind (SVG, gradientes, ícones). Mantenha em sincronia com tailwind.config.js. */
 export const COLORS = {
+  // Uniforme do Wolverine
+  claw: '#FFC72C',
+  clawDark: '#E5A800',
+  clawLight: '#FFEFB8',
+  hero: '#1E3A8A',
+  heroDark: '#0F1F4D',
+  heroMid: '#3B5CC4',
+  heroLight: '#DCE6FB',
+  ink: '#111111',
+  inkSoft: '#4A4F5C',
+  white: '#FFFFFF',
+
+  // Pelagem do Logan
   akita: '#F28C28',
   akitaDark: '#D9721A',
   akitaLight: '#FFB866',
   urajiro: '#FFF8EE',
-  hero: '#1E5BD8',
-  heroDark: '#0F3480',
-  heroRed: '#E53935',
-  leaf: '#58CC02',
-  leafDark: '#46A302',
-  flame: '#FF6B1A',
-  ice: '#1CB0F6',
-  gold: '#FFC800',
-  locked: '#E5E5E5',
-  lockedDark: '#AFAFAF',
-  ink: '#1F2937',
-  inkSoft: '#6B7280',
-  white: '#FFFFFF',
+
+  danger: '#E5484D',
+  locked: '#E4E6EB',
+  lockedDark: '#A0A4AE',
+} as const;
+
+/** Tipografia de títulos e botões (carregada em app/_layout.tsx). */
+export const FONTS = {
+  display: 'Oswald_700Bold',
+  displayMedium: 'Oswald_500Medium',
 } as const;

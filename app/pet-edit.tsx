@@ -1,14 +1,15 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { Camera, X } from 'lucide-react-native';
-import { type ComponentProps, type ReactNode, useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useState } from 'react';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ChunkyButton } from '@/components/ChunkyButton';
+import { Chip, Field, TextField } from '@/components/form';
+import { HeroButton } from '@/components/HeroButton';
 import { LoganSays } from '@/components/LoganSays';
 import { CHALLENGE_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
-import { COLORS } from '@/constants/theme';
+import { COLORS, FONTS } from '@/constants/theme';
 import { useAppStore } from '@/store/useAppStore';
 import type { BehaviorChallenge, PetSize } from '@/types';
 
@@ -23,11 +24,13 @@ export default function PetEditScreen() {
   const [breed, setBreed] = useState(pet?.breed ?? '');
   const [years, setYears] = useState(pet ? String(Math.floor(pet.ageMonths / 12)) : '');
   const [months, setMonths] = useState(pet ? String(pet.ageMonths % 12) : '');
+  const [weight, setWeight] = useState(pet?.weightKg ? String(pet.weightKg).replace('.', ',') : '');
   const [size, setSize] = useState<PetSize>(pet?.size ?? 'medio');
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>(pet?.challenges ?? []);
   const [photoUri, setPhotoUri] = useState(pet?.photoUri);
 
   const ageMonths = (parseInt(years, 10) || 0) * 12 + (parseInt(months, 10) || 0);
+  const weightKg = parseFloat(weight.replace(',', '.'));
   const canSave = name.trim().length > 0 && breed.trim().length > 0;
 
   async function pickPhoto() {
@@ -45,49 +48,59 @@ export default function PetEditScreen() {
   }
 
   function handleSave() {
-    savePet({ id: pet?.id, name: name.trim(), breed: breed.trim(), ageMonths, size, challenges, photoUri });
+    savePet({
+      id: pet?.id,
+      name: name.trim(),
+      breed: breed.trim(),
+      ageMonths,
+      size,
+      weightKg: weightKg > 0 ? weightKg : undefined,
+      challenges,
+      photoUri,
+    });
     router.back();
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-row items-center justify-between px-4 py-3">
-        <Text className="text-lg font-extrabold text-ink-900">{pet ? 'Editar perfil' : 'Cadastrar pet'}</Text>
+    <SafeAreaView className="flex-1 bg-cloud">
+      <View className="flex-row items-center justify-between border-b-2 border-ink-900 bg-white px-4 py-3">
+        <Text style={{ fontFamily: FONTS.display, fontSize: 20, color: COLORS.ink }}>
+          {pet ? 'EDITAR PERFIL' : 'CADASTRAR PET'}
+        </Text>
         <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Fechar" hitSlop={12}>
-          <X size={26} color={COLORS.lockedDark} strokeWidth={3} />
+          <X size={26} color={COLORS.ink} strokeWidth={3} />
         </Pressable>
       </View>
 
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <LoganSays
-            size={64}
-            mood="happy"
-            text="Me conta tudo sobre seu parceiro! Assim eu personalizo as dicas pra ele."
-          />
+          <LoganSays size={64} mood="happy" text="Me conta tudo sobre seu parceiro! Assim eu personalizo as missões pra ele." />
 
           <Pressable onPress={pickPhoto} className="mt-6 items-center" accessibilityRole="button" accessibilityLabel="Escolher foto">
-            <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-dashed border-akita-300 bg-akita-50">
-              {photoUri ? <Image source={{ uri: photoUri }} className="h-full w-full" /> : <Camera size={32} color={COLORS.akita} />}
+            <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-ink-900 bg-white">
+              {photoUri ? <Image source={{ uri: photoUri }} className="h-full w-full" /> : <Camera size={32} color={COLORS.ink} />}
             </View>
-            <Text className="mt-2 text-sm font-bold text-akita-600">{photoUri ? 'Trocar foto' : 'Adicionar foto'}</Text>
+            <Text className="mt-2 text-sm font-bold text-hero-500">{photoUri ? 'Trocar foto' : 'Adicionar foto'}</Text>
           </Pressable>
 
           <Field label="Nome">
-            <Input value={name} onChangeText={setName} placeholder="Ex.: Thor" />
+            <TextField value={name} onChangeText={setName} placeholder="Ex.: Thor" />
           </Field>
           <Field label="Raça">
-            <Input value={breed} onChangeText={setBreed} placeholder="Ex.: Akita Inu, SRD…" />
+            <TextField value={breed} onChangeText={setBreed} placeholder="Ex.: Akita Inu, SRD…" />
           </Field>
           <Field label="Idade">
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Input value={years} onChangeText={setYears} placeholder="0" keyboardType="number-pad" suffix="anos" />
+                <TextField value={years} onChangeText={setYears} placeholder="0" keyboardType="number-pad" suffix="anos" />
               </View>
               <View className="flex-1">
-                <Input value={months} onChangeText={setMonths} placeholder="0" keyboardType="number-pad" suffix="meses" />
+                <TextField value={months} onChangeText={setMonths} placeholder="0" keyboardType="number-pad" suffix="meses" />
               </View>
             </View>
+          </Field>
+          <Field label="Peso">
+            <TextField value={weight} onChangeText={setWeight} placeholder="Ex.: 12,5" keyboardType="decimal-pad" suffix="kg" />
           </Field>
 
           <Field label="Porte">
@@ -98,7 +111,7 @@ export default function PetEditScreen() {
             </View>
           </Field>
 
-          <Field label="Desafios de comportamento">
+          <Field label="Foco do treinamento">
             <View className="flex-row flex-wrap gap-2">
               {CHALLENGES.map((c) => (
                 <Chip
@@ -112,44 +125,10 @@ export default function PetEditScreen() {
           </Field>
         </ScrollView>
 
-        <View className="border-t-2 border-gray-100 px-5 py-4">
-          <ChunkyButton label="Salvar" disabled={!canSave} onPress={handleSave} />
+        <View className="border-t-2 border-ink-900 bg-white px-5 py-4">
+          <HeroButton label="Salvar" disabled={!canSave} onPress={handleSave} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <View className="mt-5">
-      <Text className="mb-2 text-sm font-extrabold uppercase tracking-wide text-ink-400">{label}</Text>
-      {children}
-    </View>
-  );
-}
-
-function Input({ suffix, ...props }: ComponentProps<typeof TextInput> & { suffix?: string }) {
-  return (
-    <View className="flex-row items-center rounded-2xl border-2 border-gray-200 bg-cloud px-4">
-      <TextInput className="flex-1 py-3.5 text-base text-ink-900" placeholderTextColor={COLORS.lockedDark} {...props} />
-      {suffix && <Text className="ml-2 font-bold text-ink-400">{suffix}</Text>}
-    </View>
-  );
-}
-
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: active }}
-      className="rounded-full border-2 px-3.5 py-2"
-      style={{ borderColor: active ? COLORS.ice : '#E5E5E5', backgroundColor: active ? '#DDF4FF' : '#FFFFFF' }}
-    >
-      <Text className="text-sm font-bold" style={{ color: active ? COLORS.ice : COLORS.inkSoft }}>
-        {label}
-      </Text>
-    </Pressable>
   );
 }

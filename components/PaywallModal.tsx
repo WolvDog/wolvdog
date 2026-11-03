@@ -5,28 +5,28 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
-import { COLORS } from '@/constants/theme';
+import { COLORS, FONTS } from '@/constants/theme';
 import { PRO_BENEFITS, SUBSCRIPTION_PLANS } from '@/data/mockData';
 import { showAlert } from '@/services/dialog';
 import { PurchasesService } from '@/services/purchases';
 import { type PaywallSource, useAppStore } from '@/store/useAppStore';
 import type { SubscriptionPlan } from '@/types';
 
-import { ChunkyButton } from './ChunkyButton';
+import { HeroButton } from './HeroButton';
 import { Logan } from './Logan';
 
 const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
   locked_module: {
     title: 'Desbloqueie a próxima fase!',
-    logan: 'Você mandou muito bem na Fase 1! Bora virar uma dupla de heróis completa?',
+    logan: 'Você mandou muito bem nas primeiras missões! Bora virar uma dupla de heróis completa?',
   },
   profile: {
     title: 'Vire um Tutor Herói',
     logan: 'Com o Pro, eu te acompanho em TODOS os desafios do seu cão. Prometo!',
   },
   streak_freeze: {
-    title: 'Proteja sua ofensiva',
-    logan: 'Pro ganha 2 escudos por semana. Nada de perder seu foguinho!',
+    title: 'Proteja sua sequência',
+    logan: 'No Pro eu guardo 2 Ossos Reserva por semana pra você. Nada de perder a sequência!',
   },
   add_pet: {
     title: 'Mais pets, mais diversão',
@@ -89,7 +89,7 @@ export function PaywallModal() {
       <View className="flex-1 bg-white">
         <ScrollView contentContainerStyle={{ paddingBottom: 24 }} bounces={false}>
           <LinearGradient
-            colors={[COLORS.heroDark, COLORS.hero, '#3B7BFF']}
+            colors={[COLORS.ink, COLORS.heroDark, COLORS.hero]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ paddingTop: insets.top + 12, paddingBottom: 28, paddingHorizontal: 20 }}
@@ -105,10 +105,12 @@ export function PaywallModal() {
 
             <View className="mt-2 items-center">
               <Logan size={120} mood="hero" />
-              <View className="mt-3 rounded-full bg-yellow-400 px-3 py-1">
-                <Text className="text-xs font-extrabold tracking-widest text-yellow-900">WOLVERBARK PRO</Text>
+              <View className="mt-3 rotate-[-2deg] rounded-md border-2 border-ink-900 bg-claw-500 px-3 py-1">
+                <Text style={{ fontFamily: FONTS.display, fontSize: 13, letterSpacing: 2, color: COLORS.ink }}>WOLVERBARK PRO</Text>
               </View>
-              <Text className="mt-3 text-center text-3xl font-extrabold text-white">{headline.title}</Text>
+              <Text className="mt-3 text-center" style={{ fontFamily: FONTS.display, fontSize: 32, color: COLORS.white }}>
+                {headline.title}
+              </Text>
               <Text className="mt-2 text-center text-base leading-6 text-white/90">“{headline.logan}”</Text>
             </View>
           </LinearGradient>
@@ -116,30 +118,32 @@ export function PaywallModal() {
           <View className="px-5 pt-6">
             {PRO_BENEFITS.map((b) => (
               <View key={b.title} className="mb-4 flex-row items-start">
-                <View className="h-11 w-11 items-center justify-center rounded-2xl bg-akita-50">
+                <View className="h-11 w-11 items-center justify-center rounded-lg border-2 border-ink-900 bg-claw-100">
                   <Text className="text-xl">{b.icon}</Text>
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="text-base font-extrabold text-ink-900">{b.title}</Text>
+                  <Text className="text-base font-bold text-ink-900">{b.title}</Text>
                   <Text className="text-sm leading-5 text-ink-600">{b.description}</Text>
                 </View>
               </View>
             ))}
 
-            <Text className="mb-3 mt-2 text-lg font-extrabold text-ink-900">Escolha seu plano</Text>
+            <Text className="mb-3 mt-2" style={{ fontFamily: FONTS.display, fontSize: 20, color: COLORS.ink }}>
+              ESCOLHA SEU PLANO
+            </Text>
             {plans.map((plan) => (
               <PlanCard key={plan.id} plan={plan} selected={plan.id === selectedId} onPress={() => setSelectedId(plan.id)} />
             ))}
 
             <View className="mt-2 flex-row items-center justify-center">
-              <Check size={16} color={COLORS.leaf} strokeWidth={3} />
+              <Check size={16} color={COLORS.hero} strokeWidth={3} />
               <Text className="ml-1.5 text-sm font-bold text-ink-600">Sem cobrança hoje · cancele quando quiser</Text>
             </View>
           </View>
         </ScrollView>
 
-        <View className="border-t-2 border-gray-100 px-5 pt-4" style={{ paddingBottom: insets.bottom + 12 }}>
-          <ChunkyButton
+        <View className="border-t-2 border-ink-900 px-5 pt-4" style={{ paddingBottom: insets.bottom + 12 }}>
+          <HeroButton
             label={`Começar ${selected.trialDays} dias grátis`}
             variant="primary"
             loading={purchasing}
@@ -149,7 +153,7 @@ export function PaywallModal() {
             Após o teste, {selected.priceLabel}. Renovação automática pela App Store / Google Play.
           </Text>
           <Pressable onPress={handleRestore} disabled={restoring} className="mt-2 py-1">
-            <Text className="text-center text-sm font-bold text-ice-500">
+            <Text className="text-center text-sm font-bold text-hero-500">
               {restoring ? 'Restaurando…' : 'Restaurar compras'}
             </Text>
           </Pressable>
@@ -165,36 +169,37 @@ function PlanCard({ plan, selected, onPress }: { plan: SubscriptionPlan; selecte
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      className="mb-3 rounded-2xl border-2 px-4 py-4"
+      className="mb-3 rounded-xl px-4 py-4"
       style={{
-        borderColor: selected ? COLORS.ice : '#E5E5E5',
-        backgroundColor: selected ? '#EEF9FF' : '#FFFFFF',
+        borderWidth: selected ? 2.5 : 2,
+        borderColor: selected ? COLORS.ink : '#D5D8DE',
+        backgroundColor: selected ? COLORS.heroLight : COLORS.white,
       }}
     >
       {plan.badge && (
-        <View className="absolute -top-3 right-4 rounded-full bg-akita-500 px-2.5 py-0.5">
-          <Text className="text-[11px] font-extrabold text-white">{plan.badge}</Text>
+        <View className="absolute -top-3 right-4 rounded-md border-2 border-ink-900 bg-claw-500 px-2 py-0.5">
+          <Text className="text-[11px] font-bold text-ink-900">{plan.badge}</Text>
         </View>
       )}
       <View className="flex-row items-center">
         <View
-          className="h-6 w-6 items-center justify-center rounded-full border-2"
-          style={{ borderColor: selected ? COLORS.ice : '#CFCFCF', backgroundColor: selected ? COLORS.ice : 'transparent' }}
+          className="h-6 w-6 items-center justify-center rounded-md border-2"
+          style={{ borderColor: COLORS.ink, backgroundColor: selected ? COLORS.claw : COLORS.white }}
         >
-          {selected && <Check size={14} color="#FFFFFF" strokeWidth={4} />}
+          {selected && <Check size={14} color={COLORS.ink} strokeWidth={4} />}
         </View>
         <View className="ml-3 flex-1">
           <View className="flex-row items-center">
-            <Text className="text-base font-extrabold text-ink-900">{plan.title}</Text>
+            <Text className="text-base font-bold text-ink-900">{plan.title}</Text>
             {plan.savingsPercent ? (
-              <View className="ml-2 rounded-md bg-leaf-100 px-1.5 py-0.5">
-                <Text className="text-[11px] font-extrabold text-leaf-600">-{plan.savingsPercent}%</Text>
+              <View className="ml-2 rounded-md bg-hero-500 px-1.5 py-0.5">
+                <Text className="text-[11px] font-bold text-white">-{plan.savingsPercent}%</Text>
               </View>
             ) : null}
           </View>
           <Text className="text-sm text-ink-600">{plan.priceLabel}</Text>
         </View>
-        <Text className="text-base font-extrabold text-ink-900">{plan.pricePerMonthLabel}</Text>
+        <Text style={{ fontFamily: FONTS.display, fontSize: 17, color: COLORS.ink }}>{plan.pricePerMonthLabel}</Text>
       </View>
     </Pressable>
   );

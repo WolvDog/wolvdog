@@ -503,7 +503,7 @@ const module3Lessons: Lesson[] = [
         'Escolha uma rua tranquila ou o corredor do prédio.',
         'Ande normalmente. Guia esticou? PARE. Fique em silêncio.',
         'Guia ficou em "J"? "Isso!" + petisco ao lado da sua perna + volte a andar.',
-        'Se ficar muito tempo parado, dê meia-volta (prévia da próxima lição!).',
+        'Se ficar muito tempo parado, dê meia-volta (prévia da próxima missão!).',
         'Encerre com 1 minuto de "passeio livre" para farejar à vontade.',
       ],
       timerSeconds: 300,
@@ -693,7 +693,7 @@ const module4Lessons: Lesson[] = [
     },
     victory: {
       loganSpeech: 'TODAS AS FASES COMPLETAS! Você é oficialmente um Tutor Herói WolverBark! AUUUUU!',
-      nextTip: 'Revise as lições favoritas toda semana — treino é como músculo: se não usar, enfraquece.',
+      nextTip: 'Revise as missões favoritas toda semana — treino é como músculo: se não usar, enfraquece.',
     },
   }),
 ];
@@ -709,8 +709,8 @@ export const MODULES: Module[] = [
     title: 'Boas Maneiras & Xixi no Lugar Certo',
     subtitle: 'Fase 1',
     description: 'A base de tudo: comunicação, rotina de banheiro e educação em casa.',
-    color: '#58CC02',
-    colorDark: '#46A302',
+    color: '#FFC72C',
+    colorDark: '#E5A800',
     isFree: true,
     lessons: module1Lessons,
   },
@@ -720,8 +720,8 @@ export const MODULES: Module[] = [
     title: 'Comandos Básicos',
     subtitle: 'Fase 2 · Senta, Fica, Junto',
     description: 'Os comandos clássicos que todo cão educado precisa saber.',
-    color: '#1CB0F6',
-    colorDark: '#1899D6',
+    color: '#3B5CC4',
+    colorDark: '#1E3A8A',
     isFree: false,
     lessons: module2Lessons,
   },
@@ -742,8 +742,9 @@ export const MODULES: Module[] = [
     title: 'Ansiedade & Autocontrole',
     subtitle: 'Fase 4',
     description: 'Calma, paciência e confiança para lidar com o mundo.',
-    color: '#CE82FF',
-    colorDark: '#A568CC',
+    // "Adamantium": cinza metálico
+    color: '#9AA5B8',
+    colorDark: '#6B7689',
     isFree: false,
     lessons: module4Lessons,
   },
@@ -810,8 +811,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 ];
 
 export const PRO_BENEFITS = [
-  { icon: '📚', title: '+50 lições ilimitadas', description: 'Todas as fases desbloqueadas, com conteúdo novo todo mês.' },
+  { icon: '📚', title: '+50 missões ilimitadas', description: 'Todas as fases desbloqueadas, com conteúdo novo todo mês.' },
   { icon: '🧠', title: 'Comportamentos complexos', description: 'Reatividade, ansiedade, latidos e destruição de objetos.' },
-  { icon: '🐾', title: 'Múltiplos perfis de pets', description: 'Treine todos os seus cães, cada um com sua trilha.' },
-  { icon: '🛡️', title: 'Escudos de Ofensiva extras', description: '2 escudos por semana para proteger seu streak.' },
+  { icon: '🐾', title: 'Múltiplos perfis de pets', description: 'Treine todos os seus cães, cada um com sua jornada.' },
+  { icon: '🦴', title: 'Ossos Reserva extras', description: '2 ossos por semana para proteger sua sequência de treinos.' },
 ] as const;

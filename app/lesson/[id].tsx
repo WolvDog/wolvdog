@@ -4,13 +4,13 @@ import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ChunkyButton } from '@/components/ChunkyButton';
+import { HeroButton } from '@/components/HeroButton';
 import { ConceptStepView } from '@/components/lesson/ConceptStepView';
 import { PracticeStepView } from '@/components/lesson/PracticeStepView';
 import { ValidationStepView } from '@/components/lesson/ValidationStepView';
 import { VictoryStepView } from '@/components/lesson/VictoryStepView';
 import { LoganSays } from '@/components/LoganSays';
-import { ProgressBar } from '@/components/ProgressBar';
+import { SegmentedProgress } from '@/components/ProgressBar';
 import { COLORS } from '@/constants/theme';
 import { getLessonById, getModuleById } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
@@ -22,7 +22,7 @@ import type { ValidationOption } from '@/types';
 const CTA_LABEL = {
   concept: 'Entendi!',
   practice: 'Treino feito',
-  validation: 'Concluir lição',
+  validation: 'Cumprir missão',
   victory: 'Continuar',
 } as const;
 
@@ -50,8 +50,8 @@ export default function LessonScreen() {
   if (!lesson || !module) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white px-8">
-        <LoganSays layout="top" mood="thinking" text="Hmm, farejei por toda parte e não achei essa lição." />
-        <ChunkyButton className="mt-6 w-full" label="Voltar para a trilha" onPress={() => router.back()} />
+        <LoganSays layout="top" mood="thinking" text="Hmm, farejei por toda parte e não achei essa missão." />
+        <HeroButton className="mt-6 w-full" label="Voltar para a trilha" onPress={() => router.back()} />
       </SafeAreaView>
     );
   }
@@ -66,25 +66,24 @@ export default function LessonScreen() {
           mood="thinking"
           text={
             access.requiresPro
-              ? 'Essa lição faz parte do WolverBark Pro. Bora desbloquear juntos?'
-              : 'Calma, campeão! Conclua as lições anteriores para liberar esta.'
+              ? 'Essa missão faz parte do WolverBark Pro. Bora desbloquear juntos?'
+              : 'Calma, campeão! Cumpra as missões anteriores para liberar esta.'
           }
         />
         {access.requiresPro && (
-          <ChunkyButton className="mt-6 w-full" label="Conhecer o Pro" variant="hero" onPress={() => openPaywall('locked_module')} />
+          <HeroButton className="mt-6 w-full" label="Conhecer o Pro" variant="hero" onPress={() => openPaywall('locked_module')} />
         )}
-        <ChunkyButton className="mt-3 w-full" label="Voltar para a trilha" variant="secondary" onPress={() => router.back()} />
+        <HeroButton className="mt-3 w-full" label="Voltar para a trilha" variant="secondary" onPress={() => router.back()} />
       </SafeAreaView>
     );
   }
 
   const step = lesson.steps[stepIndex]!;
   const isVictory = step.type === 'victory';
-  const progress = isVictory ? 1 : stepIndex / (lesson.steps.length - 1);
 
   const handleClose = async () => {
     if (isVictory) return router.back();
-    const leave = await showConfirm('Sair da lição?', 'O Logan guarda seu progresso para você continuar depois.', {
+    const leave = await showConfirm('Sair da missão?', 'O Logan guarda seu progresso para você continuar depois.', {
       confirmText: 'Sair',
       cancelText: 'Continuar treinando',
       destructive: true,
@@ -107,11 +106,11 @@ export default function LessonScreen() {
     <SafeAreaView className="flex-1 bg-white">
       {/* Topo: fechar + barra de progresso */}
       <View className="flex-row items-center px-4 pb-2 pt-2">
-        <Pressable onPress={handleClose} accessibilityRole="button" accessibilityLabel="Fechar lição" hitSlop={12}>
-          <X size={28} color={COLORS.lockedDark} strokeWidth={3} />
+        <Pressable onPress={handleClose} accessibilityRole="button" accessibilityLabel="Fechar missão" hitSlop={12}>
+          <X size={28} color={COLORS.ink} strokeWidth={3} />
         </Pressable>
         <View className="ml-4 flex-1">
-          <ProgressBar progress={progress} color={module.color} />
+          <SegmentedProgress total={lesson.steps.length} current={stepIndex} color={module.color} />
         </View>
       </View>
 
@@ -134,10 +133,10 @@ export default function LessonScreen() {
         {step.type === 'victory' && <VictoryStepView step={step} result={result} />}
       </ScrollView>
 
-      <View className="border-t-2 border-gray-100 px-5 pb-4 pt-4">
-        <ChunkyButton
+      <View className="border-t-2 border-ink-900 px-5 pb-4 pt-4">
+        <HeroButton
           label={CTA_LABEL[step.type]}
-          variant={isVictory ? 'gold' : 'primary'}
+          variant={isVictory ? 'hero' : 'primary'}
           disabled={step.type === 'validation' && !answer}
           onPress={handleNext}
         />

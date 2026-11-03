@@ -1,22 +1,22 @@
 import { Tabs } from 'expo-router';
 import { Map, PawPrint } from 'lucide-react-native';
 
-import { COLORS } from '@/constants/theme';
+import { COLORS, FONTS } from '@/constants/theme';
 
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: COLORS.akita,
+        tabBarActiveTintColor: COLORS.hero,
         tabBarInactiveTintColor: COLORS.lockedDark,
-        tabBarLabelStyle: { fontWeight: '800', fontSize: 12 },
-        tabBarStyle: { borderTopWidth: 2, borderTopColor: '#F0F0F0', height: 64, paddingTop: 6 },
+        tabBarLabelStyle: { fontFamily: FONTS.displayMedium, fontSize: 12, letterSpacing: 0.5 },
+        tabBarStyle: { borderTopWidth: 2, borderTopColor: COLORS.ink, height: 64, paddingTop: 6 },
       }}
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Trilha', tabBarIcon: ({ color, size }) => <Map color={color} size={size} /> }}
+        options={{ title: 'Missões', tabBarIcon: ({ color, size }) => <Map color={color} size={size} /> }}
       />
       <Tabs.Screen
         name="profile"

@@ -36,6 +36,7 @@ export interface Pet {
   /** Idade em meses — facilita a lógica de filhote vs. adulto. */
   ageMonths: number;
   size: PetSize;
+  weightKg?: number;
   photoUri?: string;
   challenges: BehaviorChallenge[];
   createdAt: string;

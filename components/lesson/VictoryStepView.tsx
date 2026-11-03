@@ -1,10 +1,12 @@
-import { Flame, Shield, TrendingUp, Zap } from 'lucide-react-native';
+import { Bone, PawPrint, TrendingUp } from 'lucide-react-native';
 import { type ReactNode, useEffect, useRef } from 'react';
 import { Animated, Dimensions, Easing, Text, View } from 'react-native';
 
+import { ClawMarks } from '@/components/icons';
 import { Logan } from '@/components/Logan';
-import { COLORS } from '@/constants/theme';
+import { days, points, TERMS } from '@/constants/brand';
 import { LEVELS } from '@/constants/gamification';
+import { COLORS, FONTS } from '@/constants/theme';
 import type { LessonCompletionResult } from '@/store/useAppStore';
 import type { VictoryStep } from '@/types';
 
@@ -30,48 +32,52 @@ export function VictoryStepView({ step, result }: VictoryStepViewProps) {
         <Logan size={170} mood="excited" />
       </Animated.View>
 
-      <Text className="mt-4 text-center text-3xl font-extrabold text-akita-600">Lição concluída!</Text>
-      <Text className="mt-2 px-4 text-center text-base leading-6 text-ink-600">“{step.loganSpeech}”</Text>
+      <View className="mt-4 rotate-[-2deg] rounded-lg border-2 border-ink-900 bg-claw-500 px-5 py-1.5">
+        <Text style={{ fontFamily: FONTS.display, fontSize: 30, color: COLORS.ink }}>MISSÃO CUMPRIDA!</Text>
+      </View>
+      <Text className="mt-3 px-4 text-center text-base leading-6 text-ink-600">“{step.loganSpeech}”</Text>
 
       {result && (
         <View className="mt-6 w-full flex-row gap-3">
           <RewardCard
-            icon={<Zap size={22} color={COLORS.gold} fill={COLORS.gold} />}
-            label="XP ganho"
+            icon={<ClawMarks size={22} />}
+            label={`${TERMS.points} ganhas`}
             value={`+${result.xpEarned + result.streakBonusXp}`}
-            color="#E0A800"
+            color={COLORS.ink}
+            accent={COLORS.claw}
           />
           <RewardCard
-            icon={<Flame size={22} color={COLORS.flame} fill={COLORS.flame} />}
-            label={result.streakIncreased ? 'Ofensiva' : 'Ofensiva mantida'}
-            value={`${result.streak.current} ${result.streak.current === 1 ? 'dia' : 'dias'}`}
-            color={COLORS.flame}
+            icon={<PawPrint size={22} color={COLORS.akita} fill={COLORS.akita} />}
+            label={result.streakIncreased ? TERMS.streak : `${TERMS.streak} mantida`}
+            value={days(result.streak.current)}
+            color={COLORS.white}
+            accent={COLORS.hero}
           />
         </View>
       )}
 
       {result && result.streakBonusXp > 0 && (
-        <Banner color={COLORS.flame} icon={<Flame size={18} color={COLORS.flame} />}>
-          Bônus de semana perfeita: +{result.streakBonusXp} XP!
+        <Banner color={COLORS.akitaDark} icon={<PawPrint size={18} color={COLORS.akitaDark} />}>
+          Bônus de semana perfeita: +{points(result.streakBonusXp)}!
         </Banner>
       )}
       {result && result.freezesEarned > 0 && (
-        <Banner color={COLORS.ice} icon={<Shield size={18} color={COLORS.ice} />}>
-          O Logan te deu {result.freezesEarned} Escudo de Ofensiva!
+        <Banner color={COLORS.hero} icon={<Bone size={18} color={COLORS.hero} />}>
+          O Logan guardou {result.freezesEarned} {result.freezesEarned > 1 ? TERMS.freezes : TERMS.freeze} pra você!
         </Banner>
       )}
       {levelTitle && (
         <Banner color={COLORS.hero} icon={<TrendingUp size={18} color={COLORS.hero} />}>
-          Nível {result?.leveledUpTo}: {levelTitle}!
+          Nova {TERMS.level.toLowerCase()}: {levelTitle}!
         </Banner>
       )}
       {result && !result.isFirstCompletion && (
-        <Text className="mt-3 text-center text-xs text-ink-400">Revisão concluída — XP reduzido pela metade.</Text>
+        <Text className="mt-3 text-center text-xs text-ink-400">Missão revisada — metade das garras.</Text>
       )}
 
       {step.nextTip && (
-        <View className="mt-6 w-full rounded-2xl border-2 border-akita-100 bg-akita-50 p-4">
-          <Text className="mb-1 font-extrabold text-akita-700">💡 Para o próximo treino</Text>
+        <View className="mt-6 w-full rounded-xl border-2 border-ink-900 bg-white p-4">
+          <Text className="mb-1 font-bold text-hero-500">💡 Para o próximo treino</Text>
           <Text className="text-sm leading-6 text-ink-600">{step.nextTip}</Text>
         </View>
       )}
@@ -79,15 +85,29 @@ export function VictoryStepView({ step, result }: VictoryStepViewProps) {
   );
 }
 
-function RewardCard({ icon, label, value, color }: { icon: ReactNode; label: string; value: string; color: string }) {
+function RewardCard({
+  icon,
+  label,
+  value,
+  color,
+  accent,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  color: string;
+  accent: string;
+}) {
   return (
-    <View className="flex-1 overflow-hidden rounded-2xl border-2" style={{ borderColor: color }}>
-      <View className="py-1.5" style={{ backgroundColor: color }}>
-        <Text className="text-center text-xs font-extrabold uppercase text-white">{label}</Text>
+    <View className="flex-1 overflow-hidden rounded-xl border-2 border-ink-900">
+      <View className="py-1.5" style={{ backgroundColor: accent }}>
+        <Text className="text-center" style={{ fontFamily: FONTS.display, fontSize: 12, letterSpacing: 1, color }}>
+          {label.toUpperCase()}
+        </Text>
       </View>
       <View className="flex-row items-center justify-center bg-white py-3">
         {icon}
-        <Text className="ml-1.5 text-xl font-extrabold" style={{ color }}>
+        <Text className="ml-1.5" style={{ fontFamily: FONTS.display, fontSize: 22, color: COLORS.ink }}>
           {value}
         </Text>
       </View>
@@ -97,7 +117,7 @@ function RewardCard({ icon, label, value, color }: { icon: ReactNode; label: str
 
 function Banner({ children, icon, color }: { children: ReactNode; icon: ReactNode; color: string }) {
   return (
-    <View className="mt-3 w-full flex-row items-center rounded-xl px-4 py-3" style={{ backgroundColor: `${color}1A` }}>
+    <View className="mt-3 w-full flex-row items-center rounded-lg border-2 px-4 py-3" style={{ borderColor: color, backgroundColor: `${color}14` }}>
       {icon}
       <Text className="ml-2 flex-1 font-bold" style={{ color }}>
         {children}
@@ -106,7 +126,7 @@ function Banner({ children, icon, color }: { children: ReactNode; icon: ReactNod
   );
 }
 
-const CONFETTI = ['🦴', '⭐', '🐾', '🎉', '✨', '🦴', '⭐', '🐾', '🎉', '✨', '🦴', '🐾'];
+const CONFETTI = ['🦴', '⚡', '🐾', '🦴', '💛', '💙', '🦴', '⚡', '🐾', '💛', '💙', '🐾'];
 
 function Confetti() {
   const { width } = Dimensions.get('window');

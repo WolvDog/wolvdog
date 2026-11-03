@@ -1,8 +1,11 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { OptionCard } from '@/components/form';
 import { LoganSays } from '@/components/LoganSays';
 import { COLORS } from '@/constants/theme';
 import type { ValidationOption, ValidationStep } from '@/types';
+
+import { StepHeading } from './StepHeading';
 
 interface ValidationStepViewProps {
   step: ValidationStep;
@@ -15,8 +18,7 @@ export function ValidationStepView({ step, selectedId, onSelect }: ValidationSte
 
   return (
     <View>
-      <Text className="mb-1 text-xs font-extrabold uppercase tracking-widest text-purple-500">Validação do treino</Text>
-      <Text className="mb-5 text-2xl font-extrabold text-ink-900">{step.question}</Text>
+      <StepHeading kicker="Relatório do treino" color={COLORS.clawDark} title={step.question} />
 
       <LoganSays
         text={selected ? selected.loganFeedback : step.loganSpeech}
@@ -25,46 +27,17 @@ export function ValidationStepView({ step, selectedId, onSelect }: ValidationSte
       />
 
       <View className="mt-6" accessibilityRole="radiogroup">
-        {step.options.map((option) => {
-          const active = option.id === selectedId;
-          return (
-            <Pressable
-              key={option.id}
-              onPress={() => onSelect(option)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: active }}
-              className="mb-3"
-            >
-              {({ pressed }) => (
-                <View
-                  style={{
-                    backgroundColor: active ? '#84D8FF' : '#E5E5E5',
-                    borderRadius: 16,
-                    paddingBottom: pressed ? 0 : 4,
-                    marginTop: pressed ? 4 : 0,
-                  }}
-                >
-                  <View
-                    className="flex-row items-center rounded-2xl border-2 px-4 py-4"
-                    style={{
-                      borderColor: active ? '#84D8FF' : '#E5E5E5',
-                      backgroundColor: active ? '#DDF4FF' : '#FFFFFF',
-                    }}
-                  >
-                    <Text className="text-2xl">{option.emoji}</Text>
-                    <Text
-                      className="ml-3 flex-1 text-base font-bold"
-                      style={{ color: active ? COLORS.ice : COLORS.ink }}
-                    >
-                      {option.label}
-                    </Text>
-                  </View>
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
+        {step.options.map((option) => (
+          <OptionCard
+            key={option.id}
+            title={option.label}
+            emoji={option.emoji}
+            active={option.id === selectedId}
+            onPress={() => onSelect(option)}
+          />
+        ))}
       </View>
+      {!selected && <Text className="mt-1 text-center text-xs text-ink-400">Escolha uma opção para cumprir a missão.</Text>}
     </View>
   );
 }

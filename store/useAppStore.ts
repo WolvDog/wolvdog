@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { getLessonById, MOCK_PET, MOCK_USER } from '@/data/mockData';
+import { getLessonById, MOCK_USER } from '@/data/mockData';
 import { repository } from '@/services/api';
 import {
   calculateLessonXp,
@@ -27,8 +27,17 @@ export interface LessonCompletionResult {
 
 export type PaywallSource = 'locked_module' | 'profile' | 'streak_freeze' | 'add_pet';
 
+type PetInput = Omit<Pet, 'id' | 'ownerId' | 'createdAt'> & Partial<Pick<Pet, 'id'>>;
+
+export interface OnboardingInput {
+  tutorName: string;
+  dailyGoalMinutes: User['dailyGoalMinutes'];
+  pet: PetInput;
+}
+
 interface AppState {
   // --- estado persistido ---
+  hasOnboarded: boolean;
   user: User;
   pet: Pet | null;
   isPro: boolean;
@@ -42,7 +51,9 @@ interface AppState {
   lastStreakEvent: { event: Exclude<StreakReconcileEvent, 'none'>; freezesUsed: number } | null;
 
   // --- ações ---
-  savePet: (pet: Omit<Pet, 'id' | 'ownerId' | 'createdAt'> & Partial<Pick<Pet, 'id'>>) => void;
+  completeOnboarding: (input: OnboardingInput) => void;
+  restartOnboarding: () => void;
+  savePet: (pet: PetInput) => void;
   completeLesson: (lessonId: string, difficulty: Difficulty) => LessonCompletionResult | null;
   saveLessonDraft: (lessonId: string, stepIndex: number) => void;
   clearLessonDraft: (lessonId: string) => void;
@@ -67,8 +78,9 @@ const initialStreak: Streak = {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      hasOnboarded: false,
       user: MOCK_USER,
-      pet: MOCK_PET,
+      pet: null,
       isPro: false,
       progress: initialProgress,
       streak: initialStreak,
@@ -77,6 +89,14 @@ export const useAppStore = create<AppState>()(
       hasHydrated: false,
       paywall: { visible: false, source: null },
       lastStreakEvent: null,
+
+      completeOnboarding: ({ tutorName, dailyGoalMinutes, pet }) => {
+        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes } }));
+        get().savePet(pet);
+        set({ hasOnboarded: true });
+      },
+
+      restartOnboarding: () => set({ hasOnboarded: false }),
 
       savePet: (input) => {
         const current = get().pet;
@@ -172,6 +192,7 @@ export const useAppStore = create<AppState>()(
       version: 1,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({
+        hasOnboarded: s.hasOnboarded,
         user: s.user,
         pet: s.pet,
         isPro: s.isPro,

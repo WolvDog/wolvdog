@@ -39,10 +39,10 @@ export function Logan({ size = 96, mood = 'happy', animated = true, style }: Log
   return (
     <Animated.View style={[{ width: size, height: size, transform: [{ translateY }] }, style]}>
       <Svg width={size} height={size} viewBox="0 0 120 120">
-        {/* Bandana / capa */}
-        <Path d="M30 92 Q60 122 90 92 L84 104 Q60 126 36 104 Z" fill={COLORS.heroRed} />
-        <Circle cx={60} cy={108} r={8} fill={COLORS.gold} stroke="#E0A800" strokeWidth={1.5} />
-        <SvgText x={60} y={112} fontSize={10} fontWeight="bold" fill={COLORS.heroRed} textAnchor="middle">
+        {/* Bandana azul com emblema amarelo */}
+        <Path d="M30 92 Q60 122 90 92 L84 104 Q60 126 36 104 Z" fill={COLORS.hero} stroke={COLORS.ink} strokeWidth={1.5} />
+        <Circle cx={60} cy={108} r={8} fill={COLORS.claw} stroke={COLORS.ink} strokeWidth={1.5} />
+        <SvgText x={60} y={112} fontSize={10} fontWeight="bold" fill={COLORS.ink} textAnchor="middle">
           W
         </SvgText>
 
@@ -61,8 +61,15 @@ export function Logan({ size = 96, mood = 'happy', animated = true, style }: Log
         <Ellipse cx={44} cy={44} rx={5} ry={3.5} fill={COLORS.urajiro} />
         <Ellipse cx={76} cy={44} rx={5} ry={3.5} fill={COLORS.urajiro} />
 
-        {/* Máscara de herói */}
-        <Path d="M22 58 Q60 42 98 58 Q94 72 78 70 Q60 62 42 70 Q26 72 22 58 Z" fill={COLORS.hero} />
+        {/* Máscara amarela com detalhes pretos, no estilo do uniforme do Wolverine */}
+        <Path d="M16 50 L30 56 L22 58 Z" fill={COLORS.ink} />
+        <Path d="M104 50 L90 56 L98 58 Z" fill={COLORS.ink} />
+        <Path
+          d="M22 58 Q60 42 98 58 Q94 72 78 70 Q60 62 42 70 Q26 72 22 58 Z"
+          fill={COLORS.claw}
+          stroke={COLORS.ink}
+          strokeWidth={2}
+        />
 
         <Eyes mood={mood} />
 
@@ -84,7 +91,7 @@ function Eyes({ mood }: { mood: LoganMood }) {
   if (mood === 'excited' || mood === 'proud') {
     // Olhos fechados de felicidade: ^ ^
     return (
-      <G stroke="#FFFFFF" strokeWidth={3.5} strokeLinecap="round" fill="none">
+      <G stroke={COLORS.ink} strokeWidth={3.5} strokeLinecap="round" fill="none">
         <Path d="M38 62 Q44 54 50 62" />
         <Path d="M70 62 Q76 54 82 62" />
       </G>
@@ -92,7 +99,7 @@ function Eyes({ mood }: { mood: LoganMood }) {
   }
   if (mood === 'sleepy') {
     return (
-      <G stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round">
+      <G stroke={COLORS.ink} strokeWidth={3} strokeLinecap="round">
         <Path d="M38 61 L50 61" />
         <Path d="M70 61 L82 61" />
       </G>
@@ -102,14 +109,14 @@ function Eyes({ mood }: { mood: LoganMood }) {
   const pupilOffset = mood === 'thinking' ? { x: 2, y: -2 } : { x: 0, y: 0 };
   return (
     <G>
-      <Ellipse cx={44} cy={60} rx={7} ry={7.5} fill="#FFFFFF" />
-      <Ellipse cx={76} cy={60} rx={7} ry={7.5} fill="#FFFFFF" />
+      <Ellipse cx={44} cy={60} rx={7} ry={7.5} fill="#FFFFFF" stroke={COLORS.ink} strokeWidth={1.2} />
+      <Ellipse cx={76} cy={60} rx={7} ry={7.5} fill="#FFFFFF" stroke={COLORS.ink} strokeWidth={1.2} />
       <Circle cx={45 + pupilOffset.x} cy={61 + pupilOffset.y} r={4.2} fill={COLORS.ink} />
       <Circle cx={77 + pupilOffset.x} cy={61 + pupilOffset.y} r={4.2} fill={COLORS.ink} />
       <Circle cx={46.5 + pupilOffset.x} cy={59 + pupilOffset.y} r={1.4} fill="#FFFFFF" />
       <Circle cx={78.5 + pupilOffset.x} cy={59 + pupilOffset.y} r={1.4} fill="#FFFFFF" />
       {mood === 'hero' && (
-        <G stroke={COLORS.heroDark} strokeWidth={2.5} strokeLinecap="round">
+        <G stroke={COLORS.ink} strokeWidth={2.5} strokeLinecap="round">
           <Path d="M36 50 L50 53" />
           <Path d="M84 50 L70 53" />
         </G>
