@@ -1,9 +1,136 @@
-<!-- Cole em Authentication → Emails → "Magic Link" (e também em "Confirm signup"). Assunto sugerido: Seu código WolverBark: {{ .Token }} -->
-<div style="font-family: Arial, sans-serif; max-width: 420px; margin: 0 auto; padding: 24px; background: #ffffff; border: 2px solid #111111; border-radius: 12px;">
-  <p style="margin: 0 0 4px; font-size: 13px; letter-spacing: 2px; font-weight: bold; color: #1E3A8A;">WOLVERBARK</p>
-  <h2 style="margin: 0 0 16px; color: #111111;">Seu código de acesso 🐾</h2>
-  <p style="color: #4A4F5C; line-height: 1.5;">Au au! Digite este código no app para entrar:</p>
-  <p style="font-size: 36px; font-weight: bold; letter-spacing: 10px; text-align: center; background: #FFC72C; border: 2px solid #111111; border-radius: 10px; padding: 14px 0; margin: 20px 0; color: #111111;">{{ .Token }}</p>
-  <p style="color: #8B909C; font-size: 13px; line-height: 1.5;">O código expira em 1 hora. Se não foi você que pediu, pode ignorar este e-mail.</p>
-  <p style="color: #8B909C; font-size: 13px;">— Logan, seu mentor no WolverBark</p>
-</div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!--
+    WolverBark — e-mail do código de acesso (OTP)
+    Onde colar: Supabase → Authentication → Emails → "Magic Link" (e também "Confirm signup")
+    Assunto sugerido: 🐾 Seu código WolverBark: {{ .Token }}
+    Feito com tabelas e estilos inline para funcionar no Gmail, Outlook, Apple Mail e apps de celular.
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>Seu código WolverBark</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0; padding:0; background-color:#F4F5F7;">
+  <!-- Texto de pré-visualização (aparece na lista de e-mails, escondido no corpo) -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#F4F5F7;">
+    Seu código é {{ .Token }} — digite no app para entrar. Vale por 1 hora.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F4F5F7;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
+
+          <!-- Cabeçalho -->
+          <tr>
+            <td style="background-color:#111111; border:3px solid #111111; border-radius:14px 14px 0 0; padding:18px 24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:'Oswald','Arial Black','Arial',sans-serif; font-weight:700; font-size:26px; letter-spacing:2px; color:#FFC72C;">
+                    WOLVERBARK
+                  </td>
+                  <td align="right" style="font-family:'Arial Black',Arial,sans-serif; font-size:22px; color:#FFC72C; letter-spacing:-2px;">
+                    ///
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Faixa azul -->
+          <tr>
+            <td style="background-color:#1E3A8A; border-left:3px solid #111111; border-right:3px solid #111111; height:8px; line-height:8px; font-size:0;">&nbsp;</td>
+          </tr>
+
+          <!-- Corpo -->
+          <tr>
+            <td style="background-color:#FFFFFF; border:3px solid #111111; border-top:0; border-radius:0 0 14px 14px; padding:28px 24px 24px;">
+
+              <!-- Logan + balão -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="64" valign="top" style="padding-right:12px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center" valign="middle" width="56" height="56" style="width:56px; height:56px; background-color:#FFC72C; border:3px solid #111111; border-radius:12px; font-size:30px; line-height:56px;">
+                          🐕
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td valign="top">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color:#FFFFFF; border:2px solid #111111; border-radius:12px; padding:12px 14px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:22px; color:#111111;">
+                          <strong>Au au!</strong> Aqui é o Logan. Pediram um código para entrar no WolverBark com o e-mail <strong>{{ .Email }}</strong>.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Título -->
+              <p style="margin:26px 0 6px; font-family:'Oswald','Arial Black',Arial,sans-serif; font-weight:700; font-size:24px; line-height:30px; color:#111111; text-transform:uppercase;">
+                Seu código de acesso
+              </p>
+              <p style="margin:0 0 18px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:22px; color:#4A4F5C;">
+                Digite estes números no app para continuar a jornada:
+              </p>
+
+              <!-- Código (bordas mais grossas embaixo/direita imitam a sombra de quadrinho do app) -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="background-color:#FFC72C; border:3px solid #111111; border-right-width:7px; border-bottom-width:7px; border-radius:12px; padding:18px 8px;">
+                    <span style="font-family:'Courier New',Courier,monospace; font-weight:700; font-size:40px; line-height:44px; letter-spacing:12px; padding-left:12px; color:#111111;">{{ .Token }}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Validade -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+                <tr>
+                  <td style="background-color:#DCE6FB; border-left:5px solid #1E3A8A; border-radius:6px; padding:12px 14px; font-family:Arial,Helvetica,sans-serif; font-size:14px; line-height:20px; color:#0F1F4D;">
+                    ⏱️ O código vale por <strong>1 hora</strong> e só pode ser usado uma vez.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Segurança -->
+              <p style="margin:22px 0 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:20px; color:#8B909C;">
+                🔒 Nunca compartilhe este código. A equipe WolverBark nunca vai pedir ele para você.<br>
+                Não foi você? Pode ignorar este e-mail com tranquilidade — sua conta continua segura.
+              </p>
+
+              <!-- Assinatura -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px; border-top:2px dashed #E4E6EB;">
+                <tr>
+                  <td style="padding-top:16px; font-family:Arial,Helvetica,sans-serif; font-size:14px; line-height:20px; color:#111111;">
+                    Bons treinos! 🦴<br>
+                    <strong>Logan</strong> <span style="color:#8B909C;">· mentor oficial do WolverBark</span>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Rodapé -->
+          <tr>
+            <td align="center" style="padding:18px 8px 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:18px; color:#8B909C;">
+              Você recebeu este e-mail porque um acesso ao WolverBark foi solicitado.<br>
+              WolverBark · Adestramento gamificado para tutores de verdade
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
