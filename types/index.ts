@@ -14,6 +14,13 @@ export interface User {
   createdAt: string; // ISO
   /** Meta diária em minutos escolhida no onboarding (5, 10 ou 15). */
   dailyGoalMinutes: 5 | 10 | 15;
+  reminder: ReminderSettings;
+}
+
+export interface ReminderSettings {
+  enabled: boolean;
+  hour: number;
+  minute: number;
 }
 
 export type PetSize = 'mini' | 'pequeno' | 'medio' | 'grande' | 'gigante';

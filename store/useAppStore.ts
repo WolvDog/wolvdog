@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { getLessonById, MOCK_USER } from '@/data/mockData';
-import { repository } from '@/services/api';
+import type { CloudSnapshot } from '@/services/api';
 import {
   calculateLessonXp,
   getLevelInfo,
@@ -12,7 +12,7 @@ import {
   type StreakReconcileEvent,
   toDateKey,
 } from '@/services/gamification';
-import type { Difficulty, LessonCompletion, Pet, Streak, User, UserProgress } from '@/types';
+import type { Difficulty, LessonCompletion, Pet, ReminderSettings, Streak, User, UserProgress } from '@/types';
 
 export interface LessonCompletionResult {
   xpEarned: number;
@@ -26,18 +26,22 @@ export interface LessonCompletionResult {
 }
 
 export type PaywallSource = 'locked_module' | 'profile' | 'streak_freeze' | 'add_pet';
+export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 type PetInput = Omit<Pet, 'id' | 'ownerId' | 'createdAt'> & Partial<Pick<Pet, 'id'>>;
 
 export interface OnboardingInput {
   tutorName: string;
   dailyGoalMinutes: User['dailyGoalMinutes'];
+  reminder: ReminderSettings;
   pet: PetInput;
 }
 
 interface AppState {
   // --- estado persistido ---
   hasOnboarded: boolean;
+  /** Tutor escolheu "continuar sem conta" (dados só no aparelho). */
+  authSkipped: boolean;
   user: User;
   pet: Pet | null;
   isPro: boolean;
@@ -47,6 +51,13 @@ interface AppState {
 
   // --- estado efêmero ---
   hasHydrated: boolean;
+  /** Sessão do Supabase já foi verificada na abertura do app. */
+  authReady: boolean;
+  authUserId: string | null;
+  authEmail: string | null;
+  /** Tutor tocou em "Já tenho conta" antes do onboarding — libera a tela de login. */
+  loginRequested: boolean;
+  syncStatus: SyncStatus;
   paywall: { visible: boolean; source: PaywallSource | null };
   lastStreakEvent: { event: Exclude<StreakReconcileEvent, 'none'>; freezesUsed: number } | null;
 
@@ -54,6 +65,7 @@ interface AppState {
   completeOnboarding: (input: OnboardingInput) => void;
   restartOnboarding: () => void;
   savePet: (pet: PetInput) => void;
+  setReminder: (reminder: ReminderSettings) => void;
   completeLesson: (lessonId: string, difficulty: Difficulty) => LessonCompletionResult | null;
   saveLessonDraft: (lessonId: string, stepIndex: number) => void;
   clearLessonDraft: (lessonId: string) => void;
@@ -63,6 +75,15 @@ interface AppState {
   openPaywall: (source: PaywallSource) => void;
   closePaywall: () => void;
   resetProgress: () => void;
+
+  setAuth: (auth: { userId: string; email: string | null } | null) => void;
+  skipAuth: () => void;
+  requestLogin: (requested: boolean) => void;
+  setSyncStatus: (status: SyncStatus) => void;
+  getCloudSnapshot: () => CloudSnapshot;
+  applyCloudSnapshot: (snap: CloudSnapshot) => void;
+  /** Ao sair da conta: limpa os dados locais para não misturar contas no mesmo aparelho. */
+  clearLocalData: () => void;
 }
 
 const initialProgress: UserProgress = { totalXp: 0, completedLessons: {}, xpHistory: [] };
@@ -79,6 +100,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       hasOnboarded: false,
+      authSkipped: false,
       user: MOCK_USER,
       pet: null,
       isPro: false,
@@ -87,11 +109,16 @@ export const useAppStore = create<AppState>()(
       lessonDrafts: {},
 
       hasHydrated: false,
+      authReady: false,
+      authUserId: null,
+      authEmail: null,
+      loginRequested: false,
+      syncStatus: 'idle',
       paywall: { visible: false, source: null },
       lastStreakEvent: null,
 
-      completeOnboarding: ({ tutorName, dailyGoalMinutes, pet }) => {
-        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes } }));
+      completeOnboarding: ({ tutorName, dailyGoalMinutes, reminder, pet }) => {
+        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes, reminder } }));
         get().savePet(pet);
         set({ hasOnboarded: true });
       },
@@ -103,18 +130,19 @@ export const useAppStore = create<AppState>()(
         const pet: Pet = {
           ...input,
           id: input.id ?? current?.id ?? `pet-${Date.now()}`,
-          ownerId: get().user.id,
+          ownerId: get().authUserId ?? get().user.id,
           createdAt: current?.createdAt ?? new Date().toISOString(),
         };
         set({ pet });
-        void repository.upsertPet(pet);
       },
+
+      setReminder: (reminder) => set((s) => ({ user: { ...s.user, reminder } })),
 
       completeLesson: (lessonId, difficulty) => {
         const lesson = getLessonById(lessonId);
         if (!lesson) return null;
 
-        const { progress, streak, isPro, user, lessonDrafts } = get();
+        const { progress, streak, isPro, lessonDrafts } = get();
         const today = toDateKey();
         const previous = progress.completedLessons[lessonId];
 
@@ -147,7 +175,6 @@ export const useAppStore = create<AppState>()(
           streak: activity.streak,
           lessonDrafts: remainingDrafts,
         });
-        void repository.saveLessonCompletion(user.id, completion);
 
         return {
           xpEarned,
@@ -186,13 +213,66 @@ export const useAppStore = create<AppState>()(
 
       resetProgress: () =>
         set({ progress: initialProgress, streak: initialStreak, lessonDrafts: {}, lastStreakEvent: null }),
+
+      setAuth: (auth) =>
+        set({
+          authReady: true,
+          authUserId: auth?.userId ?? null,
+          authEmail: auth?.email ?? null,
+          ...(auth ? { authSkipped: false } : {}),
+        }),
+
+      skipAuth: () => set({ authSkipped: true }),
+
+      requestLogin: (loginRequested) => set({ loginRequested }),
+
+      setSyncStatus: (syncStatus) => set({ syncStatus }),
+
+      getCloudSnapshot: () => {
+        const s = get();
+        return {
+          hasOnboarded: s.hasOnboarded,
+          isPro: s.isPro,
+          user: { name: s.user.name, dailyGoalMinutes: s.user.dailyGoalMinutes, reminder: s.user.reminder },
+          pet: s.pet,
+          progress: s.progress,
+          streak: s.streak,
+        };
+      },
+
+      applyCloudSnapshot: (snap) =>
+        set((s) => ({
+          hasOnboarded: snap.hasOnboarded,
+          // Enquanto o RevenueCat é simulado, mantém o Pro local também.
+          isPro: snap.isPro || s.isPro,
+          user: { ...s.user, ...snap.user },
+          // A foto ainda vive só no aparelho: preserva a local se for o mesmo pet.
+          pet: snap.pet ? { ...snap.pet, photoUri: snap.pet.photoUri ?? (s.pet?.id === snap.pet.id ? s.pet.photoUri : undefined) } : null,
+          progress: snap.progress,
+          streak: snap.streak,
+        })),
+
+      clearLocalData: () =>
+        set({
+          hasOnboarded: false,
+          authSkipped: false,
+          user: MOCK_USER,
+          pet: null,
+          isPro: false,
+          progress: initialProgress,
+          streak: initialStreak,
+          lessonDrafts: {},
+          lastStreakEvent: null,
+          syncStatus: 'idle',
+        }),
     }),
     {
       name: 'wolverbark-store',
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({
         hasOnboarded: s.hasOnboarded,
+        authSkipped: s.authSkipped,
         user: s.user,
         pet: s.pet,
         isPro: s.isPro,
@@ -200,6 +280,14 @@ export const useAppStore = create<AppState>()(
         streak: s.streak,
         lessonDrafts: s.lessonDrafts,
       }),
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<AppState>;
+        // v2: lembretes diários no perfil do tutor.
+        if (version < 2 && state.user) {
+          state.user = { ...MOCK_USER, ...state.user, reminder: state.user.reminder ?? MOCK_USER.reminder };
+        }
+        return state as AppState;
+      },
       onRehydrateStorage: () => () => {
         useAppStore.setState({ hasHydrated: true });
       },

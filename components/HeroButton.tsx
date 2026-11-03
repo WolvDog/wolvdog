@@ -1,8 +1,8 @@
-import * as Haptics from 'expo-haptics';
 import { type ReactNode, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { COLORS, FONTS } from '@/constants/theme';
+import { tap } from '@/services/haptics';
 
 type Variant = 'primary' | 'hero' | 'secondary' | 'danger';
 
@@ -50,7 +50,7 @@ export function HeroButton({ label, onPress, variant = 'primary', disabled, load
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       onPress={() => {
-        if (Platform.OS !== 'web') void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        tap();
         onPress?.();
       }}
       className={className}

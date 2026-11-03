@@ -770,6 +770,7 @@ export const MOCK_USER: User = {
   email: 'tutor@wolverbark.app',
   createdAt: new Date().toISOString(),
   dailyGoalMinutes: 10,
+  reminder: { enabled: false, hour: 19, minute: 0 },
 };
 
 export const MOCK_PET: Pet = {

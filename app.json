@@ -11,7 +11,10 @@
       "bundleIdentifier": "com.wolverbark.app"
     },
     "android": {
-      "package": "com.wolverbark.app"
+      "package": "com.wolverbark.app",
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -19,7 +22,13 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#1E3A8A"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

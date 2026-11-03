@@ -1,19 +1,15 @@
-import * as Haptics from 'expo-haptics';
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import { useState } from 'react';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { LoganSays } from '@/components/LoganSays';
 import { ProgressBar } from '@/components/ProgressBar';
 import { COLORS, FONTS } from '@/constants/theme';
 import { useCountdown } from '@/hooks/useCountdown';
+import { HapticStyle, tap } from '@/services/haptics';
 import type { PracticeStep } from '@/types';
 
 import { StepHeading } from './StepHeading';
-
-function tap(style = Haptics.ImpactFeedbackStyle.Light) {
-  if (Platform.OS !== 'web') void Haptics.impactAsync(style);
-}
 
 export function PracticeStepView({ step }: { step: PracticeStep }) {
   const [checked, setChecked] = useState<Set<number>>(new Set());
@@ -97,7 +93,7 @@ function CardLabel({ children }: { children: string }) {
 }
 
 function TimerCard({ seconds }: { seconds: number }) {
-  const timer = useCountdown(seconds, () => tap(Haptics.ImpactFeedbackStyle.Heavy));
+  const timer = useCountdown(seconds, () => tap(HapticStyle.Heavy));
   const running = timer.status === 'running';
   const finished = timer.status === 'finished';
 
@@ -145,7 +141,7 @@ function RepCounter({ target }: { target: number }) {
   const done = count >= target;
 
   const change = (delta: number) => {
-    tap(delta > 0 && count + 1 === target ? Haptics.ImpactFeedbackStyle.Heavy : Haptics.ImpactFeedbackStyle.Light);
+    tap(delta > 0 && count + 1 === target ? HapticStyle.Heavy : HapticStyle.Light);
     setCount((c) => Math.max(0, c + delta));
   };
 

@@ -5,28 +5,54 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 
 import { Logan } from '@/components/Logan';
 import { PaywallModal } from '@/components/PaywallModal';
 import { COLORS } from '@/constants/theme';
+import { useReminderSync } from '@/hooks/useReminderSync';
+import { isSupabaseConfigured } from '@/services/supabase';
+import { startAuthListener, startAutoSync } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({ Oswald_500Medium, Oswald_700Bold });
-  const hasHydrated = useAppStore((s) => s.hasHydrated);
-  const hasOnboarded = useAppStore((s) => s.hasOnboarded);
-  const reconcileStreakOnOpen = useAppStore((s) => s.reconcileStreakOnOpen);
+  const { hasHydrated, hasOnboarded, authReady, authUserId, authSkipped, loginRequested, syncStatus, reconcileStreakOnOpen } = useAppStore(
+    useShallow((s) => ({
+      hasHydrated: s.hasHydrated,
+      hasOnboarded: s.hasOnboarded,
+      authReady: s.authReady,
+      authUserId: s.authUserId,
+      authSkipped: s.authSkipped,
+      loginRequested: s.loginRequested,
+      syncStatus: s.syncStatus,
+      reconcileStreakOnOpen: s.reconcileStreakOnOpen,
+    })),
+  );
 
   useEffect(() => {
-    if (hasHydrated) reconcileStreakOnOpen();
+    if (!hasHydrated) return;
+    reconcileStreakOnOpen();
+    const stopAuth = startAuthListener();
+    const stopSync = startAutoSync();
+    return () => {
+      stopAuth();
+      stopSync();
+    };
   }, [hasHydrated, reconcileStreakOnOpen]);
 
-  if (!hasHydrated || !fontsLoaded) {
+  useReminderSync();
+
+  const needsAccount = isSupabaseConfigured && !authUserId && !authSkipped;
+  // Depois de entrar numa conta existente, espera os dados da nuvem antes de decidir a tela.
+  const restoringAccount = !!authUserId && !hasOnboarded && syncStatus === 'syncing';
+
+  if (!hasHydrated || !fontsLoaded || !authReady || restoringAccount) {
     return (
       <View className="flex-1 items-center justify-center bg-hero-500">
         <Logan size={140} mood="sleepy" />
         <Text className="mt-4 text-lg font-bold" style={{ color: COLORS.claw }}>
-          WOLVERBARK
+          {restoringAccount ? 'Buscando sua jornada…' : 'WOLVERBARK'}
         </Text>
       </View>
     );
@@ -39,10 +65,14 @@ export default function RootLayout() {
         <Stack.Protected guard={!hasOnboarded}>
           <Stack.Screen name="onboarding" />
         </Stack.Protected>
-        <Stack.Protected guard={hasOnboarded}>
+        <Stack.Protected guard={hasOnboarded && !needsAccount}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="lesson/[id]" options={{ presentation: 'fullScreenModal', gestureEnabled: false }} />
           <Stack.Screen name="pet-edit" options={{ presentation: 'modal' }} />
+        </Stack.Protected>
+        {/* Antes do onboarding, o login só fica disponível sob pedido (o router escolhe a 1ª rota em ordem alfabética). */}
+        <Stack.Protected guard={isSupabaseConfigured && !authUserId && (hasOnboarded || loginRequested)}>
+          <Stack.Screen name="auth" />
         </Stack.Protected>
       </Stack>
       <PaywallModal />

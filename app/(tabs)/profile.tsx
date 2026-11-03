@@ -5,6 +5,7 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
+import { AccountSettings } from '@/components/AccountSettings';
 import { HeroButton } from '@/components/HeroButton';
 import { ClawMarks } from '@/components/icons';
 import { Logan } from '@/components/Logan';
@@ -196,6 +197,8 @@ export default function ProfileScreen() {
             })
           )}
         </View>
+
+        <AccountSettings />
 
         {/* Assinatura */}
         <View className="mt-4 rounded-xl border-2 border-ink-900 bg-white p-5">

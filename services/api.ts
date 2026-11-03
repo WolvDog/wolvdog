@@ -1,28 +1,161 @@
-import type { LessonCompletion, Pet, UserProgress } from '@/types';
+import type { BehaviorChallenge, Difficulty, LessonCompletion, Pet, PetSize, Streak, User, UserProgress } from '@/types';
 
-/**
- * Repositório de dados "Supabase-ready".
- * Hoje tudo vive no Zustand persistido localmente (offline-first). Quando as variáveis
- * EXPO_PUBLIC_SUPABASE_* forem definidas, implemente SupabaseRepository com @supabase/supabase-js
- * seguindo o schema em supabase/schema.sql — o store chama apenas esta interface.
- */
-export interface WolverBarkRepository {
-  upsertPet(pet: Pet): Promise<void>;
-  saveLessonCompletion(userId: string, completion: LessonCompletion): Promise<void>;
-  fetchProgress(userId: string): Promise<UserProgress | null>;
+import { supabase } from './supabase';
+
+/** Tudo o que é sincronizado com a nuvem. Rascunhos de missão ficam só no aparelho. */
+export interface CloudSnapshot {
+  hasOnboarded: boolean;
+  isPro: boolean;
+  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'reminder'>;
+  pet: Pet | null;
+  progress: UserProgress;
+  streak: Streak;
 }
 
-export const isSupabaseConfigured = Boolean(
-  process.env.EXPO_PUBLIC_SUPABASE_URL && process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-);
+/**
+ * Repositório Supabase seguindo supabase/schema.sql.
+ * Estratégia offline-first: o app grava local (Zustand) e envia o estado completo em segundo plano.
+ */
+export const repository = {
+  async pull(userId: string): Promise<CloudSnapshot | null> {
+    if (!supabase) return null;
 
-/** Implementação local: no-op, pois o estado já é persistido pelo store. */
-const localRepository: WolverBarkRepository = {
-  async upsertPet() {},
-  async saveLessonCompletion() {},
-  async fetchProgress() {
-    return null;
+    const [profile, pets, completions, xpEvents, streak] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+      supabase.from('pets').select('*').eq('owner_id', userId).order('created_at').limit(1),
+      supabase.from('lesson_completions').select('*').eq('user_id', userId),
+      supabase.from('xp_events').select('*').eq('user_id', userId).order('seq'),
+      supabase.from('streaks').select('*').eq('user_id', userId).maybeSingle(),
+    ]);
+    const error = profile.error ?? pets.error ?? completions.error ?? xpEvents.error ?? streak.error;
+    if (error) throw error;
+    if (!profile.data) return null;
+
+    const p = profile.data;
+    const petRow = pets.data?.[0];
+
+    return {
+      hasOnboarded: p.has_onboarded,
+      isPro: p.is_pro,
+      user: {
+        name: p.name,
+        dailyGoalMinutes: p.daily_goal_minutes,
+        reminder: { enabled: p.reminder_enabled, hour: p.reminder_hour, minute: p.reminder_minute },
+      },
+      pet: petRow
+        ? {
+            id: petRow.id,
+            ownerId: petRow.owner_id,
+            name: petRow.name,
+            breed: petRow.breed,
+            ageMonths: petRow.age_months,
+            size: petRow.size as PetSize,
+            weightKg: petRow.weight_kg != null ? Number(petRow.weight_kg) : undefined,
+            photoUri: petRow.photo_url ?? undefined,
+            challenges: petRow.challenges as BehaviorChallenge[],
+            createdAt: petRow.created_at,
+          }
+        : null,
+      progress: {
+        totalXp: p.total_xp,
+        completedLessons: Object.fromEntries(
+          (completions.data ?? []).map((c): [string, LessonCompletion] => [
+            c.lesson_id,
+            {
+              lessonId: c.lesson_id,
+              completedAt: c.completed_at,
+              xpEarned: c.xp_earned,
+              difficulty: c.difficulty as Difficulty,
+              timesCompleted: c.times_completed,
+            },
+          ]),
+        ),
+        xpHistory: (xpEvents.data ?? []).map((e) => ({ date: e.date, amount: e.amount, source: e.source })),
+      },
+      streak: streak.data
+        ? {
+            current: streak.data.current,
+            longest: streak.data.longest,
+            lastActiveDate: streak.data.last_active_date,
+            freezesAvailable: streak.data.freezes_available,
+            frozenDates: streak.data.frozen_dates ?? [],
+          }
+        : { current: 0, longest: 0, lastActiveDate: null, freezesAvailable: 1, frozenDates: [] },
+    };
+  },
+
+  async push(userId: string, snap: CloudSnapshot): Promise<void> {
+    if (!supabase) return;
+    const db = supabase;
+
+    // O perfil precisa existir antes das tabelas filhas (chave estrangeira).
+    const profile = await db.from('profiles').upsert({
+      id: userId,
+      name: snap.user.name,
+      daily_goal_minutes: snap.user.dailyGoalMinutes,
+      total_xp: snap.progress.totalXp,
+      has_onboarded: snap.hasOnboarded,
+      reminder_enabled: snap.user.reminder.enabled,
+      reminder_hour: snap.user.reminder.hour,
+      reminder_minute: snap.user.reminder.minute,
+      updated_at: new Date().toISOString(),
+    });
+    if (profile.error) throw profile.error;
+
+    const writes = [
+      db.from('streaks').upsert({
+        user_id: userId,
+        current: snap.streak.current,
+        longest: snap.streak.longest,
+        last_active_date: snap.streak.lastActiveDate,
+        freezes_available: snap.streak.freezesAvailable,
+        frozen_dates: snap.streak.frozenDates,
+      }),
+    ];
+
+    if (snap.pet) {
+      writes.push(
+        db.from('pets').upsert({
+          id: snap.pet.id,
+          owner_id: userId,
+          name: snap.pet.name,
+          breed: snap.pet.breed,
+          age_months: snap.pet.ageMonths,
+          size: snap.pet.size,
+          weight_kg: snap.pet.weightKg ?? null,
+          // Fotos locais (file://) ainda não vão para o Storage — só URLs públicas.
+          photo_url: snap.pet.photoUri?.startsWith('http') ? snap.pet.photoUri : null,
+          challenges: snap.pet.challenges,
+        }),
+      );
+    }
+
+    const completions = Object.values(snap.progress.completedLessons);
+    if (completions.length > 0) {
+      writes.push(
+        db.from('lesson_completions').upsert(
+          completions.map((c) => ({
+            user_id: userId,
+            lesson_id: c.lessonId,
+            completed_at: c.completedAt,
+            xp_earned: c.xpEarned,
+            difficulty: c.difficulty,
+            times_completed: c.timesCompleted,
+          })),
+        ),
+      );
+    }
+
+    if (snap.progress.xpHistory.length > 0) {
+      writes.push(
+        db.from('xp_events').upsert(
+          snap.progress.xpHistory.map((e, seq) => ({ user_id: userId, seq, date: e.date, amount: e.amount, source: e.source })),
+        ),
+      );
+    }
+
+    const results = await Promise.all(writes);
+    const failed = results.find((r) => r.error);
+    if (failed?.error) throw failed.error;
   },
 };
-
-export const repository: WolverBarkRepository = localRepository;

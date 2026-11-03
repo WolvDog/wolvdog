@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 import { ArrowLeft, Camera } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
@@ -22,10 +23,12 @@ import {
 } from '@/constants/labels';
 import { COLORS, FONTS } from '@/constants/theme';
 import { MODULES } from '@/data/mockData';
+import { formatTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
+import { isSupabaseConfigured } from '@/services/supabase';
 import { useAppStore } from '@/store/useAppStore';
 import type { BehaviorChallenge, PetSize, User } from '@/types';
 
-const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'focus', 'goal', 'plan'] as const;
+const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'focus', 'goal', 'reminder', 'plan'] as const;
 type Step = (typeof STEPS)[number];
 
 const SIZES = Object.keys(PET_SIZE_LABELS) as PetSize[];
@@ -38,6 +41,7 @@ const GOALS: { minutes: User['dailyGoalMinutes']; title: string; subtitle: strin
 
 export default function OnboardingScreen() {
   const completeOnboarding = useAppStore((s) => s.completeOnboarding);
+  const requestLogin = useAppStore((s) => s.requestLogin);
 
   const [stepIndex, setStepIndex] = useState(0);
   const [tutorName, setTutorName] = useState('');
@@ -51,6 +55,8 @@ export default function OnboardingScreen() {
   const [months, setMonths] = useState('');
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>([]);
   const [goal, setGoal] = useState<User['dailyGoalMinutes']>(10);
+  const [reminderTime, setReminderTime] = useState<{ hour: number; minute: number } | null>(REMINDER_TIMES[3]);
+  const [askingPermission, setAskingPermission] = useState(false);
 
   const step: Step = STEPS[stepIndex]!;
   const dog = petName.trim() || 'seu cão';
@@ -67,6 +73,7 @@ export default function OnboardingScreen() {
     age: ageMonths > 0,
     focus: true,
     goal: true,
+    reminder: true,
     plan: true,
   };
 
@@ -92,6 +99,9 @@ export default function OnboardingScreen() {
       completeOnboarding({
         tutorName: tutor,
         dailyGoalMinutes: goal,
+        reminder: reminderTime
+          ? { enabled: true, hour: reminderTime.hour, minute: reminderTime.minute }
+          : { enabled: false, hour: 19, minute: 0 },
         pet: {
           name: petName.trim(),
           breed: breed.trim(),
@@ -101,6 +111,16 @@ export default function OnboardingScreen() {
           challenges,
           photoUri,
         },
+      });
+      return;
+    }
+    if (step === 'reminder' && reminderTime && remindersSupported) {
+      // Pede a permissão no momento em que o tutor escolhe o horário (contexto claro = mais aceite).
+      setAskingPermission(true);
+      void requestReminderPermission().then((granted) => {
+        setAskingPermission(false);
+        if (!granted) setReminderTime(null);
+        setStepIndex((i) => i + 1);
       });
       return;
     }
@@ -120,6 +140,20 @@ export default function OnboardingScreen() {
         <View className="px-6 pb-6">
           <HeroButton label="Vamos começar" onPress={next} />
           <Text className="mt-3 text-center text-xs text-white/70">Leva menos de 1 minuto para montar o plano.</Text>
+          {isSupabaseConfigured && (
+            <Pressable
+              onPress={() => {
+                requestLogin(true);
+                // Espera o layout liberar a rota protegida antes de navegar.
+                setTimeout(() => router.push({ pathname: '/auth', params: { mode: 'login' } }), 0);
+              }}
+              className="mt-3 py-1"
+            >
+              <Text className="text-center text-sm font-bold" style={{ color: COLORS.claw }}>
+                Já tenho conta — entrar
+              </Text>
+            </Pressable>
+          )}
         </View>
       </SafeAreaView>
     );
@@ -265,6 +299,30 @@ export default function OnboardingScreen() {
             </>
           )}
 
+          {step === 'reminder' && (
+            <>
+              <LoganSays
+                mood="happy"
+                text={`Posso te lembrar todo dia da missão de ${dog}? Prometo não encher o saco: se você já treinou, eu fico quietinho.`}
+              />
+              <Field label="Horário do lembrete">
+                {REMINDER_TIMES.map((t) => (
+                  <OptionCard
+                    key={t.label}
+                    title={`${t.label} · ${formatTime(t.hour, t.minute)}`}
+                    emoji={t.emoji}
+                    active={reminderTime?.hour === t.hour && reminderTime.minute === t.minute}
+                    onPress={() => setReminderTime({ hour: t.hour, minute: t.minute })}
+                  />
+                ))}
+                <OptionCard title="Sem lembretes" emoji="🔕" active={reminderTime === null} onPress={() => setReminderTime(null)} />
+              </Field>
+              {!remindersSupported && (
+                <Text className="mt-2 text-xs text-ink-400">Os lembretes funcionam no app do celular.</Text>
+              )}
+            </>
+          )}
+
           {step === 'plan' && (
             <>
               <LoganSays layout="top" size={110} mood="proud" text={`Plano pronto, ${tutor}! Eu e ${dog} vamos formar uma dupla imbatível.`} />
@@ -288,6 +346,10 @@ export default function OnboardingScreen() {
                 </View>
                 <View className="p-4">
                   <SummaryRow label="Meta diária" value={`${goal} min`} />
+                  <SummaryRow
+                    label="Lembrete do Logan"
+                    value={reminderTime ? formatTime(reminderTime.hour, reminderTime.minute) : 'Desligado'}
+                  />
                   <SummaryRow label="Primeira missão" value="O marcador mágico" />
                   <Text className="mb-2 mt-3 text-xs font-bold uppercase text-ink-400">Fases prioritárias</Text>
                   {focusPhases.length === 0 ? (
@@ -316,6 +378,7 @@ export default function OnboardingScreen() {
             label={step === 'plan' ? 'Começar a jornada' : step === 'focus' && challenges.length === 0 ? 'Pular por enquanto' : 'Continuar'}
             variant={step === 'plan' ? 'hero' : 'primary'}
             disabled={!canContinue[step]}
+            loading={askingPermission}
             onPress={next}
           />
         </View>

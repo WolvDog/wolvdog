@@ -47,7 +47,24 @@ Paleta do uniforme do Wolverine (amarelo `#FFC72C`, azul `#1E3A8A`, preto e bran
 - Fase 1 é gratuita; demais fases exigem Pro e a conclusão da fase anterior.
 - Primeiro acesso passa pelo onboarding (`app/onboarding.tsx`): tutor, cão, raça, peso/porte, idade, foco e meta diária.
 
+## Conta e nuvem (Supabase)
+
+Sem `.env` o app roda 100% local (sem login). Para ativar:
+
+1. Crie um projeto em [supabase.com](https://supabase.com) (plano grátis).
+2. **SQL Editor →** cole e rode `supabase/schema.sql`.
+3. **Authentication → Providers → Email:** para testes, desligue "Confirm email".
+4. **Project Settings → API:** copie a *Project URL* e a *anon public key* para um arquivo `.env` (veja `.env.example`).
+5. Reinicie o Expo com `--clear`.
+
+Fluxo: o onboarding acontece primeiro; depois o tutor cria conta (ou continua sem conta). Login em conta existente restaura a jornada da nuvem; conta nova envia o que já foi feito no aparelho. Alterações são sincronizadas em segundo plano (`services/sync.ts`).
+
+## Lembretes diários
+
+Notificações locais (`services/notifications.ts`) agendadas para os próximos 7 dias no horário escolhido; o lembrete do dia é pulado se o tutor já treinou. Reagendadas ao abrir o app e ao cumprir missões. Não funcionam no navegador.
+
 ## Próximos passos de integração
 
-- **RevenueCat:** `npx expo install react-native-purchases` e implementar `services/purchases.ts` (interface já pronta).
-- **Supabase:** preencher `.env` (ver `.env.example`), aplicar `supabase/schema.sql` e implementar `WolverBarkRepository` em `services/api.ts`.
+- **RevenueCat:** `npx expo install react-native-purchases` e implementar `services/purchases.ts` (interface já pronta). `is_pro` no banco só deve ser alterado pelo webhook do RevenueCat.
+- **Fotos do pet:** enviar para o Supabase Storage (hoje ficam só no aparelho).
+- **Login com Google/Apple:** exige development build (não funciona no Expo Go).
