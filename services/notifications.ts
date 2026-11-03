@@ -42,19 +42,26 @@ interface ReminderContext {
   reminder: ReminderSettings;
   petName: string;
   tutorName: string;
-  streak: number;
+  /** Sequência em semanas. */
+  streakWeeks: number;
+  /** Treinos que faltam para bater a meta desta semana. */
+  weekRemaining: number;
   trainedToday: boolean;
 }
 
 /** Mensagens do Logan — variam a cada dia para não ficarem repetitivas. */
 function buildMessage(ctx: ReminderContext, dayOffset: number): { title: string; body: string } {
-  const { petName, tutorName, streak } = ctx;
+  const { petName, tutorName, streakWeeks, weekRemaining } = ctx;
   const tutor = tutorName || 'parceiro';
   // A sequência só é "conhecida" para o primeiro lembrete; nos dias seguintes usamos mensagens genéricas.
-  if (dayOffset <= 1 && streak >= 2) {
+  // O progresso da semana só é "conhecido" para os primeiros lembretes; depois usamos mensagens genéricas.
+  if (dayOffset <= 1 && weekRemaining > 0) {
     return {
-      title: `🐾 Sequência de ${streak} dias em jogo!`,
-      body: `${tutor}, 5 minutinhos com ${petName} e a sequência continua. Bora?`,
+      title: `🐾 Faltam ${weekRemaining} ${weekRemaining === 1 ? 'treino' : 'treinos'} para fechar a semana`,
+      body:
+        streakWeeks > 0
+          ? `${tutor}, sua sequência de ${streakWeeks} ${streakWeeks === 1 ? 'semana' : 'semanas'} está em jogo. 5 minutinhos com ${petName}?`
+          : `${tutor}, 5 minutinhos com ${petName} hoje e a meta da semana fica mais perto.`,
     };
   }
   const pool = [

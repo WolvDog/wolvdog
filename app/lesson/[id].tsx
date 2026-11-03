@@ -27,7 +27,9 @@ const CTA_LABEL = {
 } as const;
 
 export default function LessonScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, review } = useLocalSearchParams<{ id: string; review?: string }>();
+  // Reforço: pula a explicação e vai direto ao treino prático.
+  const isReview = review === '1';
   const lesson = id ? getLessonById(id) : undefined;
   const module = lesson ? getModuleById(lesson.moduleId) : undefined;
 
@@ -38,7 +40,7 @@ export default function LessonScreen() {
   const saveLessonDraft = useAppStore((s) => s.saveLessonDraft);
 
   // Retoma de onde parou, mas nunca direto na tela de vitória.
-  const [stepIndex, setStepIndex] = useState(() => Math.min(draftIndex ?? 0, 2));
+  const [stepIndex, setStepIndex] = useState(() => (isReview ? 1 : Math.min(draftIndex ?? 0, 2)));
   const [answer, setAnswer] = useState<ValidationOption | null>(null);
   const [result, setResult] = useState<LessonCompletionResult | null>(null);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
@@ -89,7 +91,7 @@ export default function LessonScreen() {
       destructive: true,
     });
     if (!leave) return;
-    saveLessonDraft(lesson.id, stepIndex);
+    if (!isReview) saveLessonDraft(lesson.id, stepIndex);
     router.back();
   };
 
@@ -117,7 +119,7 @@ export default function LessonScreen() {
       {!isVictory && (
         <View className="flex-row items-center px-5 pb-1">
           <Text className="flex-1 text-sm font-bold text-ink-400" numberOfLines={1}>
-            {module.subtitle} · {lesson.title}
+            {isReview ? 'Reforço' : module.subtitle} · {lesson.title}
           </Text>
           <Clock size={14} color={COLORS.inkSoft} />
           <Text className="ml-1 text-sm font-bold text-ink-400">{lesson.durationMinutes} min</Text>

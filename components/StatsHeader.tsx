@@ -3,9 +3,9 @@ import { Bone, Crown, PawPrint } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { days, points, TERMS } from '@/constants/brand';
+import { points, TERMS, weeks } from '@/constants/brand';
 import { COLORS, FONTS } from '@/constants/theme';
-import { isStreakAtRisk } from '@/services/gamification';
+import { useWeekStatus } from '@/hooks/useWeekStatus';
 import { useAppStore } from '@/store/useAppStore';
 
 import { ClawMarks } from './icons';
@@ -21,8 +21,8 @@ export function StatsHeader() {
       openPaywall: s.openPaywall,
     })),
   );
-  const atRisk = isStreakAtRisk(streak);
-  const streakColor = streak.current === 0 || atRisk ? COLORS.lockedDark : COLORS.akita;
+  const week = useWeekStatus();
+  const streakColor = week.goalMet ? COLORS.akita : week.done > 0 ? COLORS.akitaDark : COLORS.lockedDark;
 
   return (
     <View className="flex-row items-center justify-between border-b-2 border-ink-900 bg-white px-4 py-3">
@@ -34,8 +34,12 @@ export function StatsHeader() {
       </View>
 
       <View className="flex-row items-center gap-4">
-        <Stat label={`${TERMS.streak}: ${days(streak.current)}`} value={streak.current} color={streakColor}>
-          <PawPrint size={20} color={streakColor} fill={streakColor} />
+        <Stat
+          label={`Semana: ${week.done} de ${week.goal} treinos. ${TERMS.streak}: ${weeks(week.displayStreak)}`}
+          value={`${week.done}/${week.goal}`}
+          color={streakColor}
+        >
+          <PawPrint size={20} color={streakColor} fill={week.goalMet ? streakColor : 'transparent'} />
         </Stat>
         <Stat label={`${streak.freezesAvailable} ${TERMS.freezes}`} value={streak.freezesAvailable} color={COLORS.hero}>
           <Bone size={20} color={COLORS.hero} fill={streak.freezesAvailable > 0 ? COLORS.heroLight : 'transparent'} />
@@ -58,7 +62,7 @@ export function StatsHeader() {
   );
 }
 
-function Stat({ children, value, color, label }: { children: ReactNode; value: number; color: string; label: string }) {
+function Stat({ children, value, color, label }: { children: ReactNode; value: number | string; color: string; label: string }) {
   return (
     <View className="flex-row items-center" accessibilityLabel={label}>
       {children}

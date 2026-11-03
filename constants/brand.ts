@@ -16,4 +16,5 @@ export const TERMS = {
 } as const;
 
 export const days = (n: number) => `${n} ${n === 1 ? 'dia' : 'dias'}`;
+export const weeks = (n: number) => `${n} ${n === 1 ? 'semana' : 'semanas'}`;
 export const points = (n: number) => `${n} ${n === 1 ? 'garra' : 'garras'}`;

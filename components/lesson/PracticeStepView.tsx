@@ -9,10 +9,12 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { HapticStyle, tap } from '@/services/haptics';
 import type { PracticeStep } from '@/types';
 
+import { Clicker } from './Clicker';
 import { StepHeading } from './StepHeading';
 
 export function PracticeStepView({ step }: { step: PracticeStep }) {
   const [checked, setChecked] = useState<Set<number>>(new Set());
+  const [reps, setReps] = useState(0);
 
   const toggle = (i: number) => {
     tap();
@@ -61,10 +63,12 @@ export function PracticeStepView({ step }: { step: PracticeStep }) {
         })}
       </View>
 
+      <Clicker countsReps={!!step.targetReps} onClick={() => step.targetReps && setReps((r) => r + 1)} />
+
       {(step.timerSeconds || step.targetReps) && (
         <View className="mt-3 flex-row gap-3">
           {step.timerSeconds ? <TimerCard seconds={step.timerSeconds} /> : null}
-          {step.targetReps ? <RepCounter target={step.targetReps} /> : null}
+          {step.targetReps ? <RepCounter target={step.targetReps} count={reps} onChange={setReps} /> : null}
         </View>
       )}
 
@@ -136,13 +140,12 @@ function TimerCard({ seconds }: { seconds: number }) {
   );
 }
 
-function RepCounter({ target }: { target: number }) {
-  const [count, setCount] = useState(0);
+function RepCounter({ target, count, onChange }: { target: number; count: number; onChange: (n: number) => void }) {
   const done = count >= target;
 
   const change = (delta: number) => {
     tap(delta > 0 && count + 1 === target ? HapticStyle.Heavy : HapticStyle.Light);
-    setCount((c) => Math.max(0, c + delta));
+    onChange(Math.max(0, count + delta));
   };
 
   return (

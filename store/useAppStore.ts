@@ -7,22 +7,41 @@ import type { CloudSnapshot } from '@/services/api';
 import {
   calculateLessonXp,
   getLevelInfo,
-  reconcileStreak,
-  registerStreakActivity,
+  getWeekStatus,
+  reconcileWeeks,
+  registerWeekActivity,
   type StreakReconcileEvent,
   toDateKey,
 } from '@/services/gamification';
-import type { Difficulty, LessonCompletion, Pet, ReminderSettings, Streak, User, UserProgress } from '@/types';
+import { scheduleReview } from '@/services/review';
+import type {
+  Difficulty,
+  LessonCompletion,
+  Pet,
+  ReminderSettings,
+  ReviewItem,
+  Streak,
+  User,
+  UserProgress,
+  WeeklyGoalDays,
+} from '@/types';
 
 export interface LessonCompletionResult {
   xpEarned: number;
+  /** Bônus por bater a meta semanal com esta missão. */
   streakBonusXp: number;
   totalXp: number;
-  streak: Streak;
-  streakIncreased: boolean;
+  /** Treinos da semana após esta missão, e a meta. */
+  weekDone: number;
+  weekGoal: number;
+  weekGoalReached: boolean;
+  /** Sequência exibida em semanas (inclui a atual se a meta foi batida). */
+  streakWeeks: number;
   freezesEarned: number;
   isFirstCompletion: boolean;
   leveledUpTo: number | null;
+  /** Em quantos dias o Logan traz esta missão de volta como reforço. */
+  reviewInDays: number;
 }
 
 export type PaywallSource = 'locked_module' | 'profile' | 'streak_freeze' | 'add_pet';
@@ -33,6 +52,7 @@ type PetInput = Omit<Pet, 'id' | 'ownerId' | 'createdAt'> & Partial<Pick<Pet, 'i
 export interface OnboardingInput {
   tutorName: string;
   dailyGoalMinutes: User['dailyGoalMinutes'];
+  weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
   pet: PetInput;
 }
@@ -47,6 +67,8 @@ interface AppState {
   isPro: boolean;
   progress: UserProgress;
   streak: Streak;
+  /** Fila de reforço adaptativo (missões cumpridas que voltam para revisão). */
+  reviews: Record<string, ReviewItem>;
   lessonDrafts: Record<string, number>;
 
   // --- estado efêmero ---
@@ -66,6 +88,7 @@ interface AppState {
   restartOnboarding: () => void;
   savePet: (pet: PetInput) => void;
   setReminder: (reminder: ReminderSettings) => void;
+  setWeeklyGoal: (days: WeeklyGoalDays) => void;
   completeLesson: (lessonId: string, difficulty: Difficulty) => LessonCompletionResult | null;
   saveLessonDraft: (lessonId: string, stepIndex: number) => void;
   clearLessonDraft: (lessonId: string) => void;
@@ -93,7 +116,8 @@ const initialStreak: Streak = {
   longest: 0,
   lastActiveDate: null,
   freezesAvailable: 1, // presente de boas-vindas do Logan
-  frozenDates: [],
+  frozenWeeks: [],
+  lastEvaluatedWeek: null,
 };
 
 export const useAppStore = create<AppState>()(
@@ -106,6 +130,7 @@ export const useAppStore = create<AppState>()(
       isPro: false,
       progress: initialProgress,
       streak: initialStreak,
+      reviews: {},
       lessonDrafts: {},
 
       hasHydrated: false,
@@ -117,8 +142,8 @@ export const useAppStore = create<AppState>()(
       paywall: { visible: false, source: null },
       lastStreakEvent: null,
 
-      completeOnboarding: ({ tutorName, dailyGoalMinutes, reminder, pet }) => {
-        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes, reminder } }));
+      completeOnboarding: ({ tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, pet }) => {
+        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes, weeklyGoalDays, reminder } }));
         get().savePet(pet);
         set({ hasOnboarded: true });
       },
@@ -138,17 +163,21 @@ export const useAppStore = create<AppState>()(
 
       setReminder: (reminder) => set((s) => ({ user: { ...s.user, reminder } })),
 
+      setWeeklyGoal: (weeklyGoalDays) => set((s) => ({ user: { ...s.user, weeklyGoalDays } })),
+
       completeLesson: (lessonId, difficulty) => {
         const lesson = getLessonById(lessonId);
         if (!lesson) return null;
 
-        const { progress, streak, isPro, lessonDrafts } = get();
+        const { progress, streak, isPro, lessonDrafts, reviews, user } = get();
         const today = toDateKey();
         const previous = progress.completedLessons[lessonId];
+        const goal = user.weeklyGoalDays;
 
         const xpEarned = calculateLessonXp(lesson, difficulty, previous);
-        const activity = registerStreakActivity(streak, isPro, today);
+        const activity = registerWeekActivity(streak, progress.xpHistory, goal, isPro, today);
         const totalXp = progress.totalXp + xpEarned + activity.bonusXp;
+        const review = scheduleReview(reviews[lessonId], lessonId, difficulty, today);
 
         const completion: LessonCompletion = {
           lessonId,
@@ -163,6 +192,7 @@ export const useAppStore = create<AppState>()(
 
         const xpHistory = [...progress.xpHistory, { date: today, amount: xpEarned, source: 'lesson' as const }];
         if (activity.bonusXp > 0) xpHistory.push({ date: today, amount: activity.bonusXp, source: 'streak_bonus' });
+        const week = getWeekStatus(activity.streak, xpHistory, goal, today);
 
         const { [lessonId]: _discarded, ...remainingDrafts } = lessonDrafts;
 
@@ -173,6 +203,7 @@ export const useAppStore = create<AppState>()(
             xpHistory,
           },
           streak: activity.streak,
+          reviews: { ...reviews, [lessonId]: review },
           lessonDrafts: remainingDrafts,
         });
 
@@ -180,11 +211,14 @@ export const useAppStore = create<AppState>()(
           xpEarned,
           streakBonusXp: activity.bonusXp,
           totalXp,
-          streak: activity.streak,
-          streakIncreased: activity.increased,
+          weekDone: week.done,
+          weekGoal: goal,
+          weekGoalReached: activity.weekGoalReached,
+          streakWeeks: week.displayStreak,
           freezesEarned: activity.freezesEarned,
           isFirstCompletion: !previous,
           leveledUpTo: levelAfter > levelBefore ? levelAfter : null,
+          reviewInDays: review.intervalDays,
         };
       },
 
@@ -198,7 +232,9 @@ export const useAppStore = create<AppState>()(
         }),
 
       reconcileStreakOnOpen: () => {
-        const result = reconcileStreak(get().streak);
+        const { streak, progress, user } = get();
+        const result = reconcileWeeks(streak, progress.xpHistory, user.weeklyGoalDays);
+        if (result.streak !== streak) set({ streak: result.streak });
         if (result.event === 'none') return;
         set({ streak: result.streak, lastStreakEvent: { event: result.event, freezesUsed: result.freezesUsed } });
       },
@@ -212,7 +248,7 @@ export const useAppStore = create<AppState>()(
       closePaywall: () => set((s) => ({ paywall: { ...s.paywall, visible: false } })),
 
       resetProgress: () =>
-        set({ progress: initialProgress, streak: initialStreak, lessonDrafts: {}, lastStreakEvent: null }),
+        set({ progress: initialProgress, streak: initialStreak, reviews: {}, lessonDrafts: {}, lastStreakEvent: null }),
 
       setAuth: (auth) =>
         set({
@@ -233,10 +269,16 @@ export const useAppStore = create<AppState>()(
         return {
           hasOnboarded: s.hasOnboarded,
           isPro: s.isPro,
-          user: { name: s.user.name, dailyGoalMinutes: s.user.dailyGoalMinutes, reminder: s.user.reminder },
+          user: {
+            name: s.user.name,
+            dailyGoalMinutes: s.user.dailyGoalMinutes,
+            weeklyGoalDays: s.user.weeklyGoalDays,
+            reminder: s.user.reminder,
+          },
           pet: s.pet,
           progress: s.progress,
           streak: s.streak,
+          reviews: s.reviews,
         };
       },
 
@@ -250,6 +292,7 @@ export const useAppStore = create<AppState>()(
           pet: snap.pet ? { ...snap.pet, photoUri: snap.pet.photoUri ?? (s.pet?.id === snap.pet.id ? s.pet.photoUri : undefined) } : null,
           progress: snap.progress,
           streak: snap.streak,
+          reviews: snap.reviews,
         })),
 
       clearLocalData: () =>
@@ -261,6 +304,7 @@ export const useAppStore = create<AppState>()(
           isPro: false,
           progress: initialProgress,
           streak: initialStreak,
+          reviews: {},
           lessonDrafts: {},
           lastStreakEvent: null,
           syncStatus: 'idle',
@@ -268,7 +312,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'wolverbark-store',
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({
         hasOnboarded: s.hasOnboarded,
@@ -278,6 +322,7 @@ export const useAppStore = create<AppState>()(
         isPro: s.isPro,
         progress: s.progress,
         streak: s.streak,
+        reviews: s.reviews,
         lessonDrafts: s.lessonDrafts,
       }),
       migrate: (persisted, version) => {
@@ -285,6 +330,17 @@ export const useAppStore = create<AppState>()(
         // v2: lembretes diários no perfil do tutor.
         if (version < 2 && state.user) {
           state.user = { ...MOCK_USER, ...state.user, reminder: state.user.reminder ?? MOCK_USER.reminder };
+        }
+        // v3: sequência passa a ser semanal + fila de reforço.
+        if (version < 3) {
+          if (state.user) state.user = { ...state.user, weeklyGoalDays: state.user.weeklyGoalDays ?? 3 };
+          const old = state.streak as Partial<Streak> | undefined;
+          state.streak = { ...initialStreak, freezesAvailable: old?.freezesAvailable ?? 1, lastActiveDate: old?.lastActiveDate ?? null };
+          // Missões já cumpridas entram na fila de reforço a partir de amanhã.
+          const today = toDateKey();
+          state.reviews = Object.fromEntries(
+            Object.values(state.progress?.completedLessons ?? {}).map((c) => [c.lessonId, scheduleReview(undefined, c.lessonId, c.difficulty, today)]),
+          );
         }
         return state as AppState;
       },

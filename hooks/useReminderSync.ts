@@ -6,18 +6,22 @@ import { toDateKey } from '@/services/gamification';
 import { remindersSupported, rescheduleReminders } from '@/services/notifications';
 import { useAppStore } from '@/store/useAppStore';
 
+import { useWeekStatus } from './useWeekStatus';
+
 /** Mantém os lembretes do Logan agendados conforme o estado do tutor (e ao voltar para o app). */
 export function useReminderSync() {
-  const { reminder, petName, tutorName, streak, lastActiveDate, hasOnboarded } = useAppStore(
+  const { reminder, petName, tutorName, lastActiveDate, hasOnboarded } = useAppStore(
     useShallow((s) => ({
       reminder: s.user.reminder,
       petName: s.pet?.name ?? 'Seu cão',
       tutorName: s.user.name,
-      streak: s.streak.current,
       lastActiveDate: s.streak.lastActiveDate,
       hasOnboarded: s.hasOnboarded,
     })),
   );
+  const week = useWeekStatus();
+  const streakWeeks = week.displayStreak;
+  const weekRemaining = Math.max(0, week.goal - week.done);
 
   useEffect(() => {
     if (!remindersSupported || !hasOnboarded) return;
@@ -27,12 +31,13 @@ export function useReminderSync() {
         reminder,
         petName,
         tutorName,
-        streak,
+        streakWeeks,
+        weekRemaining,
         trainedToday: lastActiveDate === toDateKey(),
       }).catch((e) => console.warn('[reminders]', e));
 
     run();
     const sub = AppState.addEventListener('change', (state) => state === 'active' && run());
     return () => sub.remove();
-  }, [reminder, petName, tutorName, streak, lastActiveDate, hasOnboarded]);
+  }, [reminder, petName, tutorName, streakWeeks, weekRemaining, lastActiveDate, hasOnboarded]);
 }

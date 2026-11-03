@@ -42,11 +42,27 @@
           "resizeMode": "contain",
           "backgroundColor": "#1850BE"
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
     },
-    "icon": "./assets/icon.png"
+    "icon": "./assets/icon.png",
+    "owner": "maarcosramalhos-team",
+    "extra": {
+      "eas": {
+        "projectId": "cfe3ee50-f603-4b70-8920-cfdb3965b3d3"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }

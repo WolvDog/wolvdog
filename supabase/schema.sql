@@ -6,6 +6,8 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users on delete cascade,
   name text not null default '',
   daily_goal_minutes smallint not null default 10,
+  weekly_goal_days smallint not null default 3,
+  review_queue jsonb not null default '{}'::jsonb,
   total_xp integer not null default 0,
   has_onboarded boolean not null default false,
   reminder_enabled boolean not null default false,
@@ -56,7 +58,8 @@ create table if not exists public.streaks (
   longest integer not null default 0,
   last_active_date date,
   freezes_available smallint not null default 1,
-  frozen_dates date[] not null default '{}'
+  frozen_dates date[] not null default '{}',
+  last_evaluated_week date
 );
 
 -- Row Level Security: cada usuário só enxerga e altera os próprios dados -------
@@ -80,7 +83,7 @@ create policy "own streak" on public.streaks for all using (auth.uid() = user_id
 
 -- Impede que o app marque a si mesmo como Pro: o cliente só escreve as colunas abaixo.
 revoke insert, update on public.profiles from authenticated;
-grant insert (id, name, daily_goal_minutes, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant insert (id, name, daily_goal_minutes, weekly_goal_days, review_queue, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;
-grant update (name, daily_goal_minutes, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant update (name, daily_goal_minutes, weekly_goal_days, review_queue, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;

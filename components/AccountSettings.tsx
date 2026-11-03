@@ -3,6 +3,7 @@ import { Bell, Cloud, CloudOff, LogOut } from 'lucide-react-native';
 import { Pressable, Switch, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
+import { WEEKLY_GOAL_OPTIONS } from '@/constants/gamification';
 import { COLORS, FONTS } from '@/constants/theme';
 import { showAlert, showConfirm } from '@/services/dialog';
 import { formatTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
@@ -24,8 +25,10 @@ const SYNC_LABEL = {
 
 /** Cartões de lembretes diários e de conta/sincronização, exibidos no perfil. */
 export function AccountSettings() {
-  const { reminder, setReminder, authEmail, authUserId, syncStatus } = useAppStore(
+  const { weeklyGoal, setWeeklyGoal, reminder, setReminder, authEmail, authUserId, syncStatus } = useAppStore(
     useShallow((s) => ({
+      weeklyGoal: s.user.weeklyGoalDays,
+      setWeeklyGoal: s.setWeeklyGoal,
       reminder: s.user.reminder,
       setReminder: s.setReminder,
       authEmail: s.authEmail,
@@ -51,6 +54,19 @@ export function AccountSettings() {
 
   return (
     <>
+      {/* Meta semanal */}
+      <View className="mt-4 rounded-xl border-2 border-ink-900 bg-white p-5">
+        <Text style={TITLE}>META SEMANAL</Text>
+        <Text className="mt-1 text-sm text-ink-600">
+          Quantos dias por semana vocês treinam. A sequência conta as semanas em que a meta é batida.
+        </Text>
+        <View className="mt-3 flex-row flex-wrap gap-2">
+          {WEEKLY_GOAL_OPTIONS.map((o) => (
+            <Chip key={o.days} label={o.days === 7 ? 'Todo dia' : `${o.days}x`} active={weeklyGoal === o.days} onPress={() => setWeeklyGoal(o.days)} />
+          ))}
+        </View>
+      </View>
+
       {/* Lembretes do Logan */}
       <View className="mt-4 rounded-xl border-2 border-ink-900 bg-white p-5">
         <View className="flex-row items-center">

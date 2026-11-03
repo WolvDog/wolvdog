@@ -15,6 +15,7 @@ import { points, TERMS } from '@/constants/brand';
 import { COLORS, FONTS } from '@/constants/theme';
 import { getLessonById } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
+import { useWeekStatus } from '@/hooks/useWeekStatus';
 import { showAlert, showConfirm } from '@/services/dialog';
 import { addDays, toDateKey } from '@/services/gamification';
 import { useAppStore } from '@/store/useAppStore';
@@ -42,6 +43,7 @@ export default function ProfileScreen() {
     })),
   );
 
+  const week = useWeekStatus();
   const history = Object.values(completedLessons).sort((a, b) => b.completedAt.localeCompare(a.completedAt));
 
   return (
@@ -116,11 +118,11 @@ export default function ProfileScreen() {
 
         {/* Estatísticas */}
         <View className="mt-4 flex-row flex-wrap gap-3">
-          <StatCard icon={<PawPrint size={22} color={COLORS.akita} fill={COLORS.akita} />} value={streak.current} label={`${TERMS.streak} atual`} />
+          <StatCard icon={<PawPrint size={22} color={COLORS.akita} fill={COLORS.akita} />} value={week.displayStreak} label={`${TERMS.streak} (semanas)`} />
           <StatCard
             icon={<Trophy size={22} color={COLORS.clawDark} fill={COLORS.claw} />}
-            value={streak.longest}
-            label={`Maior ${TERMS.streak.toLowerCase()}`}
+            value={Math.max(streak.longest, week.displayStreak)}
+            label={`Maior ${TERMS.streak.toLowerCase()} (semanas)`}
           />
           <StatCard icon={<ClawMarks size={22} />} value={totalXp} label={`${TERMS.points} no total`} />
           <StatCard

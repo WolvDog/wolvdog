@@ -1,13 +1,12 @@
 import {
   DIFFICULTY_XP_BONUS,
-  FREEZES_EARNED_PER_WEEK,
+  FREEZE_EVERY_WEEKS,
   LEVELS,
   MAX_STREAK_FREEZES,
   REPEAT_XP_MULTIPLIER,
-  STREAK_BONUS_EVERY_DAYS,
-  STREAK_BONUS_XP,
+  WEEK_GOAL_BONUS_XP,
 } from '@/constants/gamification';
-import type { Difficulty, Lesson, LessonCompletion, Streak } from '@/types';
+import type { Difficulty, Lesson, LessonCompletion, Streak, XpEvent } from '@/types';
 
 // ---------------------------------------------------------------------------
 // Datas — sempre no fuso local do usuário, no formato YYYY-MM-DD.
@@ -34,9 +33,65 @@ export function addDays(key: string, amount: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+/** Segunda-feira da semana do dia informado (as semanas vão de segunda a domingo). */
+export function weekStart(key: string): string {
+  const weekday = new Date(keyToUtc(key)).getUTCDay(); // 0 = domingo
+  return addDays(key, -((weekday + 6) % 7));
+}
+
 // ---------------------------------------------------------------------------
-// Streak
+// Sequência semanal
 // ---------------------------------------------------------------------------
+
+/** Dias (YYYY-MM-DD) em que o tutor cumpriu ao menos uma missão. */
+export function trainingDays(history: XpEvent[]): Set<string> {
+  return new Set(history.filter((e) => e.source === 'lesson').map((e) => e.date));
+}
+
+export function daysTrainedInWeek(days: Set<string>, week: string): number {
+  let count = 0;
+  for (let i = 0; i < 7; i++) if (days.has(addDays(week, i))) count++;
+  return count;
+}
+
+export interface WeekStatus {
+  week: string;
+  /** Dias treinados nesta semana. */
+  done: number;
+  goal: number;
+  goalMet: boolean;
+  /** Dias restantes na semana, contando hoje. */
+  daysLeft: number;
+  /** Só dá para bater a meta treinando todos os dias que restam. */
+  atRisk: boolean;
+  /** Sequência exibida: semanas fechadas + a atual, se a meta já foi batida. */
+  displayStreak: number;
+  /** Segunda a domingo: treinou naquele dia? */
+  calendar: { date: string; trained: boolean; isToday: boolean; isFuture: boolean }[];
+}
+
+export function getWeekStatus(streak: Streak, history: XpEvent[], goal: number, today: string = toDateKey()): WeekStatus {
+  const week = weekStart(today);
+  const days = trainingDays(history);
+  const done = daysTrainedInWeek(days, week);
+  const goalMet = done >= goal;
+  const daysLeft = 7 - daysBetween(week, today);
+  const trainedToday = days.has(today);
+  const remainingNeeded = goal - done;
+  return {
+    week,
+    done,
+    goal,
+    goalMet,
+    daysLeft,
+    atRisk: !goalMet && remainingNeeded >= (trainedToday ? daysLeft - 1 : daysLeft),
+    displayStreak: streak.current + (goalMet ? 1 : 0),
+    calendar: Array.from({ length: 7 }, (_, i) => {
+      const date = addDays(week, i);
+      return { date, trained: days.has(date), isToday: date === today, isFuture: date > today };
+    }),
+  };
+}
 
 export type StreakReconcileEvent = 'none' | 'frozen' | 'lost';
 
@@ -47,88 +102,87 @@ export interface StreakReconcileResult {
 }
 
 /**
- * Executado ao abrir o app: verifica se dias foram perdidos desde a última atividade.
- * Se houver Escudos suficientes, eles cobrem os dias perdidos; senão a ofensiva zera.
+ * Ao abrir o app: fecha as semanas que já terminaram. Semana com a meta cumprida soma 1;
+ * semana abaixo da meta consome um Osso Reserva ou zera a sequência.
  */
-export function reconcileStreak(streak: Streak, today: string = toDateKey()): StreakReconcileResult {
-  if (!streak.lastActiveDate || streak.current === 0) {
-    return { streak, event: 'none', freezesUsed: 0 };
+export function reconcileWeeks(
+  streak: Streak,
+  history: XpEvent[],
+  goal: number,
+  today: string = toDateKey(),
+): StreakReconcileResult {
+  const lastClosed = addDays(weekStart(today), -7);
+  if (!streak.lastEvaluatedWeek) {
+    return { streak: { ...streak, lastEvaluatedWeek: lastClosed }, event: 'none', freezesUsed: 0 };
   }
+  if (streak.lastEvaluatedWeek >= lastClosed) return { streak, event: 'none', freezesUsed: 0 };
 
-  const gap = daysBetween(streak.lastActiveDate, today);
-  if (gap <= 1) return { streak, event: 'none', freezesUsed: 0 };
+  const days = trainingDays(history);
+  let next = { ...streak, frozenWeeks: [...streak.frozenWeeks] };
+  let freezesUsed = 0;
+  let lost = false;
 
-  const missedDays = gap - 1;
-  if (streak.freezesAvailable >= missedDays) {
-    const frozen = Array.from({ length: missedDays }, (_, i) => addDays(streak.lastActiveDate!, i + 1));
-    return {
-      event: 'frozen',
-      freezesUsed: missedDays,
-      streak: {
-        ...streak,
-        freezesAvailable: streak.freezesAvailable - missedDays,
-        frozenDates: [...streak.frozenDates, ...frozen],
-        // Mantém a ofensiva "viva": o último dia coberto passa a ser ontem.
-        lastActiveDate: addDays(today, -1),
-      },
-    };
+  for (let week = addDays(streak.lastEvaluatedWeek, 7); week <= lastClosed; week = addDays(week, 7)) {
+    if (daysTrainedInWeek(days, week) >= goal) {
+      next.current += 1;
+      next.longest = Math.max(next.longest, next.current);
+    } else if (next.current > 0 && next.freezesAvailable > 0) {
+      next.freezesAvailable -= 1;
+      next.frozenWeeks.push(week);
+      freezesUsed += 1;
+    } else {
+      if (next.current > 0) lost = true;
+      next.current = 0;
+    }
   }
+  next = { ...next, lastEvaluatedWeek: lastClosed };
 
-  return { event: 'lost', freezesUsed: 0, streak: { ...streak, current: 0 } };
+  const event: StreakReconcileEvent = lost ? 'lost' : freezesUsed > 0 ? 'frozen' : 'none';
+  return { streak: next, event, freezesUsed };
 }
 
-export interface StreakActivityResult {
+export interface WeekActivityResult {
   streak: Streak;
-  increased: boolean;
+  /** Esta missão fez o tutor bater a meta da semana agora. */
+  weekGoalReached: boolean;
   bonusXp: number;
   freezesEarned: number;
 }
 
-/** Registra uma lição concluída hoje e incrementa a ofensiva (no máximo 1x por dia). */
-export function registerStreakActivity(
+/** Registra uma missão cumprida hoje. `historyBefore` é o histórico antes desta missão. */
+export function registerWeekActivity(
   streak: Streak,
+  historyBefore: XpEvent[],
+  goal: number,
   isPro: boolean,
   today: string = toDateKey(),
-): StreakActivityResult {
-  if (streak.lastActiveDate === today) {
-    return { streak, increased: false, bonusXp: 0, freezesEarned: 0 };
+): WeekActivityResult {
+  const week = weekStart(today);
+  const days = trainingDays(historyBefore);
+  const before = daysTrainedInWeek(days, week);
+  const after = days.has(today) ? before : before + 1;
+  const weekGoalReached = before < goal && after >= goal;
+
+  let freezesEarned = 0;
+  let next: Streak = { ...streak, lastActiveDate: today };
+  if (weekGoalReached) {
+    const weeksInARow = streak.current + 1;
+    next.longest = Math.max(next.longest, weeksInARow);
+    if (weeksInARow % FREEZE_EVERY_WEEKS[isPro ? 'pro' : 'free'] === 0) {
+      const freezesAvailable = Math.min(MAX_STREAK_FREEZES, streak.freezesAvailable + 1);
+      freezesEarned = freezesAvailable - streak.freezesAvailable;
+      next = { ...next, freezesAvailable };
+    }
   }
 
-  const continues = streak.lastActiveDate !== null && daysBetween(streak.lastActiveDate, today) === 1;
-  const current = continues ? streak.current + 1 : 1;
-  const milestone = current % STREAK_BONUS_EVERY_DAYS === 0;
-
-  const earned = milestone ? FREEZES_EARNED_PER_WEEK[isPro ? 'pro' : 'free'] : 0;
-  const freezesAvailable = Math.min(MAX_STREAK_FREEZES, streak.freezesAvailable + earned);
-
-  return {
-    increased: true,
-    bonusXp: milestone ? STREAK_BONUS_XP : 0,
-    freezesEarned: freezesAvailable - streak.freezesAvailable,
-    streak: {
-      ...streak,
-      current,
-      longest: Math.max(streak.longest, current),
-      lastActiveDate: today,
-      freezesAvailable,
-    },
-  };
-}
-
-/** Ofensiva está em risco quando o tutor treinou ontem mas ainda não treinou hoje. */
-export function isStreakAtRisk(streak: Streak, today: string = toDateKey()): boolean {
-  return streak.current > 0 && streak.lastActiveDate !== today;
+  return { streak: next, weekGoalReached, bonusXp: weekGoalReached ? WEEK_GOAL_BONUS_XP : 0, freezesEarned };
 }
 
 // ---------------------------------------------------------------------------
-// XP & Níveis
+// Garras (XP) & Patentes
 // ---------------------------------------------------------------------------
 
-export function calculateLessonXp(
-  lesson: Lesson,
-  difficulty: Difficulty,
-  previous?: LessonCompletion,
-): number {
+export function calculateLessonXp(lesson: Lesson, difficulty: Difficulty, previous?: LessonCompletion): number {
   const base = lesson.xpReward + DIFFICULTY_XP_BONUS[difficulty];
   return previous ? Math.round(base * REPEAT_XP_MULTIPLIER) : base;
 }

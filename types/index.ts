@@ -14,8 +14,12 @@ export interface User {
   createdAt: string; // ISO
   /** Meta diária em minutos escolhida no onboarding (5, 10 ou 15). */
   dailyGoalMinutes: 5 | 10 | 15;
+  /** Meta de dias de treino por semana — a sequência conta semanas cumpridas. */
+  weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
 }
+
+export type WeeklyGoalDays = 3 | 4 | 5 | 7;
 
 export interface ReminderSettings {
   enabled: boolean;
@@ -162,15 +166,31 @@ export interface UserProgress {
   xpHistory: XpEvent[];
 }
 
+/**
+ * Sequência semanal: conta semanas seguidas (segunda a domingo) em que o tutor
+ * treinou pelo menos a meta de dias escolhida.
+ */
 export interface Streak {
+  /** Semanas seguidas já fechadas com a meta cumprida (a semana atual não entra). */
   current: number;
   longest: number;
-  /** Último dia (YYYY-MM-DD, horário local) em que uma lição foi concluída. */
+  /** Último dia (YYYY-MM-DD, horário local) em que uma missão foi cumprida. */
   lastActiveDate: string | null;
-  /** Escudos de Ofensiva disponíveis (Streak Freeze). */
+  /** Ossos Reserva disponíveis: cada um salva uma semana abaixo da meta. */
   freezesAvailable: number;
-  /** Dias que foram salvos por um escudo. */
-  frozenDates: string[];
+  /** Semanas (segunda-feira YYYY-MM-DD) salvas por um Osso Reserva. */
+  frozenWeeks: string[];
+  /** Última semana já fechada e avaliada (segunda-feira YYYY-MM-DD). */
+  lastEvaluatedWeek: string | null;
+}
+
+/** Agenda de reforço (repetição espaçada) de uma missão já cumprida. */
+export interface ReviewItem {
+  lessonId: string;
+  /** Dia em que o reforço fica disponível (YYYY-MM-DD). */
+  dueDate: string;
+  intervalDays: number;
+  lastDifficulty: Difficulty;
 }
 
 // ---------------------------------------------------------------------------

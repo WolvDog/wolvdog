@@ -41,18 +41,20 @@ Paleta do uniforme do Wolverine (amarelo `#FFC72C`, azul `#1E3A8A`, preto e bran
 
 ## Regras de gamificação
 
-- Garras = recompensa da missão + bônus de dificuldade (0/3/5). Refazer missão rende 50%.
-- Sequência sobe 1x por dia. A cada 7 dias: +50 garras e Osso(s) Reserva (1 grátis / 2 Pro, máx. 2).
-- Ao abrir o app, dias perdidos consomem Ossos Reserva; sem ossos suficientes a sequência zera.
+- **Garras** = recompensa da missão + bônus de dificuldade (0/3/5). Refazer/reforçar rende 50%.
+- **Sequência semanal:** o tutor escolhe a meta (3x, 4x, 5x por semana ou todo dia). A sequência conta semanas (seg–dom) com a meta batida. Bater a meta rende +30 garras.
+- **Osso Reserva:** salva uma semana abaixo da meta. Ganha-se 1 a cada 4 semanas seguidas (Pro: a cada 2), máx. 2.
+- **Treino de Reforço (repetição espaçada):** toda missão cumprida volta para revisão — "difícil" no dia seguinte, "médio" em 3 dias, "fácil" em 7, com intervalos crescentes. Até 3 reforços por dia no Mapa de Missões; o reforço abre direto no treino prático.
+- **Clicker digital** na etapa de treino: som + vibração no exato momento do acerto; cada clique conta uma repetição.
 - Fase 1 é gratuita; demais fases exigem Pro e a conclusão da fase anterior.
-- Primeiro acesso passa pelo onboarding (`app/onboarding.tsx`): tutor, cão, raça, peso/porte, idade, foco e meta diária.
+- Primeiro acesso passa pelo onboarding (`app/onboarding.tsx`): tutor, cão, raça, peso/porte, idade, foco, meta semanal e lembrete.
 
 ## Conta e nuvem (Supabase)
 
 Sem `.env` o app roda 100% local (sem login). Para ativar:
 
 1. Crie um projeto em [supabase.com](https://supabase.com) (plano grátis).
-2. **SQL Editor →** cole e rode `supabase/schema.sql`.
+2. **SQL Editor →** cole e rode `supabase/schema.sql` (projetos que já rodaram uma versão anterior: rode também os arquivos de `supabase/migrations/`).
 3. **Authentication → Sign In / Providers → Email:** desligue "Confirm email" e confirme que **Email OTP Length = 6**.
 4. **Authentication → Emails → Magic Link** (e **Confirm signup**): cole o conteúdo de `supabase/email-codigo.html` (assunto: `Seu código WolverBark: {{ .Token }}`). Sem isso o e-mail chega com um link em vez do código.
 5. **Project Settings → API:** copie a *Project URL* e a *anon public key* para um arquivo `.env` (veja `.env.example`).
@@ -65,6 +67,13 @@ Fluxo: o onboarding acontece primeiro; depois o tutor cria conta (ou continua se
 ## Lembretes diários
 
 Notificações locais (`services/notifications.ts`) agendadas para os próximos 7 dias no horário escolhido; o lembrete do dia é pulado se o tutor já treinou. Reagendadas ao abrir o app e ao cumprir missões. Não funcionam no navegador.
+
+## Build (APK / lojas)
+
+Projeto EAS: `@maarcosramalhos-team/wolverbark`. Perfis em `eas.json`:
+
+- `eas build -p android --profile preview` → APK para instalar e testar
+- `eas build --profile production` → builds das lojas
 
 ## Próximos passos de integração
 

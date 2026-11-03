@@ -53,6 +53,7 @@ export function startAutoSync(): () => void {
     const changed =
       state.progress !== prev.progress ||
       state.streak !== prev.streak ||
+      state.reviews !== prev.reviews ||
       state.pet !== prev.pet ||
       state.user !== prev.user ||
       state.hasOnboarded !== prev.hasOnboarded;

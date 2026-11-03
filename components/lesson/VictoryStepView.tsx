@@ -1,10 +1,10 @@
-import { Bone, PawPrint, TrendingUp } from 'lucide-react-native';
+import { Bone, PawPrint, RotateCcw, TrendingUp } from 'lucide-react-native';
 import { type ReactNode, useEffect, useRef } from 'react';
 import { Animated, Dimensions, Easing, Text, View } from 'react-native';
 
 import { ClawMarks } from '@/components/icons';
 import { Logan } from '@/components/Logan';
-import { days, points, TERMS } from '@/constants/brand';
+import { points, TERMS, weeks } from '@/constants/brand';
 import { LEVELS } from '@/constants/gamification';
 import { COLORS, FONTS } from '@/constants/theme';
 import type { LessonCompletionResult } from '@/store/useAppStore';
@@ -48,8 +48,8 @@ export function VictoryStepView({ step, result }: VictoryStepViewProps) {
           />
           <RewardCard
             icon={<PawPrint size={22} color={COLORS.akita} fill={COLORS.akita} />}
-            label={result.streakIncreased ? TERMS.streak : `${TERMS.streak} mantida`}
-            value={days(result.streak.current)}
+            label="Treinos da semana"
+            value={`${Math.min(result.weekDone, result.weekGoal)}/${result.weekGoal}`}
             color={COLORS.white}
             accent={COLORS.hero}
           />
@@ -58,7 +58,7 @@ export function VictoryStepView({ step, result }: VictoryStepViewProps) {
 
       {result && result.streakBonusXp > 0 && (
         <Banner color={COLORS.akitaDark} icon={<PawPrint size={18} color={COLORS.akitaDark} />}>
-          Bônus de semana perfeita: +{points(result.streakBonusXp)}!
+          Meta da semana batida! +{points(result.streakBonusXp)} · {TERMS.streak}: {weeks(result.streakWeeks)}
         </Banner>
       )}
       {result && result.freezesEarned > 0 && (
@@ -69,6 +69,11 @@ export function VictoryStepView({ step, result }: VictoryStepViewProps) {
       {levelTitle && (
         <Banner color={COLORS.hero} icon={<TrendingUp size={18} color={COLORS.hero} />}>
           Nova {TERMS.level.toLowerCase()}: {levelTitle}!
+        </Banner>
+      )}
+      {result && result.reviewInDays === 1 && (
+        <Banner color={COLORS.hero} icon={<RotateCcw size={18} color={COLORS.hero} />}>
+          Sem problemas! O Logan traz esta missão de volta amanhã como reforço.
         </Banner>
       )}
       {result && !result.isFirstCompletion && (

@@ -21,22 +21,23 @@ import {
   PET_SIZE_LABELS,
   sizeFromWeight,
 } from '@/constants/labels';
+import { WEEKLY_GOAL_OPTIONS } from '@/constants/gamification';
 import { COLORS, FONTS } from '@/constants/theme';
 import { MODULES } from '@/data/mockData';
 import { formatTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { useAppStore } from '@/store/useAppStore';
-import type { BehaviorChallenge, PetSize, User } from '@/types';
+import type { BehaviorChallenge, PetSize, User, WeeklyGoalDays } from '@/types';
 
 const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'focus', 'goal', 'reminder', 'plan'] as const;
 type Step = (typeof STEPS)[number];
 
 const SIZES = Object.keys(PET_SIZE_LABELS) as PetSize[];
 const CHALLENGES = Object.keys(CHALLENGE_LABELS) as BehaviorChallenge[];
-const GOALS: { minutes: User['dailyGoalMinutes']; title: string; subtitle: string; emoji: string }[] = [
-  { minutes: 5, title: '5 min por dia', subtitle: 'Leve — 1 missão rápida', emoji: '🐾' },
-  { minutes: 10, title: '10 min por dia', subtitle: 'Recomendado — evolução constante', emoji: '⚡' },
-  { minutes: 15, title: '15 min por dia', subtitle: 'Intenso — para quem quer resultado rápido', emoji: '🔥' },
+const GOALS: { minutes: User['dailyGoalMinutes']; emoji: string }[] = [
+  { minutes: 5, emoji: '🐾' },
+  { minutes: 10, emoji: '⚡' },
+  { minutes: 15, emoji: '🔥' },
 ];
 
 export default function OnboardingScreen() {
@@ -55,6 +56,7 @@ export default function OnboardingScreen() {
   const [months, setMonths] = useState('');
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>([]);
   const [goal, setGoal] = useState<User['dailyGoalMinutes']>(10);
+  const [weeklyDays, setWeeklyDays] = useState<WeeklyGoalDays>(4);
   const [reminderTime, setReminderTime] = useState<{ hour: number; minute: number } | null>(REMINDER_TIMES[3]);
   const [askingPermission, setAskingPermission] = useState(false);
 
@@ -99,6 +101,7 @@ export default function OnboardingScreen() {
       completeOnboarding({
         tutorName: tutor,
         dailyGoalMinutes: goal,
+        weeklyGoalDays: weeklyDays,
         reminder: reminderTime
           ? { enabled: true, hour: reminderTime.hour, minute: reminderTime.minute }
           : { enabled: false, hour: 19, minute: 0 },
@@ -283,18 +286,27 @@ export default function OnboardingScreen() {
 
           {step === 'goal' && (
             <>
-              <LoganSays mood="excited" text="Quanto tempo por dia vocês vão treinar? Constância vale mais que intensidade!" />
-              <Field label="Meta diária">
-                {GOALS.map((g) => (
+              <LoganSays
+                mood="excited"
+                text="Quantos dias por semana vocês vão treinar? Não precisa ser todo dia: constância vale mais que intensidade!"
+              />
+              <Field label="Treinos por semana" hint="Sua sequência conta as semanas em que você bate essa meta.">
+                {WEEKLY_GOAL_OPTIONS.map((o) => (
                   <OptionCard
-                    key={g.minutes}
-                    title={g.title}
-                    subtitle={g.subtitle}
-                    emoji={g.emoji}
-                    active={goal === g.minutes}
-                    onPress={() => setGoal(g.minutes)}
+                    key={o.days}
+                    title={o.title}
+                    subtitle={o.subtitle}
+                    active={weeklyDays === o.days}
+                    onPress={() => setWeeklyDays(o.days)}
                   />
                 ))}
+              </Field>
+              <Field label="Duração de cada treino">
+                <View className="flex-row gap-2">
+                  {GOALS.map((g) => (
+                    <Chip key={g.minutes} label={`${g.emoji} ${g.minutes} min`} active={goal === g.minutes} onPress={() => setGoal(g.minutes)} />
+                  ))}
+                </View>
               </Field>
             </>
           )}
@@ -345,7 +357,7 @@ export default function OnboardingScreen() {
                   </View>
                 </View>
                 <View className="p-4">
-                  <SummaryRow label="Meta diária" value={`${goal} min`} />
+                  <SummaryRow label="Meta" value={`${weeklyDays === 7 ? 'Todo dia' : `${weeklyDays}x por semana`} · ${goal} min`} />
                   <SummaryRow
                     label="Lembrete do Logan"
                     value={reminderTime ? formatTime(reminderTime.hour, reminderTime.minute) : 'Desligado'}

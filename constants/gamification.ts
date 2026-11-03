@@ -1,24 +1,39 @@
 import type { Difficulty } from '@/types';
 
-/** Bônus de XP conforme o tutor reporta a dificuldade — treinos difíceis valem mais esforço. */
+/** Bônus de garras conforme o tutor reporta a dificuldade — treinos difíceis valem mais esforço. */
 export const DIFFICULTY_XP_BONUS: Record<Difficulty, number> = {
   easy: 0,
   medium: 3,
   hard: 5,
 };
 
-/** Refazer uma lição concluída rende uma fração do XP original (prática espaçada). */
+/** Refazer uma missão (ou o reforço) rende uma fração das garras originais. */
 export const REPEAT_XP_MULTIPLIER = 0.5;
 
-/** A cada N dias de ofensiva o tutor ganha XP extra. */
-export const STREAK_BONUS_EVERY_DAYS = 7;
-export const STREAK_BONUS_XP = 50;
+/** Garras extras ao atingir a meta semanal de treinos. */
+export const WEEK_GOAL_BONUS_XP = 30;
 
 export const MAX_STREAK_FREEZES = 2;
-/** Usuários grátis ganham 1 escudo a cada 7 dias de ofensiva; Pro ganham 2. */
-export const FREEZES_EARNED_PER_WEEK = { free: 1, pro: 2 } as const;
+/** A cada N semanas seguidas com a meta cumprida, o tutor ganha 1 Osso Reserva. */
+export const FREEZE_EVERY_WEEKS = { free: 4, pro: 2 } as const;
 
-/** Curva de níveis do pet: XP acumulado necessário para atingir cada nível. */
+export const WEEKLY_GOAL_OPTIONS = [
+  { days: 3, title: '3x por semana', subtitle: 'Leve — ótimo para começar' },
+  { days: 4, title: '4x por semana', subtitle: 'Recomendado — evolução constante' },
+  { days: 5, title: '5x por semana', subtitle: 'Intenso — resultado mais rápido' },
+  { days: 7, title: 'Todo dia', subtitle: 'Modo herói' },
+] as const;
+
+/**
+ * Repetição espaçada do reforço: dias até a próxima revisão, conforme o relato do tutor.
+ * "Difícil" volta no dia seguinte; "fácil" espaça cada vez mais.
+ */
+export const REVIEW_FIRST_INTERVAL: Record<Difficulty, number> = { hard: 1, medium: 3, easy: 7 };
+export const REVIEW_GROWTH: Record<Difficulty, number> = { hard: 0, medium: 1.5, easy: 2.5 };
+export const REVIEW_MAX_INTERVAL = 60;
+export const DAILY_REVIEW_LIMIT = 3;
+
+/** Curva de patentes do pet: garras acumuladas necessárias para cada nível. */
 export const LEVELS = [
   { level: 1, minXp: 0, title: 'Filhote Curioso' },
   { level: 2, minXp: 40, title: 'Aprendiz de Patas' },

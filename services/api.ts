@@ -1,4 +1,14 @@
-import type { BehaviorChallenge, Difficulty, LessonCompletion, Pet, PetSize, Streak, User, UserProgress } from '@/types';
+import type {
+  BehaviorChallenge,
+  Difficulty,
+  LessonCompletion,
+  Pet,
+  PetSize,
+  ReviewItem,
+  Streak,
+  User,
+  UserProgress,
+} from '@/types';
 
 import { supabase } from './supabase';
 
@@ -6,10 +16,11 @@ import { supabase } from './supabase';
 export interface CloudSnapshot {
   hasOnboarded: boolean;
   isPro: boolean;
-  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'reminder'>;
+  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'weeklyGoalDays' | 'reminder'>;
   pet: Pet | null;
   progress: UserProgress;
   streak: Streak;
+  reviews: Record<string, ReviewItem>;
 }
 
 /**
@@ -40,6 +51,7 @@ export const repository = {
       user: {
         name: p.name,
         dailyGoalMinutes: p.daily_goal_minutes,
+        weeklyGoalDays: p.weekly_goal_days ?? 3,
         reminder: { enabled: p.reminder_enabled, hour: p.reminder_hour, minute: p.reminder_minute },
       },
       pet: petRow
@@ -78,9 +90,11 @@ export const repository = {
             longest: streak.data.longest,
             lastActiveDate: streak.data.last_active_date,
             freezesAvailable: streak.data.freezes_available,
-            frozenDates: streak.data.frozen_dates ?? [],
+            frozenWeeks: streak.data.frozen_dates ?? [],
+            lastEvaluatedWeek: streak.data.last_evaluated_week ?? null,
           }
-        : { current: 0, longest: 0, lastActiveDate: null, freezesAvailable: 1, frozenDates: [] },
+        : { current: 0, longest: 0, lastActiveDate: null, freezesAvailable: 1, frozenWeeks: [], lastEvaluatedWeek: null },
+      reviews: (p.review_queue as Record<string, ReviewItem> | null) ?? {},
     };
   },
 
@@ -93,6 +107,8 @@ export const repository = {
       id: userId,
       name: snap.user.name,
       daily_goal_minutes: snap.user.dailyGoalMinutes,
+      weekly_goal_days: snap.user.weeklyGoalDays,
+      review_queue: snap.reviews,
       total_xp: snap.progress.totalXp,
       has_onboarded: snap.hasOnboarded,
       reminder_enabled: snap.user.reminder.enabled,
@@ -109,7 +125,8 @@ export const repository = {
         longest: snap.streak.longest,
         last_active_date: snap.streak.lastActiveDate,
         freezes_available: snap.streak.freezesAvailable,
-        frozen_dates: snap.streak.frozenDates,
+        frozen_dates: snap.streak.frozenWeeks,
+        last_evaluated_week: snap.streak.lastEvaluatedWeek,
       }),
     ];
 
