@@ -23,7 +23,7 @@ Expo SDK 58 · Expo Router · TypeScript estrito · NativeWind v4 · Zustand (pe
 | `components/` | Logan (SVG), LoganSays, MissionRow, ModuleBanner, StatsHeader, HeroButton, form, icons, ProgressBar, PaywallModal, `lesson/*` |
 | `store/` | `useAppStore` — pet, progresso, XP, streak, escudos, `isPro`, paywall |
 | `services/` | Regras puras de gamificação e progressão, mock RevenueCat, repositório Supabase-ready, diálogos |
-| `data/` | `mockData.ts` — 4 fases, 14 lições, planos e benefícios Pro |
+| `data/` | `mockData.ts` (fases, planos), `missionsExtra.ts` (missões novas e quizzes), `lessonBuilder.ts` — 5 fases, 21 missões |
 | `types/` | Schema do domínio |
 | `supabase/` | `schema.sql` com RLS |
 
@@ -47,8 +47,21 @@ Paleta do uniforme do Wolverine (amarelo `#FFC72C`, azul `#1E3A8A`, preto e bran
 - **Treino de Reforço (repetição espaçada):** toda missão cumprida volta para revisão — "difícil" no dia seguinte, "médio" em 3 dias, "fácil" em 7, com intervalos crescentes. Até 3 reforços por dia no Mapa de Missões; o reforço abre direto no treino prático.
 - **Clicker digital** na etapa de treino: som + vibração no exato momento do acerto; cada clique conta uma repetição.
 - **Diário de comportamento:** check-in semanal (1 = fora de controle, 5 = sob controle) para cada desafio do cão, com gráfico das últimas 8 semanas (`app/diary.tsx`).
-- **Código de parceiro:** creches/hotéis indicam com um código (ex.: `GARRIDOSP`, em `constants/partners.ts`); fica salvo no perfil (`profiles.partner_code`) para medir aquisição e conversão do piloto.
-- Fase 1 é gratuita; demais fases exigem Pro e a conclusão da fase anterior.
+- **Código de parceiro:** creches/hotéis indicam com um código cadastrado na tabela `partners` do Supabase (migração 005; códigos de teste `PARCEIRO30` e `AUAU`). O código fica salvo no perfil (`profiles.partner_code`) para medir aquisição e conversão por parceiro. Nenhum parceiro fica fixo no app.
+- **Quizzes:** missões teóricas têm 3–5 perguntas de múltipla escolha entre a Dica do Logan e o treino (+2 garras por acerto, só na primeira vez).
+- **Clicker com parada automática:** ao atingir as repetições da missão, o clicker trava e segue para o Relatório do Treino.
+- **Mídia de demonstração:** `practice.media` aceita Lottie (`.json`) ou vídeo curto (`.mp4`) em `assets/demos/`.
+- Fase 1 (grátis) inclui Senta e Caminha; demais fases exigem Pro e a conclusão da fase anterior.
+
+## Planos (WolverBark Pro)
+
+| Plano | Preço | Por cão adicional (50%) | Pacote RevenueCat |
+| --- | --- | --- | --- |
+| Mensal | R$ 34,99/mês | R$ 17,49/mês | `$rc_monthly` + `wolverbark_extra_pet_monthly` |
+| Semestral | R$ 179,99/semestre | R$ 89,99/semestre | `$rc_six_month` + `wolverbark_extra_pet_semiannual` |
+| Anual (melhor valor) | R$ 259,99/ano | R$ 129,99/ano | `$rc_annual` + `wolverbark_extra_pet_annual` |
+
+O plano cobre 1 cão; o cálculo do total por número de cães está em `services/pricing.ts`.
 - Primeiro acesso passa pelo onboarding (`app/onboarding.tsx`): tutor, cão, raça, peso/porte, idade, foco, meta semanal e lembrete.
 
 ## Conta e nuvem (Supabase)

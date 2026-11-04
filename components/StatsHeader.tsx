@@ -29,7 +29,7 @@ export function StatsHeader() {
       <View className="flex-row items-center rounded-lg border-2 border-ink-900 bg-claw-500 px-2.5 py-1">
         <Text className="text-sm">🐶</Text>
         <Text className="ml-1.5 max-w-[90px] text-ink-900" style={{ fontFamily: FONTS.display, fontSize: 15 }} numberOfLines={1}>
-          {petName ?? 'Seu cão'}
+          {petName ?? 'Seu Pet'}
         </Text>
       </View>
 

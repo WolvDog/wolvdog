@@ -17,7 +17,7 @@ import { supabase } from './supabase';
 export interface CloudSnapshot {
   hasOnboarded: boolean;
   isPro: boolean;
-  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'weeklyGoalDays' | 'reminder' | 'partnerCode'>;
+  user: Pick<User, 'name' | 'dailyGoalMinutes' | 'weeklyGoalDays' | 'reminder' | 'partnerCode' | 'tutorGender' | 'tutorBirthDate'>;
   pet: Pet | null;
   progress: UserProgress;
   streak: Streak;
@@ -55,6 +55,8 @@ export const repository = {
         dailyGoalMinutes: p.daily_goal_minutes,
         weeklyGoalDays: p.weekly_goal_days ?? 3,
         partnerCode: p.partner_code ?? null,
+        tutorGender: p.tutor_gender ?? null,
+        tutorBirthDate: p.tutor_birth_date ?? null,
         reminder: { enabled: p.reminder_enabled, hour: p.reminder_hour, minute: p.reminder_minute },
       },
       pet: petRow
@@ -65,6 +67,7 @@ export const repository = {
             breed: petRow.breed,
             ageMonths: petRow.age_months,
             size: petRow.size as PetSize,
+            sex: petRow.sex ?? undefined,
             weightKg: petRow.weight_kg != null ? Number(petRow.weight_kg) : undefined,
             photoUri: petRow.photo_url ?? undefined,
             challenges: petRow.challenges as BehaviorChallenge[],
@@ -114,6 +117,8 @@ export const repository = {
       weekly_goal_days: snap.user.weeklyGoalDays,
       review_queue: snap.reviews,
       partner_code: snap.user.partnerCode,
+      tutor_gender: snap.user.tutorGender,
+      tutor_birth_date: snap.user.tutorBirthDate,
       behavior_log: snap.behaviorLog,
       total_xp: snap.progress.totalXp,
       has_onboarded: snap.hasOnboarded,
@@ -145,6 +150,7 @@ export const repository = {
           breed: snap.pet.breed,
           age_months: snap.pet.ageMonths,
           size: snap.pet.size,
+          sex: snap.pet.sex ?? null,
           weight_kg: snap.pet.weightKg ?? null,
           // Fotos locais (file://) ainda não vão para o Storage — só URLs públicas.
           photo_url: snap.pet.photoUri?.startsWith('http') ? snap.pet.photoUri : null,

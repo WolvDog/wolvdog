@@ -11,14 +11,15 @@ import { HeroButton } from '@/components/HeroButton';
 import { ClawMarks } from '@/components/icons';
 import { Logan } from '@/components/Logan';
 import { ProgressBar } from '@/components/ProgressBar';
-import { CHALLENGE_LABELS, DIFFICULTY_LABELS, formatAge, formatWeight, PET_SIZE_LABELS } from '@/constants/labels';
+import { CHALLENGE_LABELS, DIFFICULTY_LABELS, formatAge, formatWeight, PET_SEX_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
 import { points, TERMS } from '@/constants/brand';
 import { COLORS, FONTS } from '@/constants/theme';
-import { getLessonById } from '@/data/mockData';
+import { getLessonById, SUBSCRIPTION_PLANS } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
 import { useWeekStatus } from '@/hooks/useWeekStatus';
 import { showAlert, showConfirm } from '@/services/dialog';
 import { addDays, toDateKey } from '@/services/gamification';
+import { extraPetLabel } from '@/services/pricing';
 import { useAppStore } from '@/store/useAppStore';
 import type { XpEvent } from '@/types';
 
@@ -76,6 +77,7 @@ export default function ProfileScreen() {
                 {pet.name}
               </Text>
               <Text className="mt-0.5 text-sm text-ink-600">
+                {pet.sex ? `${PET_SEX_LABELS[pet.sex].label} · ` : ''}
                 {pet.breed} · {formatAge(pet.ageMonths)} · Porte {PET_SIZE_LABELS[pet.size].toLowerCase()}
                 {pet.weightKg ? ` · ${formatWeight(pet.weightKg)}` : ''}
               </Text>
@@ -105,7 +107,7 @@ export default function ProfileScreen() {
             </View>
             <View className="ml-3 flex-1">
               <Text className="text-xs font-bold uppercase text-ink-400">
-                {TERMS.level} de {pet?.name ?? 'seu cão'}
+                {TERMS.level} de {pet?.name ?? 'seu pet'}
               </Text>
               <Text style={SECTION_TITLE}>{level.title}</Text>
             </View>
@@ -242,7 +244,12 @@ export default function ProfileScreen() {
               variant="secondary"
               icon={<Plus size={18} color={COLORS.ink} strokeWidth={3} />}
               onPress={() =>
-                isPro ? showAlert('Em breve', 'Múltiplos perfis chegam na próxima versão!') : openPaywall('add_pet')
+                isPro
+                  ? showAlert(
+                      'Perfis para mais cães',
+                      `Cada cão adicional custa 50% do seu plano (${extraPetLabel(SUBSCRIPTION_PLANS[0]!)} no anual). Os perfis múltiplos chegam na próxima versão!`,
+                    )
+                  : openPaywall('add_pet')
               }
             />
           </View>

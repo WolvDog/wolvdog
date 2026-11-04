@@ -1,72 +1,14 @@
-import type {
-  ConceptStep,
-  Difficulty,
-  Lesson,
-  Module,
-  Pet,
-  PracticeStep,
-  SubscriptionPlan,
-  User,
-  ValidationStep,
-  VictoryStep,
-} from '@/types';
+import type { Lesson, Module, Pet, SubscriptionPlan, User } from '@/types';
 
-// ---------------------------------------------------------------------------
-// Helpers de autoria — mantêm o conteúdo legível e os IDs consistentes.
-// ---------------------------------------------------------------------------
-
-type ConceptInput = Omit<ConceptStep, 'id' | 'type'>;
-type PracticeInput = Omit<PracticeStep, 'id' | 'type'>;
-type VictoryInput = Omit<VictoryStep, 'id' | 'type'>;
-
-interface ValidationInput {
-  question?: string;
-  loganSpeech?: string;
-  feedback: Record<Difficulty, string>;
-}
-
-function validation(lessonId: string, input: ValidationInput): ValidationStep {
-  return {
-    id: `${lessonId}-validation`,
-    type: 'validation',
-    loganMood: 'thinking',
-    question: input.question ?? 'Como seu cão reagiu ao exercício?',
-    loganSpeech: input.loganSpeech ?? 'Seja sincero, tá? Não existe resposta errada — eu uso isso pra ajustar seu próximo treino!',
-    options: [
-      { id: 'easy', emoji: '🌟', label: 'Mandou bem! Pegou rápido', difficulty: 'easy', loganFeedback: input.feedback.easy },
-      { id: 'medium', emoji: '🐾', label: 'Foi indo, com algumas pausas', difficulty: 'medium', loganFeedback: input.feedback.medium },
-      { id: 'hard', emoji: '🌀', label: 'Ficou distraído / difícil', difficulty: 'hard', loganFeedback: input.feedback.hard },
-    ],
-  };
-}
-
-interface LessonInput {
-  id: string;
-  moduleId: string;
-  order: number;
-  title: string;
-  summary: string;
-  durationMinutes: number;
-  xpReward: number;
-  icon: string;
-  concept: ConceptInput;
-  practice: PracticeInput;
-  validation: ValidationInput;
-  victory: VictoryInput;
-}
-
-function lesson(input: LessonInput): Lesson {
-  const { concept, practice, victory, ...meta } = input;
-  return {
-    ...meta,
-    steps: [
-      { id: `${input.id}-concept`, type: 'concept', loganMood: 'happy', ...concept },
-      { id: `${input.id}-practice`, type: 'practice', loganMood: 'hero', ...practice },
-      validation(input.id, input.validation),
-      { id: `${input.id}-victory`, type: 'victory', loganMood: 'excited', ...victory },
-    ],
-  };
-}
+import { lesson, sequence } from './lessonBuilder';
+import {
+  areaSeguraLesson,
+  caminhaLesson,
+  EXISTING_QUIZZES,
+  module5Lessons,
+  passeioCalorLesson,
+  socializacaoLesson,
+} from './missionsExtra';
 
 // ---------------------------------------------------------------------------
 // FASE 1 — Boas Maneiras & Xixi no Lugar Certo (gratuita)
@@ -702,51 +644,83 @@ const module4Lessons: Lesson[] = [
 // Módulos
 // ---------------------------------------------------------------------------
 
+const pick = (list: Lesson[], id: string): Lesson => {
+  const found = list.find((l) => l.id === id);
+  if (!found) throw new Error(`Missão não encontrada: ${id}`);
+  return found;
+};
+
+const MODULE_5 = 'm5-alimentacao';
+
 export const MODULES: Module[] = [
   {
     id: MODULE_1,
     phase: 1,
     title: 'Boas Maneiras & Xixi no Lugar Certo',
-    subtitle: 'Fase 1',
-    description: 'A base de tudo: comunicação, rotina de banheiro e educação em casa.',
+    subtitle: 'Fase 1 · Grátis',
+    description: 'A base de tudo: comunicação, banheiro, área segura, Senta e Caminha.',
     color: '#FFC72C',
     colorDark: '#E5A800',
     isFree: true,
-    lessons: module1Lessons,
+    lessons: sequence(
+      MODULE_1,
+      [
+        pick(module1Lessons, 'm1-l1'),
+        pick(module1Lessons, 'm1-l2'),
+        pick(module1Lessons, 'm1-l3'),
+        areaSeguraLesson,
+        pick(module1Lessons, 'm1-l4'),
+        // "Senta" e "Caminha" são prioritários e ficam na fase gratuita.
+        pick(module2Lessons, 'm2-l1'),
+        caminhaLesson,
+      ],
+      EXISTING_QUIZZES,
+    ),
   },
   {
     id: MODULE_2,
     phase: 2,
     title: 'Comandos Básicos',
-    subtitle: 'Fase 2 · Senta, Fica, Junto',
+    subtitle: 'Fase 2 · Fica, Junto, Vem',
     description: 'Os comandos clássicos que todo cão educado precisa saber.',
     color: '#3B5CC4',
     colorDark: '#1E3A8A',
     isFree: false,
-    lessons: module2Lessons,
+    lessons: sequence(MODULE_2, module2Lessons.filter((l) => l.id !== 'm2-l1'), EXISTING_QUIZZES),
   },
   {
     id: MODULE_3,
     phase: 3,
-    title: 'Passeio sem Puxar a Guia',
+    title: 'Passeio & Socialização',
     subtitle: 'Fase 3',
-    description: 'Transforme o passeio em um momento leve e prazeroso.',
+    description: 'Passeio sem puxar, rotina no calor e um mundo cheio de boas experiências.',
     color: '#F28C28',
     colorDark: '#D9721A',
     isFree: false,
-    lessons: module3Lessons,
+    lessons: sequence(MODULE_3, [...module3Lessons, passeioCalorLesson, socializacaoLesson], EXISTING_QUIZZES),
+  },
+  {
+    id: MODULE_5,
+    phase: 4,
+    title: 'Alimentação & Enriquecimento',
+    subtitle: 'Fase 4',
+    description: 'Refeições com calma, faro e brincadeiras que cansam a mente.',
+    color: '#60A5FA',
+    colorDark: '#3B82F6',
+    isFree: false,
+    lessons: sequence(MODULE_5, module5Lessons, EXISTING_QUIZZES),
   },
   {
     id: MODULE_4,
-    phase: 4,
+    phase: 5,
     title: 'Ansiedade & Autocontrole',
-    subtitle: 'Fase 4',
+    subtitle: 'Fase 5',
     description: 'Calma, paciência e confiança para lidar com o mundo.',
     // "Adamantium": cinza metálico
     color: '#9AA5B8',
     colorDark: '#6B7689',
     isFree: false,
-    lessons: module4Lessons,
+    lessons: sequence(MODULE_4, module4Lessons, EXISTING_QUIZZES),
   },
 ];
 
@@ -773,42 +747,67 @@ export const MOCK_USER: User = {
   weeklyGoalDays: 3,
   reminder: { enabled: false, hour: 19, minute: 0 },
   partnerCode: null,
+  partnerInfo: null,
+  tutorGender: null,
+  tutorBirthDate: null,
 };
 
 export const MOCK_PET: Pet = {
   id: 'pet-demo',
   ownerId: MOCK_USER.id,
-  name: 'Thor',
-  breed: 'Vira-lata Caramelo',
+  name: 'Caramelo',
+  breed: 'Vira-lata (SRD)',
   ageMonths: 8,
   size: 'medio',
   challenges: ['puxa_a_guia', 'pula_nas_pessoas'],
   createdAt: new Date().toISOString(),
 };
 
+/**
+ * Planos do WolverBark Pro. O plano cobre 1 cão; cada cão adicional custa 50% do plano base
+ * (assinatura adicional `extraPetProductId` nas lojas). Labels em services/pricing.ts.
+ */
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'wolverbark_pro_annual',
     revenueCatPackageId: '$rc_annual',
+    extraPetProductId: 'wolverbark_extra_pet_annual',
     period: 'annual',
     title: 'Anual',
-    priceCents: 19990,
+    priceCents: 25999,
+    extraPetPriceCents: 12999,
     currency: 'BRL',
-    priceLabel: 'R$ 199,90/ano',
-    pricePerMonthLabel: 'R$ 16,66/mês',
+    priceLabel: 'R$ 259,99/ano',
+    pricePerMonthLabel: 'R$ 21,67/mês',
     trialDays: 7,
-    badge: 'MAIS POPULAR',
-    savingsPercent: 44,
+    badge: 'MELHOR VALOR',
+    savingsPercent: 38,
+  },
+  {
+    id: 'wolverbark_pro_semiannual',
+    revenueCatPackageId: '$rc_six_month',
+    extraPetProductId: 'wolverbark_extra_pet_semiannual',
+    period: 'semiannual',
+    title: 'Semestral',
+    priceCents: 17999,
+    extraPetPriceCents: 8999,
+    currency: 'BRL',
+    priceLabel: 'R$ 179,99/semestre',
+    pricePerMonthLabel: 'R$ 30,00/mês',
+    trialDays: 7,
+    savingsPercent: 14,
   },
   {
     id: 'wolverbark_pro_monthly',
     revenueCatPackageId: '$rc_monthly',
+    extraPetProductId: 'wolverbark_extra_pet_monthly',
     period: 'monthly',
     title: 'Mensal',
-    priceCents: 2990,
+    priceCents: 3499,
+    extraPetPriceCents: 1749,
     currency: 'BRL',
-    priceLabel: 'R$ 29,90/mês',
-    pricePerMonthLabel: 'R$ 29,90/mês',
+    priceLabel: 'R$ 34,99/mês',
+    pricePerMonthLabel: 'R$ 34,99/mês',
     trialDays: 7,
   },
 ];
@@ -816,6 +815,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 export const PRO_BENEFITS = [
   { icon: '📚', title: '+50 missões ilimitadas', description: 'Todas as fases desbloqueadas, com conteúdo novo todo mês.' },
   { icon: '🧠', title: 'Comportamentos complexos', description: 'Reatividade, ansiedade, latidos e destruição de objetos.' },
-  { icon: '🐾', title: 'Múltiplos perfis de pets', description: 'Treine todos os seus cães, cada um com sua jornada.' },
-  { icon: '🦴', title: 'Ossos Reserva extras', description: '2 ossos por semana para proteger sua sequência de treinos.' },
+  { icon: '🐾', title: 'Mais de um cão', description: 'Cada cão adicional por apenas 50% do valor do plano.' },
+  { icon: '🦴', title: 'Ossos Reserva em dobro', description: 'Ganhe um Osso Reserva a cada 2 semanas de meta batida.' },
 ] as const;

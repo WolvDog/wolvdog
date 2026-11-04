@@ -106,6 +106,10 @@ export function formatTime(hour: number, minute: number): string {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
+export function isPresetTime(hour: number, minute: number): boolean {
+  return REMINDER_TIMES.some((t) => t.hour === hour && t.minute === minute);
+}
+
 export const REMINDER_TIMES = [
   { hour: 7, minute: 30, label: 'Manhã', emoji: '🌅' },
   { hour: 12, minute: 30, label: 'Almoço', emoji: '☀️' },

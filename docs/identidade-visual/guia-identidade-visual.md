@@ -108,9 +108,9 @@ Oswald é gratuita no Google Fonts.
 - **Linguagem de herói com moderação:** dupla de heróis, missão, patente, uniforme.
 
 **Exemplos de frases do Logan:**
-- "Au au, Marcos! Pronto para treinar o Thor hoje?"
-- "Separei um reforço rápido para o Thor não esquecer o que aprendeu."
-- "Meta da semana batida! O Thor está ficando afiado."
+- "Au au, João! Pronto para treinar o Caramelo hoje?"
+- "Separei um reforço rápido para a Mel não esquecer o que aprendeu."
+- "Meta da semana batida! O Pretinho está ficando afiado."
 - "Sem problemas! O Logan traz esta missão de volta amanhã como reforço."
 
 ## 8. Telas de referência (pasta `telas/`)
@@ -125,7 +125,8 @@ Oswald é gratuita no Google Fonts.
 | `05-missao-cumprida.jpg` | Tela de vitória: "Missão cumprida!" |
 | `06-diario-de-comportamento.jpg` | Diário de comportamento com evolução semanal |
 | `07-perfil-do-pet.jpg` | Perfil do pet: patente, sequência, garras |
-| `08-paywall-pro.jpg` | WolverBark Pro com benefício de parceiro (Creche Garrido) |
+| `08-paywall-pro.jpg` | WolverBark Pro com benefício de parceiro (código de teste) |
+| `09-quiz-do-logan.jpg` | Quiz de múltipla escolha de uma missão teórica |
 
 ## 9. Do's & Don'ts
 

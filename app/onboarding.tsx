@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Chip, Field, OptionCard, TextField } from '@/components/form';
 import { HeroButton } from '@/components/HeroButton';
+import { PartnerCodeField } from '@/components/PartnerCodeField';
+import { TimePickerButton } from '@/components/TimePickerButton';
 import { Logan } from '@/components/Logan';
 import { LoganSays } from '@/components/LoganSays';
 import { SegmentedProgress } from '@/components/ProgressBar';
@@ -17,18 +19,21 @@ import {
   CHALLENGE_LABELS,
   formatAge,
   formatWeight,
+  maskBirthDate,
+  parseBirthDate,
+  PET_SEX_LABELS,
   PET_SIZE_DETAILS,
   PET_SIZE_LABELS,
   sizeFromWeight,
+  TUTOR_GENDER_LABELS,
 } from '@/constants/labels';
 import { WEEKLY_GOAL_OPTIONS } from '@/constants/gamification';
 import { COLORS, FONTS } from '@/constants/theme';
-import { findPartner } from '@/constants/partners';
 import { MODULES } from '@/data/mockData';
-import { formatTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
+import { formatTime, isPresetTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { useAppStore } from '@/store/useAppStore';
-import type { BehaviorChallenge, PetSize, User, WeeklyGoalDays } from '@/types';
+import type { BehaviorChallenge, PartnerInfo, PetSex, PetSize, TutorGender, User, WeeklyGoalDays } from '@/types';
 
 const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'focus', 'goal', 'reminder', 'plan'] as const;
 type Step = (typeof STEPS)[number];
@@ -47,7 +52,11 @@ export default function OnboardingScreen() {
 
   const [stepIndex, setStepIndex] = useState(0);
   const [tutorName, setTutorName] = useState('');
+  const [tutorGender, setTutorGender] = useState<TutorGender | null>(null);
+  const [birthInput, setBirthInput] = useState('');
+  const tutorBirthDate = parseBirthDate(birthInput);
   const [petName, setPetName] = useState('');
+  const [petSex, setPetSex] = useState<PetSex | null>(null);
   const [photoUri, setPhotoUri] = useState<string>();
   const [breed, setBreed] = useState('');
   const [weight, setWeight] = useState('');
@@ -58,21 +67,20 @@ export default function OnboardingScreen() {
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>([]);
   const [goal, setGoal] = useState<User['dailyGoalMinutes']>(10);
   const [weeklyDays, setWeeklyDays] = useState<WeeklyGoalDays>(4);
-  const [partnerInput, setPartnerInput] = useState('');
-  const partner = findPartner(partnerInput);
+  const [partner, setPartner] = useState<PartnerInfo | null>(null);
   const [reminderTime, setReminderTime] = useState<{ hour: number; minute: number } | null>(REMINDER_TIMES[3]);
   const [askingPermission, setAskingPermission] = useState(false);
 
   const step: Step = STEPS[stepIndex]!;
-  const dog = petName.trim() || 'seu cão';
+  const dog = petName.trim() || 'seu pet';
   const tutor = tutorName.trim();
   const weightKg = parseFloat(weight.replace(',', '.'));
   const ageMonths = (parseInt(years, 10) || 0) * 12 + (parseInt(months, 10) || 0);
 
   const canContinue: Record<Step, boolean> = {
     welcome: true,
-    tutor: tutor.length > 0,
-    petName: petName.trim().length > 0,
+    tutor: tutor.length > 0 && tutorGender !== null && tutorBirthDate !== null,
+    petName: petName.trim().length > 0 && petSex !== null,
     breed: breed.trim().length > 0,
     size: size !== null,
     age: ageMonths > 0,
@@ -103,14 +111,17 @@ export default function OnboardingScreen() {
     if (step === 'plan') {
       completeOnboarding({
         tutorName: tutor,
+        tutorGender: tutorGender ?? 'undisclosed',
+        tutorBirthDate: tutorBirthDate ?? '',
         dailyGoalMinutes: goal,
         weeklyGoalDays: weeklyDays,
-        partnerCode: partner?.code ?? null,
+        partner,
         reminder: reminderTime
           ? { enabled: true, hour: reminderTime.hour, minute: reminderTime.minute }
           : { enabled: false, hour: 19, minute: 0 },
         pet: {
           name: petName.trim(),
+          sex: petSex ?? undefined,
           breed: breed.trim(),
           ageMonths,
           size: size ?? 'medio',
@@ -189,8 +200,29 @@ export default function OnboardingScreen() {
             <>
               <LoganSays mood="happy" text="Antes de tudo: como posso te chamar, parceiro?" />
               <Field label="Seu nome">
-                <TextField value={tutorName} onChangeText={setTutorName} placeholder="Ex.: Marcos" autoFocus autoCapitalize="words" />
+                <TextField value={tutorName} onChangeText={setTutorName} placeholder="Ex: João Silva" autoFocus autoCapitalize="words" />
               </Field>
+              <Field label="Você é">
+                <View className="flex-row flex-wrap gap-2">
+                  {(Object.keys(TUTOR_GENDER_LABELS) as TutorGender[]).map((g) => (
+                    <Chip key={g} label={TUTOR_GENDER_LABELS[g]} active={tutorGender === g} onPress={() => setTutorGender(g)} />
+                  ))}
+                </View>
+              </Field>
+              <Field label="Data de nascimento">
+                <TextField
+                  value={birthInput}
+                  onChangeText={(t) => setBirthInput(maskBirthDate(t))}
+                  placeholder="DD/MM/AAAA"
+                  keyboardType="number-pad"
+                  maxLength={10}
+                />
+              </Field>
+              {birthInput.length === 10 && !tutorBirthDate && (
+                <Text className="mt-2 text-xs" style={{ color: COLORS.danger }}>
+                  Confira a data (DD/MM/AAAA).
+                </Text>
+              )}
             </>
           )}
 
@@ -198,7 +230,19 @@ export default function OnboardingScreen() {
             <>
               <LoganSays mood="excited" text={`Prazer, ${tutor}! E qual o nome do seu cão?`} />
               <Field label="Nome do cão">
-                <TextField value={petName} onChangeText={setPetName} placeholder="Ex.: Thor" autoFocus autoCapitalize="words" />
+                <TextField value={petName} onChangeText={setPetName} placeholder="Ex: Caramelo" autoFocus autoCapitalize="words" />
+              </Field>
+              <Field label="Sexo">
+                <View className="flex-row gap-2">
+                  {(Object.keys(PET_SEX_LABELS) as PetSex[]).map((sx) => (
+                    <Chip
+                      key={sx}
+                      label={`${PET_SEX_LABELS[sx].emoji} ${PET_SEX_LABELS[sx].label}`}
+                      active={petSex === sx}
+                      onPress={() => setPetSex(sx)}
+                    />
+                  ))}
+                </View>
               </Field>
               <Pressable onPress={pickPhoto} className="mt-6 items-center" accessibilityRole="button" accessibilityLabel="Adicionar foto do cão">
                 <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-ink-900 bg-white">
@@ -227,7 +271,7 @@ export default function OnboardingScreen() {
             <>
               <LoganSays mood="happy" text={`Quanto ${dog} pesa? Se não souber exato, escolha o porte mesmo.`} />
               <Field label="Peso (opcional)">
-                <TextField value={weight} onChangeText={handleWeight} placeholder="Ex.: 12,5" keyboardType="decimal-pad" suffix="kg" />
+                <TextField value={weight} onChangeText={handleWeight} placeholder="Ex: 12,5" keyboardType="decimal-pad" suffix="kg" />
               </Field>
               <Field label="Porte">
                 {SIZES.map((s) => (
@@ -331,6 +375,15 @@ export default function OnboardingScreen() {
                     onPress={() => setReminderTime({ hour: t.hour, minute: t.minute })}
                   />
                 ))}
+                <View className="mb-2.5 flex-row items-center justify-between rounded-xl border-2 border-dashed px-4 py-3" style={{ borderColor: '#D5D8DE' }}>
+                  <Text className="text-sm text-ink-600">Prefere outro horário?</Text>
+                  <TimePickerButton
+                    hour={reminderTime?.hour ?? 19}
+                    minute={reminderTime?.minute ?? 0}
+                    active={!!reminderTime && !isPresetTime(reminderTime.hour, reminderTime.minute)}
+                    onChange={setReminderTime}
+                  />
+                </View>
                 <OptionCard title="Sem lembretes" emoji="🔕" active={reminderTime === null} onPress={() => setReminderTime(null)} />
               </Field>
               {!remindersSupported && (
@@ -383,24 +436,8 @@ export default function OnboardingScreen() {
                 </View>
               </View>
               <Field label="Código de parceiro (opcional)" hint="Veio por indicação de uma creche, hotel ou adestrador?">
-                <TextField
-                  value={partnerInput}
-                  onChangeText={setPartnerInput}
-                  placeholder="Ex.: GARRIDOSP"
-                  autoCapitalize="characters"
-                  autoCorrect={false}
-                />
+                <PartnerCodeField onChange={setPartner} />
               </Field>
-              {partner ? (
-                <View className="mt-2 rounded-lg border-2 border-ink-900 bg-claw-100 p-3">
-                  <Text className="text-sm font-bold text-ink-900">🎁 {partner.name}</Text>
-                  <Text className="text-xs text-ink-600">Benefício no Pro: {partner.perk}</Text>
-                </View>
-              ) : partnerInput.trim().length >= 4 ? (
-                <Text className="mt-2 text-xs" style={{ color: COLORS.danger }}>
-                  Código não encontrado. Confira com quem te indicou.
-                </Text>
-              ) : null}
 
               <Text className="mt-3 text-center text-xs text-ink-400">
                 Cada {TERMS.lesson.toLowerCase()} cumprida rende {TERMS.points.toLowerCase()} e mantém sua {TERMS.streak.toLowerCase()}.

@@ -5,10 +5,11 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
-import { findPartner } from '@/constants/partners';
 import { COLORS, FONTS } from '@/constants/theme';
 import { PRO_BENEFITS, SUBSCRIPTION_PLANS } from '@/data/mockData';
 import { showAlert } from '@/services/dialog';
+import { lookupPartner } from '@/services/partners';
+import { extraPetLabel } from '@/services/pricing';
 import { PurchasesService } from '@/services/purchases';
 import { type PaywallSource, useAppStore } from '@/store/useAppStore';
 import type { SubscriptionPlan } from '@/types';
@@ -37,7 +38,7 @@ const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
 
 export function PaywallModal() {
   const insets = useSafeAreaInsets();
-  const { visible, source, close, setPro, userId, partnerCode } = useAppStore(
+  const { visible, source, close, setPro, userId, partnerCode, partner, setPartner } = useAppStore(
     useShallow((s) => ({
       visible: s.paywall.visible,
       source: s.paywall.source,
@@ -45,6 +46,8 @@ export function PaywallModal() {
       setPro: s.setPro,
       userId: s.user.id,
       partnerCode: s.user.partnerCode,
+      partner: s.user.partnerInfo,
+      setPartner: s.setPartner,
     })),
   );
 
@@ -54,12 +57,15 @@ export function PaywallModal() {
   const [restoring, setRestoring] = useState(false);
 
   useEffect(() => {
+    if (visible && partnerCode && !partner) void lookupPartner(partnerCode).then((p) => p && setPartner(p));
+  }, [visible, partnerCode, partner, setPartner]);
+
+  useEffect(() => {
     PurchasesService.configure(userId);
     if (visible) void PurchasesService.getPlans().then(setPlans);
   }, [visible, userId]);
 
   const headline = HEADLINES[source ?? 'profile'];
-  const partner = findPartner(partnerCode);
   const selected = plans.find((p) => p.id === selectedId) ?? plans[0]!;
 
   async function handlePurchase() {
@@ -145,6 +151,12 @@ export function PaywallModal() {
             {plans.map((plan) => (
               <PlanCard key={plan.id} plan={plan} selected={plan.id === selectedId} onPress={() => setSelectedId(plan.id)} />
             ))}
+
+            <View className="mt-1 rounded-lg border-2 border-dashed px-3 py-2.5" style={{ borderColor: '#D5D8DE' }}>
+              <Text className="text-sm text-ink-600">
+                🐾 O plano inclui 1 cão. Tem mais? <Text className="font-bold text-ink-900">{extraPetLabel(selected)}</Text> (50% do plano).
+              </Text>
+            </View>
 
             <View className="mt-2 flex-row items-center justify-center">
               <Check size={16} color={COLORS.hero} strokeWidth={3} />

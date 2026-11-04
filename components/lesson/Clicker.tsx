@@ -11,13 +11,15 @@ interface ClickerProps {
   /** Chamado a cada clique (ex.: somar uma repetição). */
   onClick?: () => void;
   countsReps?: boolean;
+  /** Meta de repetições atingida: o clicker trava. */
+  disabled?: boolean;
 }
 
 /**
  * Clicker digital: marca o comportamento certo no instante exato, com som e vibração.
  * Substitui o clicker físico durante o treino — clique e, em seguida, o petisco.
  */
-export function Clicker({ onClick, countsReps }: ClickerProps) {
+export function Clicker({ onClick, countsReps, disabled }: ClickerProps) {
   const player = useAudioPlayer(CLICK_SOUND);
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -27,6 +29,7 @@ export function Clicker({ onClick, countsReps }: ClickerProps) {
   }, []);
 
   function handlePress() {
+    if (disabled) return;
     player.seekTo(0);
     player.play();
     tap(HapticStyle.Medium);
@@ -39,7 +42,14 @@ export function Clicker({ onClick, countsReps }: ClickerProps) {
 
   return (
     <View className="mt-3 flex-row items-center rounded-xl border-2 border-ink-900 bg-white p-4">
-      <Pressable onPress={handlePress} accessibilityRole="button" accessibilityLabel="Clicker: marcar acerto" hitSlop={8}>
+      <Pressable
+        onPress={handlePress}
+        disabled={disabled}
+        accessibilityRole="button"
+        accessibilityLabel="Clicker: marcar acerto"
+        accessibilityState={{ disabled: !!disabled }}
+        hitSlop={8}
+      >
         <Animated.View
           style={{
             width: 80,
@@ -47,13 +57,15 @@ export function Clicker({ onClick, countsReps }: ClickerProps) {
             borderRadius: 40,
             borderWidth: 3,
             borderColor: COLORS.ink,
-            backgroundColor: COLORS.claw,
+            backgroundColor: disabled ? COLORS.locked : COLORS.claw,
             alignItems: 'center',
             justifyContent: 'center',
             transform: [{ scale }],
           }}
         >
-          <Text style={{ fontFamily: FONTS.display, fontSize: 18, color: COLORS.ink }}>CLIC</Text>
+          <Text style={{ fontFamily: FONTS.display, fontSize: disabled ? 30 : 18, color: disabled ? COLORS.inkSoft : COLORS.ink }}>
+            {disabled ? '✓' : 'CLIC'}
+          </Text>
         </Animated.View>
       </Pressable>
       <View className="ml-4 flex-1">

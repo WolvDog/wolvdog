@@ -37,6 +37,8 @@ export function authErrorMessage(message: string): string {
   if (m.includes('rate limit')) return 'Muitos e-mails enviados em pouco tempo. Aguarde alguns minutos e tente de novo.';
   if (m.includes('security purposes')) return 'Aguarde alguns segundos antes de pedir outro código.';
   if (m.includes('signups not allowed')) return 'Cadastros estão temporariamente desativados.';
+  // Falha do servidor de e-mail (SMTP) configurado no Supabase — não é erro do tutor.
+  if (m.includes('error sending')) return 'Não conseguimos enviar o e-mail com o código agora. Tente de novo em alguns minutos.';
   if (m.includes('network')) return 'Sem conexão. Verifique sua internet.';
   return message;
 }

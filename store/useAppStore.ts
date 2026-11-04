@@ -14,18 +14,21 @@ import {
   toDateKey,
 } from '@/services/gamification';
 import { scheduleReview } from '@/services/review';
+import { QUIZ_XP_PER_CORRECT } from '@/constants/gamification';
 import type {
   BehaviorChallenge,
   BehaviorLog,
   BehaviorRating,
   Difficulty,
   LessonCompletion,
+  PartnerInfo,
   Pet,
   ReminderSettings,
   ReviewItem,
   Streak,
   User,
   UserProgress,
+  TutorGender,
   WeeklyGoalDays,
 } from '@/types';
 
@@ -45,6 +48,9 @@ export interface LessonCompletionResult {
   leveledUpTo: number | null;
   /** Em quantos dias o Logan traz esta missão de volta como reforço. */
   reviewInDays: number;
+  /** Acertos e garras do quiz (só contam na primeira vez que a missão é cumprida). */
+  quizCorrect: number;
+  quizBonusXp: number;
 }
 
 export type PaywallSource = 'locked_module' | 'profile' | 'streak_freeze' | 'add_pet';
@@ -57,7 +63,9 @@ export interface OnboardingInput {
   dailyGoalMinutes: User['dailyGoalMinutes'];
   weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
-  partnerCode: string | null;
+  partner: PartnerInfo | null;
+  tutorGender: TutorGender;
+  tutorBirthDate: string;
   pet: PetInput;
 }
 
@@ -95,9 +103,9 @@ interface AppState {
   savePet: (pet: PetInput) => void;
   setReminder: (reminder: ReminderSettings) => void;
   setWeeklyGoal: (days: WeeklyGoalDays) => void;
-  setPartnerCode: (code: string | null) => void;
+  setPartner: (partner: PartnerInfo | null) => void;
   setBehaviorRating: (week: string, challenge: BehaviorChallenge, rating: BehaviorRating) => void;
-  completeLesson: (lessonId: string, difficulty: Difficulty) => LessonCompletionResult | null;
+  completeLesson: (lessonId: string, difficulty: Difficulty, quizCorrect?: number) => LessonCompletionResult | null;
   saveLessonDraft: (lessonId: string, stepIndex: number) => void;
   clearLessonDraft: (lessonId: string) => void;
   reconcileStreakOnOpen: () => void;
@@ -151,8 +159,20 @@ export const useAppStore = create<AppState>()(
       paywall: { visible: false, source: null },
       lastStreakEvent: null,
 
-      completeOnboarding: ({ tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, partnerCode, pet }) => {
-        set((s) => ({ user: { ...s.user, name: tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, partnerCode } }));
+      completeOnboarding: ({ tutorName, dailyGoalMinutes, weeklyGoalDays, reminder, partner, tutorGender, tutorBirthDate, pet }) => {
+        set((s) => ({
+          user: {
+            ...s.user,
+            name: tutorName,
+            dailyGoalMinutes,
+            weeklyGoalDays,
+            reminder,
+            partnerCode: partner?.code ?? null,
+            partnerInfo: partner,
+            tutorGender,
+            tutorBirthDate,
+          },
+        }));
         get().savePet(pet);
         set({ hasOnboarded: true });
       },
@@ -174,12 +194,12 @@ export const useAppStore = create<AppState>()(
 
       setWeeklyGoal: (weeklyGoalDays) => set((s) => ({ user: { ...s.user, weeklyGoalDays } })),
 
-      setPartnerCode: (partnerCode) => set((s) => ({ user: { ...s.user, partnerCode } })),
+      setPartner: (partner) => set((s) => ({ user: { ...s.user, partnerCode: partner?.code ?? null, partnerInfo: partner } })),
 
       setBehaviorRating: (week, challenge, rating) =>
         set((s) => ({ behaviorLog: { ...s.behaviorLog, [week]: { ...s.behaviorLog[week], [challenge]: rating } } })),
 
-      completeLesson: (lessonId, difficulty) => {
+      completeLesson: (lessonId, difficulty, quizCorrect = 0) => {
         const lesson = getLessonById(lessonId);
         if (!lesson) return null;
 
@@ -188,7 +208,8 @@ export const useAppStore = create<AppState>()(
         const previous = progress.completedLessons[lessonId];
         const goal = user.weeklyGoalDays;
 
-        const xpEarned = calculateLessonXp(lesson, difficulty, previous);
+        const quizBonusXp = previous ? 0 : quizCorrect * QUIZ_XP_PER_CORRECT;
+        const xpEarned = calculateLessonXp(lesson, difficulty, previous) + quizBonusXp;
         const activity = registerWeekActivity(streak, progress.xpHistory, goal, isPro, today);
         const totalXp = progress.totalXp + xpEarned + activity.bonusXp;
         const review = scheduleReview(reviews[lessonId], lessonId, difficulty, today);
@@ -233,6 +254,8 @@ export const useAppStore = create<AppState>()(
           isFirstCompletion: !previous,
           leveledUpTo: levelAfter > levelBefore ? levelAfter : null,
           reviewInDays: review.intervalDays,
+          quizCorrect,
+          quizBonusXp,
         };
       },
 
@@ -289,6 +312,8 @@ export const useAppStore = create<AppState>()(
             weeklyGoalDays: s.user.weeklyGoalDays,
             reminder: s.user.reminder,
             partnerCode: s.user.partnerCode,
+            tutorGender: s.user.tutorGender,
+            tutorBirthDate: s.user.tutorBirthDate,
           },
           pet: s.pet,
           progress: s.progress,
@@ -303,7 +328,12 @@ export const useAppStore = create<AppState>()(
           hasOnboarded: snap.hasOnboarded,
           // Enquanto o RevenueCat é simulado, mantém o Pro local também.
           isPro: snap.isPro || s.isPro,
-          user: { ...s.user, ...snap.user },
+          user: {
+            ...s.user,
+            ...snap.user,
+            // O nome/benefício do parceiro é buscado de novo se o código mudou.
+            partnerInfo: s.user.partnerInfo?.code === snap.user.partnerCode ? s.user.partnerInfo : null,
+          },
           // A foto ainda vive só no aparelho: preserva a local se for o mesmo pet.
           pet: snap.pet ? { ...snap.pet, photoUri: snap.pet.photoUri ?? (s.pet?.id === snap.pet.id ? s.pet.photoUri : undefined) } : null,
           progress: snap.progress,
@@ -330,7 +360,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'wolverbark-store',
-      version: 4,
+      version: 6,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({
         hasOnboarded: s.hasOnboarded,
@@ -366,6 +396,12 @@ export const useAppStore = create<AppState>()(
           if (state.user) state.user = { ...state.user, partnerCode: state.user.partnerCode ?? null };
           state.behaviorLog = state.behaviorLog ?? {};
         }
+        // v5: gênero e nascimento do tutor (segmentação).
+        if (version < 5 && state.user) {
+          state.user = { ...state.user, tutorGender: state.user.tutorGender ?? null, tutorBirthDate: state.user.tutorBirthDate ?? null };
+        }
+        // v6: parceiros dinâmicos (tabela partners) — o nome/benefício passa a ser cache local.
+        if (version < 6 && state.user) state.user = { ...state.user, partnerInfo: null };
         return state as AppState;
       },
       onRehydrateStorage: () => () => {

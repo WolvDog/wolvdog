@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/useAppStore';
 /** Convite para o check-in semanal do diário, enquanto ele não foi feito nesta semana. */
 export function DiaryPrompt() {
   const { petName, challenges, behaviorLog } = useAppStore(
-    useShallow((s) => ({ petName: s.pet?.name ?? 'seu cão', challenges: s.pet?.challenges ?? [], behaviorLog: s.behaviorLog })),
+    useShallow((s) => ({ petName: s.pet?.name ?? 'seu pet', challenges: s.pet?.challenges ?? [], behaviorLog: s.behaviorLog })),
   );
   const week = behaviorLog[weekStart(toDateKey())] ?? {};
   const pending = challenges.filter((c) => week[c] === undefined).length;

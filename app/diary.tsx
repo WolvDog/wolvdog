@@ -25,7 +25,7 @@ export default function DiaryScreen() {
   const challenges = pet?.challenges ?? [];
   const thisWeek = behaviorLog[week] ?? {};
   const answered = challenges.filter((c) => thisWeek[c] !== undefined).length;
-  const petName = pet?.name ?? 'seu cão';
+  const petName = pet?.name ?? 'seu pet';
 
   return (
     <SafeAreaView className="flex-1 bg-cloud">

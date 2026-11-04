@@ -71,6 +71,11 @@ export function VictoryStepView({ step, result }: VictoryStepViewProps) {
           Nova {TERMS.level.toLowerCase()}: {levelTitle}!
         </Banner>
       )}
+      {result && result.quizBonusXp > 0 && (
+        <Banner color={COLORS.akitaDark} icon={<ClawMarks size={18} />}>
+          Quiz: {result.quizCorrect} {result.quizCorrect === 1 ? 'acerto' : 'acertos'} · +{points(result.quizBonusXp)}
+        </Banner>
+      )}
       {result && result.reviewInDays === 1 && (
         <Banner color={COLORS.hero} icon={<RotateCcw size={18} color={COLORS.hero} />}>
           Sem problemas! O Logan traz esta missão de volta amanhã como reforço.

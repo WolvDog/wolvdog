@@ -1,0 +1,3 @@
+Coloque aqui as demonstrações dos comandos (Lottie .json ou vídeo .mp4 curto, sem som).
+Exemplo no conteúdo (data/*.ts), dentro de practice:
+  media: { type: "lottie", source: require("@/assets/demos/senta.json"), caption: "Petisco do focinho para trás das orelhas" }

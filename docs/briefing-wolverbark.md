@@ -73,7 +73,7 @@ O paywall aparece ao tocar numa fase Pro, no perfil ou ao tentar adicionar outro
 7. **Truques como recompensa.** Dá a pata, rola, high five, finge de morto. É conteúdo divertido e muito compartilhável, ótimo para aquisição orgânica.
 8. **SOS do Logan.** Uma biblioteca de soluções rápidas para problemas pontuais (latido na campainha, mordidinha de filhote, medo de trovão). Dá utilidade imediata mesmo fora da trilha.
 9. **Família no treino.** Convidar outros moradores da casa, porque consistência entre as pessoas é essencial no adestramento. Também é um fator social de retenção.
-10. **Cartões de conquista compartilháveis.** Por exemplo, "Thor dominou o Senta! 🦴", no formato de story do Instagram.
+10. **Cartões de conquista compartilháveis.** Por exemplo, "Caramelo dominou o Senta! 🦴", no formato de story do Instagram.
 11. **Futuro Pro+:** o tutor envia um vídeo do cão executando o comando e recebe uma avaliação (por IA ou adestrador), ganhando um "certificado".
 
 ## 8. Perguntas para discussão

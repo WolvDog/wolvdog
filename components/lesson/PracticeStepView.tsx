@@ -1,5 +1,5 @@
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { LoganSays } from '@/components/LoganSays';
@@ -10,11 +10,29 @@ import { HapticStyle, tap } from '@/services/haptics';
 import type { PracticeStep } from '@/types';
 
 import { Clicker } from './Clicker';
+import { DemoMedia } from './DemoMedia';
 import { StepHeading } from './StepHeading';
 
-export function PracticeStepView({ step }: { step: PracticeStep }) {
+interface PracticeStepViewProps {
+  step: PracticeStep;
+  /** Chamado quando as repetições da missão são concluídas (segue para o relatório). */
+  onTargetReached?: () => void;
+}
+
+export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProps) {
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [reps, setReps] = useState(0);
+  const targetReached = !!step.targetReps && reps >= step.targetReps;
+  const firedRef = useRef(false);
+
+  // Bateu a meta de repetições: trava o clicker e segue para o Relatório do Treino.
+  useEffect(() => {
+    if (!targetReached || firedRef.current) return;
+    firedRef.current = true;
+    tap(HapticStyle.Heavy);
+    const id = setTimeout(() => onTargetReached?.(), 1200);
+    return () => clearTimeout(id);
+  }, [targetReached, onTargetReached]);
 
   const toggle = (i: number) => {
     tap();
@@ -31,6 +49,8 @@ export function PracticeStepView({ step }: { step: PracticeStep }) {
       <StepHeading kicker="Hora do treino" color={COLORS.hero} title={step.title} />
 
       <LoganSays text={step.loganSpeech} mood={step.loganMood} size={80} />
+
+      {step.media && <DemoMedia media={step.media} />}
 
       <View className="mt-6">
         {step.instructions.map((instruction, i) => {
@@ -63,7 +83,16 @@ export function PracticeStepView({ step }: { step: PracticeStep }) {
         })}
       </View>
 
-      <Clicker countsReps={!!step.targetReps} onClick={() => step.targetReps && setReps((r) => r + 1)} />
+      <Clicker
+        countsReps={!!step.targetReps}
+        disabled={targetReached}
+        onClick={() => step.targetReps && setReps((r) => Math.min(step.targetReps!, r + 1))}
+      />
+      {targetReached && (
+        <View className="mt-3 rounded-xl border-2 border-ink-900 bg-claw-500 p-3">
+          <Text className="text-center font-bold text-ink-900">🎯 Meta de repetições batida! Indo para o relatório…</Text>
+        </View>
+      )}
 
       {(step.timerSeconds || step.targetReps) && (
         <View className="mt-3 flex-row gap-3">

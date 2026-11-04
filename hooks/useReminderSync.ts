@@ -13,7 +13,7 @@ export function useReminderSync() {
   const { reminder, petName, tutorName, lastActiveDate, hasOnboarded } = useAppStore(
     useShallow((s) => ({
       reminder: s.user.reminder,
-      petName: s.pet?.name ?? 'Seu cão',
+      petName: s.pet?.name ?? 'Seu Pet',
       tutorName: s.user.name,
       lastActiveDate: s.streak.lastActiveDate,
       hasOnboarded: s.hasOnboarded,

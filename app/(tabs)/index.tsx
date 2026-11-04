@@ -40,7 +40,7 @@ export default function MissionMapScreen() {
     })),
   );
 
-  const petName = pet?.name ?? 'seu cão';
+  const petName = pet?.name ?? 'seu pet';
   const trainedToday = xpHistory.some((e) => e.date === toDateKey() && e.source === 'lesson');
   const week = useWeekStatus();
   const dueReviews = getDueReviews(reviews);

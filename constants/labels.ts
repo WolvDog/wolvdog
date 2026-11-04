@@ -1,4 +1,4 @@
-import type { BehaviorChallenge, Difficulty, PetSize } from '@/types';
+import type { BehaviorChallenge, Difficulty, PetSex, PetSize, TutorGender } from '@/types';
 
 export const PET_SIZE_LABELS: Record<PetSize, string> = {
   mini: 'Mini',
@@ -89,3 +89,40 @@ export const RATING_LABELS = {
   4: { emoji: '🙂', label: 'Quase lá' },
   5: { emoji: '😎', label: 'Sob controle' },
 } as const;
+
+export const TUTOR_GENDER_LABELS: Record<TutorGender, string> = {
+  female: 'Mulher',
+  male: 'Homem',
+  undisclosed: 'Prefiro não dizer',
+};
+
+export const PET_SEX_LABELS: Record<PetSex, { label: string; emoji: string }> = {
+  male: { label: 'Macho', emoji: '♂️' },
+  female: { label: 'Fêmea', emoji: '♀️' },
+};
+
+/** Máscara DD/MM/AAAA enquanto o tutor digita. */
+export function maskBirthDate(text: string): string {
+  const d = text.replace(/\D/g, '').slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+
+/** Converte DD/MM/AAAA em YYYY-MM-DD; null se a data for inválida ou fora de 13–100 anos. */
+export function parseBirthDate(masked: string): string | null {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(masked);
+  if (!m) return null;
+  const [, dd, mm, yyyy] = m;
+  const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  if (date.getDate() !== Number(dd) || date.getMonth() !== Number(mm) - 1) return null;
+  const age = (Date.now() - date.getTime()) / (365.25 * 86_400_000);
+  if (age < 13 || age > 100) return null;
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+export function formatBirthDate(iso: string | null): string {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}

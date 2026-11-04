@@ -9,6 +9,8 @@ create table if not exists public.profiles (
   weekly_goal_days smallint not null default 3,
   review_queue jsonb not null default '{}'::jsonb,
   partner_code text,
+  tutor_gender text check (tutor_gender in ('male', 'female', 'undisclosed')),
+  tutor_birth_date date,
   behavior_log jsonb not null default '{}'::jsonb,
   total_xp integer not null default 0,
   has_onboarded boolean not null default false,
@@ -28,6 +30,7 @@ create table if not exists public.pets (
   breed text not null,
   age_months smallint not null,
   size text not null check (size in ('mini','pequeno','medio','grande','gigante')),
+  sex text check (sex in ('male', 'female')),
   weight_kg numeric(5,1),
   photo_url text,
   challenges text[] not null default '{}',
@@ -85,7 +88,29 @@ create policy "own streak" on public.streaks for all using (auth.uid() = user_id
 
 -- Impede que o app marque a si mesmo como Pro: o cliente só escreve as colunas abaixo.
 revoke insert, update on public.profiles from authenticated;
-grant insert (id, name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant insert (id, name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, tutor_gender, tutor_birth_date, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;
-grant update (name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant update (name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, tutor_gender, tutor_birth_date, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;
+
+-- Parceiros B2B2C (códigos de indicação) — ver também migrations/005_partners_table.sql
+create table if not exists public.partners (
+  code text primary key check (code = upper(code)),
+  name text not null,
+  perk text not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.partners enable row level security;
+
+-- O app (inclusive antes do login) só consegue ler parceiros ativos.
+drop policy if exists "read active partners" on public.partners;
+create policy "read active partners" on public.partners for select to anon, authenticated using (active);
+
+-- Códigos de teste (desenvolvimento)
+insert into public.partners (code, name, perk) values
+  ('PARCEIRO30', 'Parceiro de teste', '30% off no 1º mês'),
+  ('AUAU', 'Cupom AUAU', '10% off no plano anual')
+on conflict (code) do nothing;
+

@@ -17,9 +17,25 @@ export interface User {
   /** Meta de dias de treino por semana — a sequência conta semanas cumpridas. */
   weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
-  /** Código do parceiro que indicou o app (ex.: creche), se houver. */
+  /** Código do parceiro que indicou o app (ex.: creche), se houver. Sincronizado com a nuvem. */
   partnerCode: string | null;
+  /** Nome e benefício do parceiro (cache local da tabela `partners`). */
+  partnerInfo: PartnerInfo | null;
+  /** Dados de perfil para segmentação de campanhas. */
+  tutorGender: TutorGender | null;
+  /** Data de nascimento do tutor (YYYY-MM-DD). */
+  tutorBirthDate: string | null;
 }
+
+export interface PartnerInfo {
+  code: string;
+  name: string;
+  /** Benefício exibido no app. */
+  perk: string;
+}
+
+export type TutorGender = 'male' | 'female' | 'undisclosed';
+export type PetSex = 'male' | 'female';
 
 export type WeeklyGoalDays = 3 | 4 | 5 | 7;
 
@@ -49,6 +65,7 @@ export interface Pet {
   /** Idade em meses — facilita a lógica de filhote vs. adulto. */
   ageMonths: number;
   size: PetSize;
+  sex?: PetSex;
   weightKg?: number;
   photoUri?: string;
   challenges: BehaviorChallenge[];
@@ -88,6 +105,30 @@ export interface PracticeStep extends BaseStep {
   targetReps?: number;
   /** Erros comuns a evitar. */
   avoid?: string[];
+  /** Demonstração do movimento (animação Lottie ou vídeo curto em loop). */
+  media?: DemoMedia;
+}
+
+/**
+ * Mídia de demonstração da etapa "Hora do treino".
+ * `source`: `require('@/assets/demos/senta.json')` (Lottie) / `require('@/assets/demos/senta.mp4')` (vídeo) ou uma URL.
+ */
+export interface DemoMedia {
+  type: 'lottie' | 'video';
+  source: number | string;
+  caption?: string;
+  /** Proporção largura/altura (padrão 16:9 para vídeo, 1:1 para Lottie). */
+  aspectRatio?: number;
+}
+
+/** Pergunta de múltipla escolha dos quizzes das missões teóricas. */
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  /** Explicação curta mostrada depois da resposta. */
+  explanation: string;
 }
 
 export interface ValidationOption {
@@ -125,6 +166,8 @@ export interface Lesson {
   xpReward: number;
   icon: string; // emoji usado no nó da trilha
   steps: [ConceptStep, PracticeStep, ValidationStep, VictoryStep];
+  /** Quiz opcional (3 a 5 perguntas) entre a Dica do Logan e a Hora do treino. */
+  quiz?: QuizQuestion[];
 }
 
 export interface Module {
@@ -205,12 +248,14 @@ export interface ReviewItem {
 // Monetização
 // ---------------------------------------------------------------------------
 
-export type PlanPeriod = 'monthly' | 'annual';
+export type PlanPeriod = 'monthly' | 'semiannual' | 'annual';
 
 export interface SubscriptionPlan {
   id: string;
-  /** Identificador do package no RevenueCat ($rc_monthly, $rc_annual). */
+  /** Identificador do package no RevenueCat ($rc_monthly, $rc_six_month, $rc_annual). */
   revenueCatPackageId: string;
+  /** Produto de assinatura adicional cobrado por cão extra (RevenueCat / lojas). */
+  extraPetProductId: string;
   period: PlanPeriod;
   title: string;
   priceCents: number;
@@ -218,6 +263,9 @@ export interface SubscriptionPlan {
   priceLabel: string;
   pricePerMonthLabel: string;
   trialDays: number;
+  /** Valor por cão adicional no mesmo período (50% do plano base). */
+  extraPetPriceCents: number;
   badge?: string;
+  /** Economia em relação a pagar o plano mensal pelo mesmo tempo. */
   savingsPercent?: number;
 }

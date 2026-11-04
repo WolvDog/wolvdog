@@ -1,12 +1,13 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Clock, X } from 'lucide-react-native';
-import { type ComponentRef, useEffect, useRef, useState } from 'react';
+import { type ComponentRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HeroButton } from '@/components/HeroButton';
 import { ConceptStepView } from '@/components/lesson/ConceptStepView';
 import { PracticeStepView } from '@/components/lesson/PracticeStepView';
+import { QuizStepView } from '@/components/lesson/QuizStepView';
 import { ValidationStepView } from '@/components/lesson/ValidationStepView';
 import { VictoryStepView } from '@/components/lesson/VictoryStepView';
 import { LoganSays } from '@/components/LoganSays';
@@ -17,10 +18,20 @@ import { useProgression } from '@/hooks/useProgression';
 import { showConfirm } from '@/services/dialog';
 import { getLessonState } from '@/services/progression';
 import { type LessonCompletionResult, useAppStore } from '@/store/useAppStore';
-import type { ValidationOption } from '@/types';
+import type { Lesson, LessonStep, ValidationOption } from '@/types';
+
+/** Etapas da missão na ordem exibida: o quiz (se houver) entra entre a Dica e o Treino. */
+type FlowStep = LessonStep | { type: 'quiz'; id: string };
+
+function buildFlow(lesson: Lesson): FlowStep[] {
+  const [concept, practice, validation, victory] = lesson.steps;
+  const quiz: FlowStep[] = lesson.quiz?.length ? [{ type: 'quiz', id: `${lesson.id}-quiz` }] : [];
+  return [concept, ...quiz, practice, validation, victory];
+}
 
 const CTA_LABEL = {
   concept: 'Entendi!',
+  quiz: '',
   practice: 'Treino feito',
   validation: 'Cumprir missão',
   victory: 'Continuar',
@@ -39,8 +50,12 @@ export default function LessonScreen() {
   const completeLesson = useAppStore((s) => s.completeLesson);
   const saveLessonDraft = useAppStore((s) => s.saveLessonDraft);
 
+  const flow = useMemo(() => (lesson ? buildFlow(lesson) : []), [lesson]);
+  const practiceIndex = flow.findIndex((s) => s.type === 'practice');
+
   // Retoma de onde parou, mas nunca direto na tela de vitória.
-  const [stepIndex, setStepIndex] = useState(() => (isReview ? 1 : Math.min(draftIndex ?? 0, 2)));
+  const [stepIndex, setStepIndex] = useState(() => (isReview ? practiceIndex : Math.min(draftIndex ?? 0, flow.length - 2)));
+  const [quizCorrect, setQuizCorrect] = useState(0);
   const [answer, setAnswer] = useState<ValidationOption | null>(null);
   const [result, setResult] = useState<LessonCompletionResult | null>(null);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
@@ -80,7 +95,7 @@ export default function LessonScreen() {
     );
   }
 
-  const step = lesson.steps[stepIndex]!;
+  const step = flow[stepIndex]!;
   const isVictory = step.type === 'victory';
 
   const handleClose = async () => {
@@ -98,7 +113,7 @@ export default function LessonScreen() {
   const handleNext = () => {
     if (step.type === 'validation') {
       if (!answer) return;
-      setResult(completeLesson(lesson.id, answer.difficulty));
+      setResult(completeLesson(lesson.id, answer.difficulty, quizCorrect));
     }
     if (isVictory) return router.back();
     setStepIndex((i) => i + 1);
@@ -112,7 +127,7 @@ export default function LessonScreen() {
           <X size={28} color={COLORS.ink} strokeWidth={3} />
         </Pressable>
         <View className="ml-4 flex-1">
-          <SegmentedProgress total={lesson.steps.length} current={stepIndex} color={module.color} />
+          <SegmentedProgress total={flow.length} current={stepIndex} color={module.color} />
         </View>
       </View>
 
@@ -128,21 +143,35 @@ export default function LessonScreen() {
 
       <ScrollView ref={scrollRef} className="flex-1" contentContainerStyle={{ padding: 20, paddingBottom: 32 }}>
         {step.type === 'concept' && <ConceptStepView step={step} />}
-        {step.type === 'practice' && <PracticeStepView key={step.id} step={step} />}
+        {step.type === 'quiz' && lesson.quiz && (
+          <QuizStepView
+            questions={lesson.quiz}
+            onComplete={(correct) => {
+              setQuizCorrect(correct);
+              setStepIndex((i) => i + 1);
+            }}
+          />
+        )}
+        {step.type === 'practice' && (
+          <PracticeStepView key={step.id} step={step} onTargetReached={() => setStepIndex((i) => i + 1)} />
+        )}
         {step.type === 'validation' && (
           <ValidationStepView step={step} selectedId={answer?.id ?? null} onSelect={setAnswer} />
         )}
         {step.type === 'victory' && <VictoryStepView step={step} result={result} />}
       </ScrollView>
 
-      <View className="border-t-2 border-ink-900 px-5 pb-4 pt-4">
-        <HeroButton
-          label={CTA_LABEL[step.type]}
-          variant={isVictory ? 'hero' : 'primary'}
-          disabled={step.type === 'validation' && !answer}
-          onPress={handleNext}
-        />
-      </View>
+      {/* O quiz tem os próprios botões de avançar. */}
+      {step.type !== 'quiz' && (
+        <View className="border-t-2 border-ink-900 px-5 pb-4 pt-4">
+          <HeroButton
+            label={CTA_LABEL[step.type]}
+            variant={isVictory ? 'hero' : 'primary'}
+            disabled={step.type === 'validation' && !answer}
+            onPress={handleNext}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

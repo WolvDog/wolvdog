@@ -10,6 +10,9 @@ export const DIFFICULTY_XP_BONUS: Record<Difficulty, number> = {
 /** Refazer uma missão (ou o reforço) rende uma fração das garras originais. */
 export const REPEAT_XP_MULTIPLIER = 0.5;
 
+/** Garras por resposta certa nos quizzes (só na primeira vez que a missão é cumprida). */
+export const QUIZ_XP_PER_CORRECT = 2;
+
 /** Garras extras ao atingir a meta semanal de treinos. */
 export const WEEK_GOAL_BONUS_XP = 30;
 

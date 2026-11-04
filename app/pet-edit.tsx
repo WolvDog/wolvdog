@@ -8,10 +8,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Chip, Field, TextField } from '@/components/form';
 import { HeroButton } from '@/components/HeroButton';
 import { LoganSays } from '@/components/LoganSays';
-import { CHALLENGE_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
+import { CHALLENGE_LABELS, PET_SEX_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
 import { COLORS, FONTS } from '@/constants/theme';
 import { useAppStore } from '@/store/useAppStore';
-import type { BehaviorChallenge, PetSize } from '@/types';
+import type { BehaviorChallenge, PetSex, PetSize } from '@/types';
 
 const SIZES = Object.keys(PET_SIZE_LABELS) as PetSize[];
 const CHALLENGES = Object.keys(CHALLENGE_LABELS) as BehaviorChallenge[];
@@ -26,6 +26,7 @@ export default function PetEditScreen() {
   const [months, setMonths] = useState(pet ? String(pet.ageMonths % 12) : '');
   const [weight, setWeight] = useState(pet?.weightKg ? String(pet.weightKg).replace('.', ',') : '');
   const [size, setSize] = useState<PetSize>(pet?.size ?? 'medio');
+  const [sex, setSex] = useState<PetSex | undefined>(pet?.sex);
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>(pet?.challenges ?? []);
   const [photoUri, setPhotoUri] = useState(pet?.photoUri);
 
@@ -54,6 +55,7 @@ export default function PetEditScreen() {
       breed: breed.trim(),
       ageMonths,
       size,
+      sex,
       weightKg: weightKg > 0 ? weightKg : undefined,
       challenges,
       photoUri,
@@ -84,10 +86,17 @@ export default function PetEditScreen() {
           </Pressable>
 
           <Field label="Nome">
-            <TextField value={name} onChangeText={setName} placeholder="Ex.: Thor" />
+            <TextField value={name} onChangeText={setName} placeholder="Ex: Mel" />
+          </Field>
+          <Field label="Sexo">
+            <View className="flex-row gap-2">
+              {(Object.keys(PET_SEX_LABELS) as PetSex[]).map((sx) => (
+                <Chip key={sx} label={`${PET_SEX_LABELS[sx].emoji} ${PET_SEX_LABELS[sx].label}`} active={sex === sx} onPress={() => setSex(sx)} />
+              ))}
+            </View>
           </Field>
           <Field label="Raça">
-            <TextField value={breed} onChangeText={setBreed} placeholder="Ex.: Akita Inu, SRD…" />
+            <TextField value={breed} onChangeText={setBreed} placeholder="Ex: Akita Inu, SRD…" />
           </Field>
           <Field label="Idade">
             <View className="flex-row gap-3">
@@ -100,7 +109,7 @@ export default function PetEditScreen() {
             </View>
           </Field>
           <Field label="Peso">
-            <TextField value={weight} onChangeText={setWeight} placeholder="Ex.: 12,5" keyboardType="decimal-pad" suffix="kg" />
+            <TextField value={weight} onChangeText={setWeight} placeholder="Ex: 12,5" keyboardType="decimal-pad" suffix="kg" />
           </Field>
 
           <Field label="Porte">

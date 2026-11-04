@@ -47,16 +47,22 @@ export function Logan({ size = 96, mood = 'happy', animated = true, style }: Log
         </SvgText>
 
         {/* Orelhas eretas */}
-        <Path d="M20 54 L30 8 L56 34 Z" fill={COLORS.akitaDark} />
-        <Path d="M100 54 L90 8 L64 34 Z" fill={COLORS.akitaDark} />
+        <Path d="M20 54 L30 8 L56 34 Z" fill={COLORS.akitaDark} stroke={COLORS.ink} strokeWidth={2} strokeLinejoin="round" />
+        <Path d="M100 54 L90 8 L64 34 Z" fill={COLORS.akitaDark} stroke={COLORS.ink} strokeWidth={2} strokeLinejoin="round" />
         <Path d="M28 44 L32 18 L48 34 Z" fill="#F7B9A0" />
         <Path d="M92 44 L88 18 L72 34 Z" fill="#F7B9A0" />
 
         {/* Cabeça */}
-        <Ellipse cx={60} cy={62} rx={42} ry={36} fill={COLORS.akita} />
+        <Ellipse cx={60} cy={62} rx={42} ry={36} fill={COLORS.akita} stroke={COLORS.ink} strokeWidth={2} />
 
-        {/* Urajiro: bochechas e focinho brancos */}
-        <Path d="M24 70 Q30 98 60 100 Q90 98 96 70 Q84 80 60 78 Q36 80 24 70 Z" fill={COLORS.urajiro} />
+        {/* Urajiro: marcações brancas bem definidas no focinho e nas bochechas */}
+        <Path
+          d="M24 70 Q30 98 60 100 Q90 98 96 70 Q84 80 60 78 Q36 80 24 70 Z"
+          fill={COLORS.urajiro}
+          stroke={COLORS.ink}
+          strokeWidth={1.5}
+          strokeLinejoin="round"
+        />
         <Ellipse cx={60} cy={82} rx={20} ry={15} fill={COLORS.urajiro} />
         <Ellipse cx={44} cy={44} rx={5} ry={3.5} fill={COLORS.urajiro} />
         <Ellipse cx={76} cy={44} rx={5} ry={3.5} fill={COLORS.urajiro} />
@@ -78,10 +84,6 @@ export function Logan({ size = 96, mood = 'happy', animated = true, style }: Log
         <Ellipse cx={57.5} cy={74.5} rx={2} ry={1.2} fill="#FFFFFF" opacity={0.6} />
 
         <Mouth mood={mood} />
-
-        {/* Bochechas */}
-        <Ellipse cx={36} cy={82} rx={5} ry={3} fill="#FF9AA2" opacity={0.55} />
-        <Ellipse cx={84} cy={82} rx={5} ry={3} fill="#FF9AA2" opacity={0.55} />
       </Svg>
     </Animated.View>
   );

@@ -5,16 +5,18 @@ import { Pressable, Switch, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { WEEKLY_GOAL_OPTIONS } from '@/constants/gamification';
-import { findPartner } from '@/constants/partners';
 import { COLORS, FONTS } from '@/constants/theme';
 import { showAlert, showConfirm } from '@/services/dialog';
-import { formatTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
+import { formatTime, isPresetTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { signOut } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
+import type { PartnerInfo } from '@/types';
 
-import { Chip, TextField } from './form';
+import { Chip } from './form';
 import { HeroButton } from './HeroButton';
+import { PartnerCodeField } from './PartnerCodeField';
+import { TimePickerButton } from './TimePickerButton';
 
 const TITLE = { fontFamily: FONTS.display, fontSize: 20, color: COLORS.ink } as const;
 
@@ -27,10 +29,10 @@ const SYNC_LABEL = {
 
 /** Cartões de lembretes diários e de conta/sincronização, exibidos no perfil. */
 export function AccountSettings() {
-  const { partnerCode, setPartnerCode, weeklyGoal, setWeeklyGoal, reminder, setReminder, authEmail, authUserId, syncStatus } = useAppStore(
+  const { partner, setPartner, weeklyGoal, setWeeklyGoal, reminder, setReminder, authEmail, authUserId, syncStatus } = useAppStore(
     useShallow((s) => ({
-      partnerCode: s.user.partnerCode,
-      setPartnerCode: s.setPartnerCode,
+      partner: s.user.partnerInfo,
+      setPartner: s.setPartner,
       weeklyGoal: s.user.weeklyGoalDays,
       setWeeklyGoal: s.setWeeklyGoal,
       reminder: s.user.reminder,
@@ -41,9 +43,7 @@ export function AccountSettings() {
     })),
   );
 
-  const [partnerInput, setPartnerInput] = useState('');
-  const partner = findPartner(partnerCode);
-  const typedPartner = findPartner(partnerInput);
+  const [typedPartner, setTypedPartner] = useState<PartnerInfo | null>(null);
 
   async function toggleReminder(enabled: boolean) {
     if (enabled && !(await requestReminderPermission())) {
@@ -107,6 +107,12 @@ export function AccountSettings() {
                 onPress={() => setReminder({ ...reminder, hour: t.hour, minute: t.minute })}
               />
             ))}
+            <TimePickerButton
+              hour={reminder.hour}
+              minute={reminder.minute}
+              active={!isPresetTime(reminder.hour, reminder.minute)}
+              onChange={(time) => setReminder({ ...reminder, ...time })}
+            />
           </View>
         )}
       </View>
@@ -121,24 +127,13 @@ export function AccountSettings() {
         ) : (
           <>
             <Text className="mb-3 mt-1 text-sm text-ink-600">Veio por indicação de uma creche, hotel ou adestrador?</Text>
-            <TextField
-              value={partnerInput}
-              onChangeText={setPartnerInput}
-              placeholder="Ex.: GARRIDOSP"
-              autoCapitalize="characters"
-              autoCorrect={false}
-            />
-            {partnerInput.trim().length >= 4 && !typedPartner && (
-              <Text className="mt-2 text-xs" style={{ color: COLORS.danger }}>
-                Código não encontrado.
-              </Text>
-            )}
+            <PartnerCodeField onChange={setTypedPartner} />
             <HeroButton
               className="mt-3"
               label="Aplicar código"
               variant="secondary"
               disabled={!typedPartner}
-              onPress={() => typedPartner && setPartnerCode(typedPartner.code)}
+              onPress={() => typedPartner && setPartner(typedPartner)}
             />
           </>
         )}
