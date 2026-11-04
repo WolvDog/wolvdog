@@ -23,7 +23,12 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "WolverBark",
+      "shortName": "WolverBark",
+      "lang": "pt-BR",
+      "themeColor": "#FFFFFF",
+      "backgroundColor": "#1850BE"
     },
     "plugins": [
       "expo-router",
