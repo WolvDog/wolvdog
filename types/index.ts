@@ -202,7 +202,39 @@ export interface LessonCompletion {
 export interface XpEvent {
   date: string; // YYYY-MM-DD
   amount: number;
-  source: 'lesson' | 'streak_bonus' | 'perfect_week';
+  source: 'lesson' | 'streak_bonus' | 'perfect_week' | 'guide';
+}
+
+// ---------------------------------------------------------------------------
+// Guia do Tutor: consultas rápidas fora da trilha de treino
+// ---------------------------------------------------------------------------
+
+export type GuideCategory = 'socializacao' | 'comportamento' | 'saude' | 'clima' | 'emergencia';
+
+export interface TutorGuide {
+  slug: string;
+  category: GuideCategory;
+  icon: string;
+  title: string;
+  /** Uma linha: a dor que o guia resolve. */
+  summary: string;
+  readMinutes: number;
+  /** Visão da veterinária: exatamente 2 frases curtas sobre a causa. */
+  doctorAdvice: string;
+  /** Missão do Logan: 3 passos práticos, sem nada punitivo. Aceita {pet}. */
+  loganSteps: [string, string, string];
+  /** Quando procurar o veterinário (destaque em vermelho). Aceita {pet}. */
+  warning?: string;
+}
+
+/** Especialista parceira que assina o Guia (tabela `experts` do Supabase). */
+export interface Expert {
+  id: string;
+  displayName: string;
+  title: string;
+  registry: string | null;
+  avatarUrl: string | null;
+  validatedGuides: string[];
 }
 
 export interface UserProgress {

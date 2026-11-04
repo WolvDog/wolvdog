@@ -114,3 +114,20 @@ insert into public.partners (code, name, perk) values
   ('AUAU', 'Cupom AUAU', '10% off no plano anual')
 on conflict (code) do nothing;
 
+
+-- Guia do Tutor (ver migrations/007_tutor_guide_experts.sql)
+create table if not exists public.experts (
+  id text primary key,
+  display_name text not null,
+  title text not null default 'Médica veterinária',
+  registry text,
+  avatar_url text,
+  validated_guides text[] not null default '{}',
+  sort int not null default 0,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table public.experts enable row level security;
+drop policy if exists "read active experts" on public.experts;
+create policy "read active experts" on public.experts for select to anon, authenticated using (active);
+alter table public.profiles add column if not exists guide_reads jsonb not null default '{}'::jsonb;

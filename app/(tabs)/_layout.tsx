@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Map, PawPrint } from 'lucide-react-native';
+import { BookHeart, Map, PawPrint } from 'lucide-react-native';
 
 import { COLORS, FONTS } from '@/constants/theme';
 
@@ -17,6 +17,10 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{ title: 'Missões', tabBarIcon: ({ color, size }) => <Map color={color} size={size} /> }}
+      />
+      <Tabs.Screen
+        name="guide"
+        options={{ title: 'Guia', tabBarIcon: ({ color, size }) => <BookHeart color={color} size={size} /> }}
       />
       <Tabs.Screen
         name="profile"

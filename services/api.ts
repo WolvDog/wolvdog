@@ -23,6 +23,8 @@ export interface CloudSnapshot {
   streak: Streak;
   reviews: Record<string, ReviewItem>;
   behaviorLog: BehaviorLog;
+  /** Guias do Tutor lidos: slug → data. */
+  guideReads: Record<string, string>;
 }
 
 /**
@@ -102,6 +104,8 @@ export const repository = {
         : { current: 0, longest: 0, lastActiveDate: null, freezesAvailable: 1, frozenWeeks: [], lastEvaluatedWeek: null },
       reviews: (p.review_queue as Record<string, ReviewItem> | null) ?? {},
       behaviorLog: (p.behavior_log as BehaviorLog | null) ?? {},
+      // Coluna da migração 007: em banco sem ela, volta vazio.
+      guideReads: (p.guide_reads as Record<string, string> | null | undefined) ?? {},
     };
   },
 
@@ -110,7 +114,7 @@ export const repository = {
     const db = supabase;
 
     // O perfil precisa existir antes das tabelas filhas (chave estrangeira).
-    const profile = await db.from('profiles').upsert({
+    const profileRow = {
       id: userId,
       name: snap.user.name,
       daily_goal_minutes: snap.user.dailyGoalMinutes,
@@ -120,13 +124,20 @@ export const repository = {
       tutor_gender: snap.user.tutorGender,
       tutor_birth_date: snap.user.tutorBirthDate,
       behavior_log: snap.behaviorLog,
+      guide_reads: snap.guideReads,
       total_xp: snap.progress.totalXp,
       has_onboarded: snap.hasOnboarded,
       reminder_enabled: snap.user.reminder.enabled,
       reminder_hour: snap.user.reminder.hour,
       reminder_minute: snap.user.reminder.minute,
       updated_at: new Date().toISOString(),
-    });
+    };
+    let profile = await db.from('profiles').upsert(profileRow);
+    // Banco ainda sem a migração 007 (coluna guide_reads): salva o resto do perfil assim mesmo.
+    if (profile.error?.message?.includes('guide_reads')) {
+      const { guide_reads: _skipped, ...withoutGuides } = profileRow;
+      profile = await db.from('profiles').upsert(withoutGuides);
+    }
     if (profile.error) throw profile.error;
 
     const writes = [

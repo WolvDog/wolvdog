@@ -11,6 +11,7 @@ import { Logan } from '@/components/Logan';
 import { PaywallModal } from '@/components/PaywallModal';
 import { COLORS } from '@/constants/theme';
 import { useReminderSync } from '@/hooks/useReminderSync';
+import { fetchActiveExpert } from '@/services/experts';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { startAuthListener, startAutoSync } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
@@ -36,6 +37,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (!hasHydrated) return;
     reconcileStreakOnOpen();
+    // Quem assina o Guia do Tutor (sem internet, fica o que já estava salvo).
+    void fetchActiveExpert().then((expert) => expert !== undefined && useAppStore.getState().setExpert(expert));
     const stopAuth = startAuthListener();
     const stopSync = startAutoSync();
     // App aberto de um dia para o outro (ou virando a semana): fecha as semanas ao voltar.
@@ -76,6 +79,7 @@ export default function RootLayout() {
           <Stack.Screen name="lesson/[id]" options={{ presentation: 'fullScreenModal', gestureEnabled: false }} />
           <Stack.Screen name="pet-edit" options={{ presentation: 'modal' }} />
           <Stack.Screen name="diary" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="guide/[slug]" options={{ presentation: 'modal' }} />
         </Stack.Protected>
         {/* Antes do onboarding, o login só fica disponível sob pedido (o router escolhe a 1ª rota em ordem alfabética). */}
         <Stack.Protected guard={isSupabaseConfigured && !authUserId && (hasOnboarded || loginRequested)}>

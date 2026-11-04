@@ -74,6 +74,7 @@ export function startAutoSync(): () => void {
       state.streak !== prev.streak ||
       state.reviews !== prev.reviews ||
       state.behaviorLog !== prev.behaviorLog ||
+      state.guideReads !== prev.guideReads ||
       state.pet !== prev.pet ||
       state.user !== prev.user ||
       state.isPro !== prev.isPro ||

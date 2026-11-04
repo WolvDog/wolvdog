@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { GUIDE_READ_REWARD } from '@/data/guides';
 import { getLessonById, MOCK_USER } from '@/data/mockData';
 import type { CloudSnapshot } from '@/services/api';
 import {
@@ -20,6 +21,7 @@ import type {
   BehaviorLog,
   BehaviorRating,
   Difficulty,
+  Expert,
   LessonCompletion,
   PartnerInfo,
   Pet,
@@ -88,6 +90,10 @@ interface AppState {
   syncedUserId: string | null;
   /** Há mudanças locais que ainda não chegaram à nuvem (ex.: treino feito offline). */
   pendingPush: boolean;
+  /** Guias do Tutor já lidos: slug → data (AAAA-MM-DD). */
+  guideReads: Record<string, string>;
+  /** Especialista que assina o Guia (cache para funcionar offline). null = Guia genérico. */
+  expert: Expert | null;
 
   // --- estado efêmero ---
   hasHydrated: boolean;
@@ -118,6 +124,9 @@ interface AppState {
   openPaywall: (source: PaywallSource) => void;
   closePaywall: () => void;
   resetProgress: () => void;
+  /** Marca o guia como lido. Retorna as garras ganhas (só na primeira leitura). */
+  markGuideRead: (slug: string) => number;
+  setExpert: (expert: Expert | null) => void;
 
   setAuth: (auth: { userId: string; email: string | null } | null) => void;
   skipAuth: () => void;
@@ -157,6 +166,8 @@ export const useAppStore = create<AppState>()(
       lessonDrafts: {},
       syncedUserId: null,
       pendingPush: false,
+      guideReads: {},
+      expert: null,
 
       hasHydrated: false,
       authReady: false,
@@ -295,7 +306,25 @@ export const useAppStore = create<AppState>()(
       closePaywall: () => set((s) => ({ paywall: { ...s.paywall, visible: false } })),
 
       resetProgress: () =>
-        set({ progress: initialProgress, streak: initialStreak, reviews: {}, lessonDrafts: {}, lastStreakEvent: null }),
+        set({ progress: initialProgress, streak: initialStreak, reviews: {}, lessonDrafts: {}, guideReads: {}, lastStreakEvent: null }),
+
+      markGuideRead: (slug) => {
+        const { guideReads, progress } = get();
+        if (guideReads[slug]) return 0;
+        const today = toDateKey();
+        set({
+          guideReads: { ...guideReads, [slug]: today },
+          progress: {
+            ...progress,
+            totalXp: progress.totalXp + GUIDE_READ_REWARD,
+            // 'guide' não conta como dia de treino na meta semanal (só 'lesson' conta).
+            xpHistory: [...progress.xpHistory, { date: today, amount: GUIDE_READ_REWARD, source: 'guide' }],
+          },
+        });
+        return GUIDE_READ_REWARD;
+      },
+
+      setExpert: (expert) => set({ expert }),
 
       setAuth: (auth) =>
         set({
@@ -336,6 +365,7 @@ export const useAppStore = create<AppState>()(
           streak: s.streak,
           reviews: s.reviews,
           behaviorLog: s.behaviorLog,
+          guideReads: s.guideReads,
         };
       },
 
@@ -356,6 +386,7 @@ export const useAppStore = create<AppState>()(
           streak: snap.streak,
           reviews: snap.reviews,
           behaviorLog: snap.behaviorLog,
+          guideReads: snap.guideReads,
         })),
 
       clearLocalData: () =>
@@ -374,6 +405,7 @@ export const useAppStore = create<AppState>()(
           syncStatus: 'idle',
           syncedUserId: null,
           pendingPush: false,
+          guideReads: {},
         }),
     }),
     {
@@ -393,6 +425,8 @@ export const useAppStore = create<AppState>()(
         lessonDrafts: s.lessonDrafts,
         syncedUserId: s.syncedUserId,
         pendingPush: s.pendingPush,
+        guideReads: s.guideReads,
+        expert: s.expert,
       }),
       migrate: (persisted, version) => {
         const state = persisted as Partial<AppState>;
