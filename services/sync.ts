@@ -3,6 +3,7 @@ import { AppState } from 'react-native';
 import { useAppStore } from '@/store/useAppStore';
 
 import { repository } from './api';
+import { unregisterPushToken } from './push';
 import { isSupabaseConfigured, supabase } from './supabase';
 
 const PUSH_DEBOUNCE_MS = 1500;
@@ -125,6 +126,8 @@ export async function signOut() {
   if (pushTimer) clearTimeout(pushTimer);
   pushTimer = null;
   reconciledFor = null;
+  // Antes de sair (ainda autenticado): este aparelho para de receber os pushes da conta.
+  await unregisterPushToken();
   await supabase?.auth.signOut();
   useAppStore.getState().clearLocalData();
 }

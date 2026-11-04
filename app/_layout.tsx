@@ -12,6 +12,7 @@ import { PaywallModal } from '@/components/PaywallModal';
 import { COLORS } from '@/constants/theme';
 import { useReminderSync } from '@/hooks/useReminderSync';
 import { fetchActiveExpert } from '@/services/experts';
+import { registerPushToken } from '@/services/push';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { startAuthListener, startAutoSync } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
@@ -51,6 +52,12 @@ export default function RootLayout() {
   }, [hasHydrated, reconcileStreakOnOpen]);
 
   useReminderSync();
+
+  // Push do servidor: registra este aparelho na conta (e de novo quando o tutor liga os lembretes).
+  const remindersOn = useAppStore((s) => s.user.reminder.enabled);
+  useEffect(() => {
+    if (hasHydrated && authUserId) void registerPushToken(authUserId);
+  }, [hasHydrated, authUserId, remindersOn]);
 
   const needsAccount = isSupabaseConfigured && !authUserId && !authSkipped;
   // Depois de entrar numa conta existente, espera os dados da nuvem antes de decidir a tela.

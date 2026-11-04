@@ -131,3 +131,17 @@ alter table public.experts enable row level security;
 drop policy if exists "read active experts" on public.experts;
 create policy "read active experts" on public.experts for select to anon, authenticated using (active);
 alter table public.profiles add column if not exists guide_reads jsonb not null default '{}'::jsonb;
+
+-- Push do servidor (ver migrations/008_push_tokens.sql)
+create table if not exists public.push_tokens (
+  token text primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  platform text not null check (platform in ('android', 'ios')),
+  updated_at timestamptz not null default now()
+);
+create index if not exists push_tokens_user_id_idx on public.push_tokens (user_id);
+alter table public.push_tokens enable row level security;
+drop policy if exists "own push tokens" on public.push_tokens;
+create policy "own push tokens" on public.push_tokens for all to authenticated
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+grant select, insert, update, delete on public.push_tokens to authenticated;
