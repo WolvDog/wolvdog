@@ -15,6 +15,9 @@ import { isSupabaseConfigured } from '@/services/supabase';
 import { startAuthListener, startAutoSync } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
 
+// Erro ao desenhar uma tela: mostra a tela de erro do router (com "tentar de novo") em vez de fechar o app.
+export { ErrorBoundary } from 'expo-router';
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({ Oswald_500Medium, Oswald_700Bold });
   const { hasHydrated, hasOnboarded, authReady, authUserId, authSkipped, loginRequested, syncStatus, reconcileStreakOnOpen } = useAppStore(
