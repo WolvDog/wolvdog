@@ -70,7 +70,7 @@ export const repository = {
             sex: petRow.sex ?? undefined,
             weightKg: petRow.weight_kg != null ? Number(petRow.weight_kg) : undefined,
             photoUri: petRow.photo_url ?? undefined,
-            challenges: petRow.challenges as BehaviorChallenge[],
+            challenges: (petRow.challenges ?? []) as BehaviorChallenge[],
             createdAt: petRow.created_at,
           }
         : null,

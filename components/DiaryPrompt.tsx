@@ -6,11 +6,15 @@ import { useShallow } from 'zustand/react/shallow';
 import { COLORS, FONTS } from '@/constants/theme';
 import { toDateKey, weekStart } from '@/services/gamification';
 import { useAppStore } from '@/store/useAppStore';
+import type { BehaviorChallenge } from '@/types';
+
+const NO_CHALLENGES: BehaviorChallenge[] = [];
 
 /** Convite para o check-in semanal do diário, enquanto ele não foi feito nesta semana. */
 export function DiaryPrompt() {
   const { petName, challenges, behaviorLog } = useAppStore(
-    useShallow((s) => ({ petName: s.pet?.name ?? 'seu pet', challenges: s.pet?.challenges ?? [], behaviorLog: s.behaviorLog })),
+    // Nada de `?? []` aqui dentro: um array novo a cada leitura faz o React redesenhar sem parar.
+    useShallow((s) => ({ petName: s.pet?.name ?? 'seu pet', challenges: s.pet?.challenges ?? NO_CHALLENGES, behaviorLog: s.behaviorLog })),
   );
   const week = behaviorLog[weekStart(toDateKey())] ?? {};
   const pending = challenges.filter((c) => week[c] === undefined).length;
