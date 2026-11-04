@@ -37,7 +37,7 @@ export const repository = {
 
     const [profile, pets, completions, xpEvents, streak] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
-      supabase.from('pets').select('*').eq('owner_id', userId).order('created_at').limit(1),
+      supabase.from('pets').select('*').eq('owner_id', userId).order('created_at', { ascending: false }).limit(1),
       supabase.from('lesson_completions').select('*').eq('user_id', userId),
       supabase.from('xp_events').select('*').eq('user_id', userId).order('seq'),
       supabase.from('streaks').select('*').eq('user_id', userId).maybeSingle(),
@@ -124,7 +124,8 @@ export const repository = {
       review_queue: snap.reviews,
       partner_code: snap.user.partnerCode,
       tutor_gender: snap.user.tutorGender,
-      tutor_birth_date: snap.user.tutorBirthDate,
+      // Coluna do tipo date: texto vazio derrubaria o envio do perfil inteiro.
+      tutor_birth_date: snap.user.tutorBirthDate || null,
       behavior_log: snap.behaviorLog,
       guide_reads: snap.guideReads,
       total_xp: snap.progress.totalXp,
@@ -155,6 +156,7 @@ export const repository = {
       }),
     ];
 
+    let petError: unknown = null;
     if (snap.pet) {
       const petRow = {
         id: snap.pet.id,
@@ -177,7 +179,8 @@ export const repository = {
         const { energy_level: _e, command_experience: _c, ...withoutProfile } = petRow;
         pet = await db.from('pets').upsert(withoutProfile);
       }
-      if (pet.error) throw pet.error;
+      // Não trava o resto: missões e garras sobem mesmo se o pet falhar (o erro é lançado no fim).
+      if (pet.error) petError = pet.error;
     }
 
     const completions = Object.values(snap.progress.completedLessons);
@@ -207,5 +210,6 @@ export const repository = {
     const results = await Promise.all(writes);
     const failed = results.find((r) => r.error);
     if (failed?.error) throw failed.error;
+    if (petError) throw petError;
   },
 };
