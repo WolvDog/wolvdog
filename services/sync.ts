@@ -77,6 +77,8 @@ export function startAuthListener(): () => void {
   void supabase.auth.getSession().then(({ data }) => {
     const user = data.session?.user;
     useAppStore.getState().setAuth(user ? { userId: user.id, email: user.email ?? null } : null);
+    // Já logado ao abrir o app: reenvia o estado local, cobrindo envios que falharam antes.
+    if (user && useAppStore.getState().hasOnboarded) void pushNow(user.id);
   });
 
   const { data } = supabase.auth.onAuthStateChange((event, session) => {

@@ -90,7 +90,7 @@ create policy "own streak" on public.streaks for all using (auth.uid() = user_id
 revoke insert, update on public.profiles from authenticated;
 grant insert (id, name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, tutor_gender, tutor_birth_date, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;
-grant update (name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, tutor_gender, tutor_birth_date, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
+grant update (id, name, daily_goal_minutes, weekly_goal_days, review_queue, partner_code, behavior_log, tutor_gender, tutor_birth_date, total_xp, has_onboarded, reminder_enabled, reminder_hour, reminder_minute, updated_at)
   on public.profiles to authenticated;
 
 -- Parceiros B2B2C (códigos de indicação) — ver também migrations/005_partners_table.sql

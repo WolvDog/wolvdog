@@ -176,8 +176,8 @@ export const caminhaLesson: Lesson = lesson({
     },
   },
   victory: {
-    loganSpeech: 'Caminha dominada! Agora a sua casa tem um herói que sabe esperar.',
-    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!".',
+    loganSpeech: 'FASE 1 COMPLETA! Caminha dominada e boas maneiras de super-herói. Tô orgulhoso!',
+    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". Na Fase 2: Fica, Junto e Vem.',
   },
 });
 
@@ -288,8 +288,8 @@ export const socializacaoLesson: Lesson = lesson({
     },
   },
   victory: {
-    loganSpeech: 'Mundo explorado com segurança! Cada experiência boa vira coragem.',
-    nextTip: 'Varie os lugares: praça, porta de padaria, estacionamento — sempre de longe no começo.',
+    loganSpeech: 'FASE 3 CONCLUÍDA! Passeios leves e um mundo cheio de boas experiências. Cada uma vira coragem!',
+    nextTip: 'Varie os lugares: praça, porta de padaria, estacionamento — sempre de longe no começo. Na Fase 4: alimentação e enriquecimento.',
   },
 });
 
@@ -330,7 +330,7 @@ export const module5Lessons: Lesson[] = [
       feedback: {
         easy: 'Educação à mesa nota 10! Aumente aos poucos o tempo de espera.',
         medium: 'Ele está pegando o jeito. Desça o pote mais devagar.',
-        hard: 'Treine antes com petiscos na mão fechada (missão "Deixa") e volte aqui.',
+        hard: 'Volte um passo: desça o pote só até a metade e libere. Aos poucos, chegue até o chão.',
       },
     },
     victory: {

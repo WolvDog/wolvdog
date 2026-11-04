@@ -190,8 +190,8 @@ const module1Lessons: Lesson[] = [
       },
     },
     victory: {
-      loganSpeech: 'FASE 1 COMPLETA! Você e seu cão já têm boas maneiras de super-herói!',
-      nextTip: 'Na Fase 2 vamos aprender os comandos clássicos: Senta, Fica e Junto. Prepare os petiscos!',
+      loganSpeech: 'Quatro patas no chão, cumprimento de herói! As chegadas em casa nunca mais vão ser um caos.',
+      nextTip: 'Combine com a família: ninguém dá atenção para pulos, nem as visitas. A seguir vem o comando mais útil de todos: o Senta.',
     },
   }),
 ];
@@ -369,7 +369,7 @@ const module2Lessons: Lesson[] = [
     },
     victory: {
       loganSpeech: 'FASE 2 CONCLUÍDA! Senta, Fica, Junto e Vem: seu cão tem um arsenal de herói!',
-      nextTip: 'Próxima fase: passeios sem puxar. Vai ser leve como uma pena!',
+      nextTip: 'Próxima fase: passeios sem puxar e socialização. Vai ser leve como uma pena!',
     },
   }),
 ];
@@ -493,14 +493,14 @@ const module3Lessons: Lesson[] = [
     },
     validation: {
       feedback: {
-        easy: 'Cão grudado em você! FASE 3 praticamente concluída.',
+        easy: 'Cão grudado em você! O passeio de vocês já é outro.',
         medium: 'Ele ainda se atrasa? Avise mais cedo e vire mais devagar.',
         hard: 'Use petiscos mais valiosos na rua — lá a concorrência é grande!',
       },
     },
     victory: {
-      loganSpeech: 'FASE 3 CONCLUÍDA! Passeios leves, tutor feliz, cão feliz. É disso que eu gosto!',
-      nextTip: 'Na Fase 4 vamos trabalhar a mente: calma, autocontrole e ansiedade.',
+      loganSpeech: 'Meia-volta dominada! Agora é você quem guia o passeio. É disso que eu gosto!',
+      nextTip: 'A seguir: como passear com segurança nos dias quentes.',
     },
   }),
 ];
