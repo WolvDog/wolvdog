@@ -83,7 +83,7 @@ for (const module of MODULES) {
   md(`${module.description} ${module.isFree ? 'Fase gratuita.' : 'Fase do WolverBark Pro.'} ${module.lessons.length} missões.`);
   md();
   module.lessons.forEach((l, i) => lessonMarkdown(l, i + 1));
-  fs.writeFileSync(path.join(OUT, `fase-${module.phase}.md`), lines.join('\n').trimEnd() + '\n');
+  fs.writeFileSync(path.join(OUT, `fase-${module.phase}.md`), lines.join('\n').replace(/\{pet\}/g, 'Caramelo').trimEnd() + '\n');
 }
 fs.rmSync(BUILD, { recursive: true, force: true });
 console.log(`Conteúdo exportado em ${OUT} (${MODULES.length} fases, ${MODULES.reduce((s, m) => s + m.lessons.length, 0)} missões)`);

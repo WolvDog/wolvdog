@@ -199,5 +199,5 @@ function getGreeting(
   if (!currentLesson) {
     return { mood: 'proud', text: `Você cumpriu tudo que está liberado, ${tutor}! Revise uma missão favorita com ${petName}.` };
   }
-  return { mood: 'happy', text: `Au au, ${tutor}! Pronto para treinar ${petName} hoje? Próxima missão: ${currentLesson.title}` };
+  return { mood: 'happy', text: `Au au, ${tutor}! Bora treinar ${petName} hoje? Próxima missão: ${currentLesson.title}` };
 }

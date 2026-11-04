@@ -1,3 +1,4 @@
+import { useAudioPlayer } from 'expo-audio';
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -13,6 +14,8 @@ import { Clicker } from './Clicker';
 import { DemoMedia } from './DemoMedia';
 import { StepHeading } from './StepHeading';
 
+const FANFARE = require('@/assets/sounds/fanfare.wav');
+
 interface PracticeStepViewProps {
   step: PracticeStep;
   /** Chamado quando as repetições da missão são concluídas (segue para o relatório). */
@@ -23,6 +26,7 @@ export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProp
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [reps, setReps] = useState(0);
   const targetReached = !!step.targetReps && reps >= step.targetReps;
+  const fanfare = useAudioPlayer(FANFARE);
   // Ref: o pai recria o callback a cada render, e isso não pode cancelar o avanço automático.
   const onTargetReachedRef = useRef(onTargetReached);
   onTargetReachedRef.current = onTargetReached;
@@ -31,8 +35,12 @@ export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProp
   useEffect(() => {
     if (!targetReached) return;
     tap(HapticStyle.Heavy);
+    // Mãos ocupadas com o cão: som + vibração avisam que acabou, sem precisar olhar a tela.
+    fanfare.seekTo(0);
+    fanfare.play();
     const id = setTimeout(() => onTargetReachedRef.current?.(), 1200);
     return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetReached]);
 
   const toggle = (i: number) => {
@@ -97,7 +105,15 @@ export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProp
 
       {(step.timerSeconds || step.targetReps) && (
         <View className="mt-3 flex-row gap-3">
-          {step.timerSeconds ? <TimerCard seconds={step.timerSeconds} /> : null}
+          {step.timerSeconds ? (
+            <TimerCard
+              seconds={step.timerSeconds}
+              onFinish={() => {
+                fanfare.seekTo(0);
+                fanfare.play();
+              }}
+            />
+          ) : null}
           {step.targetReps ? <RepCounter target={step.targetReps} count={reps} onChange={setReps} /> : null}
         </View>
       )}
@@ -126,8 +142,11 @@ function CardLabel({ children }: { children: string }) {
   );
 }
 
-function TimerCard({ seconds }: { seconds: number }) {
-  const timer = useCountdown(seconds, () => tap(HapticStyle.Heavy));
+function TimerCard({ seconds, onFinish }: { seconds: number; onFinish?: () => void }) {
+  const timer = useCountdown(seconds, () => {
+    tap(HapticStyle.Heavy);
+    onFinish?.();
+  });
   const running = timer.status === 'running';
   const finished = timer.status === 'finished';
 

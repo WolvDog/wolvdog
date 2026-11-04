@@ -86,11 +86,11 @@ export const areaSeguraLesson: Lesson = lesson({
     title: 'Montando a área segura',
     loganSpeech: 'Bora montar meu QG! Escolha um cantinho tranquilo da casa.',
     instructions: [
-      'Escolha um cômodo pequeno (lavanderia, área de serviço) ou use um cercadinho/portão de bebê.',
-      'Coloque a caminha num canto e o tapete higiênico no lado oposto.',
-      'Deixe água à vontade e um brinquedo de mastigar seguro.',
-      'Faça a área ser legal: jogue 3 petiscos lá dentro e deixe-o explorar.',
-      'Use a área só quando não puder supervisionar — nunca como castigo.',
+      'Escolha um cômodo pequeno ou um cercadinho.',
+      'Caminha num canto, tapete higiênico no outro.',
+      'Água e um brinquedo de mastigar.',
+      'Jogue 3 petiscos lá dentro e deixe explorar.',
+      'Use quando não puder vigiar. Nunca como castigo.',
     ],
     timerSeconds: 180,
     avoid: ['Usar a área como castigo', 'Tapete colado na caminha ou no pote de comida', 'Liberar a casa toda logo no primeiro dia'],
@@ -100,7 +100,7 @@ export const areaSeguraLesson: Lesson = lesson({
     feedback: {
       easy: 'Perfeito! Mantenha por uma semana e, sem acidentes, libere mais um cômodo.',
       medium: 'Ele ainda está se acostumando. Dê refeições e petiscos lá dentro para criar boas associações.',
-      hard: 'Se ele chorou, comece com períodos curtos com você por perto e aumente aos poucos.',
+      hard: 'Chorou? Comece com tempos curtos, com você por perto.',
     },
   },
   victory: {
@@ -158,11 +158,11 @@ export const caminhaLesson: Lesson = lesson({
     title: 'Subiu, ganhou!',
     loganSpeech: 'Escolha um tapete ou a caminha e separe 10 petiscos. Vamos lá!',
     instructions: [
-      'Coloque o tapete no chão e fique ao lado. Atraia o cão com um petisco até as 4 patas estarem em cima.',
-      'Patas no tapete: "Isso!" (ou clicker) + petisco entregue em cima do tapete.',
-      'Jogue um petisco fora do tapete para ele sair e repita a subida.',
-      'Quando ele subir sozinho, peça "Deita" em cima do tapete e recompense.',
-      'Depois de 5 acertos, diga "Caminha!" antes de ele subir. Libere sempre com "Livre!".',
+      'Tapete no chão. Atraia {pet} com um petisco até subir.',
+      'Patas no tapete? "Isso!" + petisco em cima dele.',
+      'Jogue um petisco fora para {pet} sair. Repita.',
+      'Subiu no tapete com as 4 patas? Peça "Senta" ou espere ele relaxar e entregue o petisco!',
+      'Após 5 acertos, diga "Caminha!" antes. Libere com "Livre!".',
     ],
     targetReps: 10,
     timerSeconds: 240,
@@ -172,7 +172,7 @@ export const caminhaLesson: Lesson = lesson({
     feedback: {
       easy: 'Ele já entendeu! Comece a pedir "Caminha" quando a campainha tocar (sem visita ainda).',
       medium: 'Bom progresso. Recompense várias vezes enquanto ele fica deitado no tapete.',
-      hard: 'Use petiscos mais gostosos e um tapete diferente do chão, para ele perceber o lugar.',
+      hard: 'Use petiscos melhores e um tapete que se destaque do chão.',
     },
   },
   victory: {
@@ -204,11 +204,11 @@ export const passeioCalorLesson: Lesson = lesson({
     title: 'Checklist do passeio seguro',
     loganSpeech: 'Antes do próximo passeio, faça este checklist comigo.',
     instructions: [
-      'Confira a temperatura e o horário (antes das 9h ou depois das 17h no verão).',
-      'Faça o teste dos 7 segundos com o dorso da mão no asfalto.',
-      'Separe uma garrafinha de água e um potinho dobrável.',
-      'Planeje uma rota com sombra, grama ou terra.',
-      'Durante o passeio, observe: língua muito para fora, babando demais ou cansaço — hora de parar na sombra.',
+      'No verão: antes das 9h ou depois das 17h.',
+      'Dorso da mão no asfalto por 7 s. Aguentou?',
+      'Leve água e um potinho.',
+      'Rota com sombra, grama ou terra.',
+      'Língua muito pra fora ou babando? Pare na sombra.',
     ],
     timerSeconds: 60,
     avoid: ['Passear ao meio-dia no verão', 'Deixar o cão no carro, mesmo por pouco tempo', 'Correr com o cão em dias quentes'],
@@ -219,7 +219,7 @@ export const passeioCalorLesson: Lesson = lesson({
     feedback: {
       easy: 'Tutor prevenido vale por dois! Deixe a garrafinha sempre na mochila do passeio.',
       medium: 'Ótimo começo. Teste rotas diferentes até achar a mais fresquinha.',
-      hard: 'Se a sua região é muito quente, troque parte dos passeios por brincadeiras de faro em casa.',
+      hard: 'Muito calor? Troque parte do passeio por faro em casa.',
     },
   },
   victory: {
@@ -270,11 +270,11 @@ export const socializacaoLesson: Lesson = lesson({
     title: 'Jogo do "Olha isso"',
     loganSpeech: 'Sente num banco de praça comigo e vamos observar o movimento!',
     instructions: [
-      'Escolha um lugar com movimento moderado e fique a uma distância em que o cão esteja calmo.',
-      'Quando ele olhar para uma pessoa, cão ou barulho: "Isso!" + petisco.',
-      'Se ele ficar tenso (orelhas para trás, rabo baixo, latido), aumente a distância.',
-      'Faça 8 repetições e vá embora enquanto ele ainda está tranquilo.',
-      'Cumprimento com outro cão? Só se os dois estiverem relaxados, por 3 segundos, e chame de volta.',
+      'Fique longe o bastante para {pet} ficar calmo.',
+      'Olhou para pessoa, cão ou barulho? "Isso!" + petisco.',
+      'Ficou tenso? Aumente a distância.',
+      '8 repetições e vá embora ainda tranquilo.',
+      'Cumprimento? Só com os dois relaxados, 3 s, e chame de volta.',
     ],
     targetReps: 8,
     timerSeconds: 300,
@@ -284,7 +284,7 @@ export const socializacaoLesson: Lesson = lesson({
     feedback: {
       easy: 'Que cão confiante! Na próxima, diminua um pouco a distância.',
       medium: 'Ele está aprendendo. Mantenha a distância até ficar fácil.',
-      hard: 'Sem problema: aumente bastante a distância e faça sessões curtinhas.',
+      hard: 'Tudo bem! Aumente a distância e faça sessões curtinhas.',
     },
   },
   victory: {
@@ -317,11 +317,11 @@ export const module5Lessons: Lesson[] = [
       title: 'Pote descendo, cão sentado',
       loganSpeech: 'Use a próxima refeição para este treino. Paciência de herói!',
       instructions: [
-        'Com o pote na mão, peça "Senta".',
-        'Comece a descer o pote. Se ele levantar, suba o pote de volta, sem falar nada.',
-        'Repita até o pote chegar ao chão com ele sentado.',
-        'Espere 1 segundo e libere: "Pode!".',
-        'Nas próximas refeições, aumente para 3 e depois 5 segundos de espera.',
+        'Pote na mão, peça "Senta".',
+        'Desça o pote. Levantou? Suba de novo, em silêncio.',
+        'Pote no chão e {pet} ainda no "Senta"? Conte 1 s.',
+        'Libere: "Pode!".',
+        'Próximas refeições: 3 s, depois 5 s.',
       ],
       targetReps: 3,
       avoid: ['Mexer no pote enquanto ele come', 'Deixar ração à vontade o dia todo', 'Esperas longas demais no começo'],
@@ -330,7 +330,7 @@ export const module5Lessons: Lesson[] = [
       feedback: {
         easy: 'Educação à mesa nota 10! Aumente aos poucos o tempo de espera.',
         medium: 'Ele está pegando o jeito. Desça o pote mais devagar.',
-        hard: 'Volte um passo: desça o pote só até a metade e libere. Aos poucos, chegue até o chão.',
+        hard: 'Desça só até a metade e libere. Vá descendo aos poucos.',
       },
     },
     victory: {
@@ -356,11 +356,11 @@ export const module5Lessons: Lesson[] = [
       title: 'Caça ao tesouro',
       loganSpeech: 'Separe um punhado da ração de hoje. Bora caçar!',
       instructions: [
-        'Separe um punhado da ração da refeição (não é extra, é parte do dia).',
-        'Com o cão esperando, espalhe a ração num tapete ou na grama.',
-        'Diga "Procura!" e deixe ele encontrar tudo sozinho.',
-        'Aumente a dificuldade: enrole a ração numa toalha ou esconda em caixas de ovo.',
-        'Termine antes de ele perder o interesse.',
+        'Separe um punhado da ração do dia.',
+        'Espalhe num tapete ou na grama.',
+        '"Procura!" e deixe {pet} achar tudo.',
+        'Fácil? Enrole a ração numa toalha.',
+        'Pare antes de perder a graça.',
       ],
       timerSeconds: 300,
       avoid: ['Ajudar demais', 'Usar petiscos extras demais (conte nas calorias do dia)'],
@@ -369,7 +369,7 @@ export const module5Lessons: Lesson[] = [
       feedback: {
         easy: 'Detetive nato! Esconda em lugares mais difíceis na próxima.',
         medium: 'Bom! Deixe os pedaços mais visíveis no começo.',
-        hard: 'Comece com a ração bem espalhada e à vista, e vá dificultando aos poucos.',
+        hard: 'Deixe a ração bem à vista no começo.',
       },
     },
     victory: {
@@ -395,11 +395,11 @@ export const module5Lessons: Lesson[] = [
       title: 'Brinquedo caseiro',
       loganSpeech: 'Vamos montar um desafio com coisas que você tem em casa!',
       instructions: [
-        'Pegue um rolo de papel higiênico vazio e dobre uma das pontas.',
-        'Coloque alguns grãos de ração dentro e dobre a outra ponta.',
-        'Entregue e deixe ele descobrir como abrir — sempre supervisionando.',
-        'Recolha os pedaços de papelão no final (ele não deve engolir).',
-        'Faça um rodízio de brinquedos: guarde alguns e troque a cada poucos dias.',
+        'Rolo de papel vazio: dobre uma ponta.',
+        'Ponha uns grãos de ração e dobre a outra.',
+        'Entregue e acompanhe {pet} abrir.',
+        'Recolha o papelão no final.',
+        'Faça rodízio de brinquedos na semana.',
       ],
       timerSeconds: 300,
       avoid: ['Deixar o cão sozinho com papelão ou garrafas', 'Ossos cozidos (lascam)', 'Alimentos proibidos para cães'],
@@ -408,7 +408,7 @@ export const module5Lessons: Lesson[] = [
       feedback: {
         easy: 'Gênio! Teste caixas de ovo ou uma toalha enrolada na próxima.',
         medium: 'Bom! Deixe o rolo mais fácil de abrir no começo.',
-        hard: 'Ele não se interessou? Use petiscos mais cheirosos e incentive com a voz.',
+        hard: 'Não ligou? Use um petisco mais cheiroso e anime com a voz.',
       },
     },
     victory: {
@@ -447,3 +447,134 @@ export const module5Lessons: Lesson[] = [
     ],
   }),
 ];
+
+// ---------------------------------------------------------------------------
+// Dores do dia a dia (revisão de UX): foco, "Solta!" e interfone
+// ---------------------------------------------------------------------------
+
+export const focoLesson: Lesson = lesson({
+  id: 'm2-foco',
+  title: 'Olha pra mim!',
+  summary: 'Um estalo e o olhar volta para você, mesmo com distração.',
+  durationMinutes: 4,
+  xpReward: 20,
+  icon: '👀',
+  concept: {
+    title: 'O olhar que liga vocês',
+    loganSpeech: 'Quando passa outro cachorro, meu mundo some... menos se meu tutor souber me chamar com um estalo!',
+    body:
+      'Foco é a base de todo comando: se ele olha para você, ele escuta você. Faça um som curto com a boca (um estalo ou "psiu"), ' +
+      'espere o olhar e marque com "Isso!". Comece em casa, sem distrações, e depois leve para o corredor e a rua.',
+    whyItWorks: 'Reforçar o contato visual vira hábito, e você usa esse olhar para tirar o cão de situações tensas.',
+  },
+  practice: {
+    title: 'Psiu, olha aqui!',
+    loganSpeech: 'Petisco na mão e {pet} na sua frente. Bora treinar o olhar!',
+    instructions: [
+      'Petisco na mão, {pet} na sua frente.',
+      'Faça um estalo com a boca ou diga "{pet}!".',
+      'Olhou no seu olho? Clique + petisco!',
+      'Acertou 5? Leve o treino para o corredor.',
+      'Passou outro cão? Estalo, olhou, petisco.',
+    ],
+    targetReps: 10,
+    avoid: ['Chamar várias vezes seguidas', 'Segurar o focinho para ele olhar'],
+  },
+  validation: {
+    question: 'Ele olhou para você quando ouviu o som?',
+    feedback: {
+      easy: 'Foco de herói! Agora tente com a TV ligada ou no corredor.',
+      medium: 'Está pegando! Faça o som uma vez e espere, sem repetir.',
+      hard: 'Tudo bem! Treine num cômodo sem nenhuma distração.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Olho no olho! Agora {pet} sabe onde está a diversão: em você.',
+    nextTip: 'No passeio, use o estalo antes que ele trave em algo.',
+  },
+});
+
+export const soltaLesson: Lesson = lesson({
+  id: 'm4-solta',
+  title: '"Solta!": troca sem briga',
+  summary: 'Pegou lixo ou osso na calçada? Ele solta em troca de algo melhor.',
+  durationMinutes: 5,
+  xpReward: 25,
+  icon: '🦴',
+  concept: {
+    title: 'Troca justa, sem cabo de guerra',
+    loganSpeech: 'Achei um osso de frango na calçada! É MEU... a não ser que você tenha algo melhor.',
+    body:
+      'Puxar da boca vira cabo de guerra, e o cão aprende a engolir rápido. No "Solta!", você oferece uma troca: mostra um petisco melhor, ' +
+      'ele abre a boca e você recolhe o objeto com calma. Treine em casa com brinquedos antes de precisar na rua. ' +
+      'Se ele engolir algo perigoso (osso cozido, remédio), procure o veterinário.',
+    whyItWorks: 'Trocar em vez de tomar evita que o cão aprenda a proteger ou engolir objetos, e torna soltar algo vantajoso.',
+  },
+  practice: {
+    title: 'Troca premiada',
+    loganSpeech: 'Um brinquedo de que {pet} goste e petiscos bem cheirosos. Começou a troca!',
+    instructions: [
+      'Dê um brinquedo para {pet} brincar.',
+      'Petisco cheiroso bem na frente do focinho.',
+      'Abriu a boca? Diga "Solta!" + petisco.',
+      'Recolha o brinquedo e devolva. Ele não perde nada!',
+      'Na rua: mesma troca e afaste o lixo com o pé.',
+    ],
+    targetReps: 8,
+    avoid: ['Puxar o objeto da boca', 'Correr atrás dele', 'Brigar quando ele soltar'],
+  },
+  validation: {
+    question: 'Ele soltou o brinquedo pelo petisco?',
+    feedback: {
+      easy: 'Troca perfeita! Agora teste com o brinquedo favorito dele.',
+      medium: 'Bom! Use um petisco ainda melhor na troca.',
+      hard: 'Tudo bem! Comece com um brinquedo de que ele gosta menos.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Solta, pega, ganha! {pet} aprendeu que trocar com você sempre compensa.',
+    nextTip: 'Engoliu algo perigoso? Ligue para o veterinário na hora.',
+  },
+});
+
+export const interfoneLesson: Lesson = lesson({
+  id: 'm4-interfone',
+  title: 'Tocou o interfone!',
+  summary: 'Campainha toca, ele corre para a caminha em vez de latir na porta.',
+  durationMinutes: 6,
+  xpReward: 25,
+  icon: '🔔',
+  concept: {
+    title: 'Campainha = hora da caminha',
+    loganSpeech: 'Tocou o interfone? Eu viro alarme! A não ser que o som signifique petisco na minha caminha...',
+    body:
+      'Em vez de brigar com o latido, mude o que o som significa. Toda vez que tocar o interfone ou a campainha, jogue 3 petiscos na caminha. ' +
+      'Logo ele corre para a caminha em vez de ir latir na porta. A missão Caminha é a base, e vale pedir ajuda a alguém para tocar a campainha nos treinos.',
+    whyItWorks: 'Contracondicionamento: o som passa a prever algo bom num lugar certo, e correr para a caminha substitui o latido na porta.',
+  },
+  practice: {
+    title: 'Toca e corre pra caminha',
+    loganSpeech: 'Peça para alguém tocar a campainha (ou use um vídeo com o som). Bora!',
+    instructions: [
+      'Alguém toca a campainha ou o interfone.',
+      'Na hora, jogue 3 petiscos na caminha.',
+      '{pet} correu pra lá? "Isso!" + mais um petisco.',
+      'Só abra a porta com {pet} na caminha.',
+      'Repita 5 vezes, com pausas entre os toques.',
+    ],
+    targetReps: 5,
+    avoid: ['Gritar "quieto" por cima do latido', 'Abrir a porta com ele latindo'],
+  },
+  validation: {
+    question: 'Ele foi para a caminha quando o som tocou?',
+    feedback: {
+      easy: 'Porteiro nota 10! Agora teste com uma visita de verdade.',
+      medium: 'Quase lá! Jogue os petiscos ainda mais rápido depois do som.',
+      hard: 'Tudo bem! Use o som do celular baixinho e aumente aos poucos.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Ding-dong, petisco na caminha! A porta ficou bem mais tranquila.',
+    nextTip: 'Deixe um pote de petiscos perto do interfone para não perder a hora.',
+  },
+});

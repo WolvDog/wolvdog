@@ -5,9 +5,12 @@ import {
   areaSeguraLesson,
   caminhaLesson,
   EXISTING_QUIZZES,
+  focoLesson,
+  interfoneLesson,
   module5Lessons,
   passeioCalorLesson,
   socializacaoLesson,
+  soltaLesson,
 } from './missionsExtra';
 
 // ---------------------------------------------------------------------------
@@ -39,11 +42,11 @@ const module1Lessons: Lesson[] = [
       title: 'Carregando o marcador',
       loganSpeech: 'Pega 15 petiscos bem pequenininhos (do tamanho de uma ervilha). Bora carregar esse marcador!',
       instructions: [
-        'Fique em um cômodo calmo, sem outras pessoas ou brinquedos.',
-        'Diga "Isso!" com voz alegre e, em até 1 segundo, entregue um petisco.',
-        'Espere 3–5 segundos sem falar nada. Repita.',
-        'O cão não precisa fazer nada ainda — só estamos criando a associação.',
-        'Teste final: diga "Isso!" quando ele estiver olhando para outro lado. Ele virou na hora? Sucesso!',
+        'Cômodo calmo, 15 petiscos pequenos na mão.',
+        'Diga "Isso!" e dê o petisco em até 1 segundo.',
+        'Espere 3 segundos em silêncio. Repita.',
+        '{pet} não precisa fazer nada ainda.',
+        'Teste: "Isso!" quando {pet} olhar para outro lado. Virou? Sucesso!',
       ],
       targetReps: 15,
       timerSeconds: 180,
@@ -54,7 +57,7 @@ const module1Lessons: Lesson[] = [
       feedback: {
         easy: 'Uau, que cão atento! Ele já entendeu o jogo. Amanhã vamos usar esse marcador de verdade.',
         medium: 'Ótimo começo! Faça mais uma rodada de 10 repetições antes de dormir e ele vai pegar.',
-        hard: 'Normal no primeiro dia! Tente um petisco mais cheiroso (frango cozido) e um lugar mais silencioso.',
+        hard: 'Normal no 1º dia! Use um petisco mais cheiroso e um lugar mais quieto.',
       },
     },
     victory: {
@@ -84,11 +87,11 @@ const module1Lessons: Lesson[] = [
       title: 'Primeira ida guiada ao banheiro',
       loganSpeech: 'Vamos treinar agora mesmo! Se ele acabou de comer, brincar ou acordar, é a hora perfeita.',
       instructions: [
-        'Leve o cão até o tapete higiênico (ou local no quintal) com calma, de preferência na guia.',
-        'Fique parado e entediante. Espere até 3 minutos sem brincar.',
-        'Quando ele começar a fazer, fique em silêncio para não interromper.',
-        'Assim que TERMINAR: "Isso!" + petisco especial ali mesmo, no local.',
-        'Se não fizer em 3 minutos, volte e tente de novo em 10–15 minutos.',
+        'Leve {pet} na guia até o tapete higiênico.',
+        'Fique parado e sem graça por até 3 min.',
+        'Começou a fazer? Silêncio total.',
+        'Terminou? "Isso!" + petisco ali mesmo.',
+        'Não fez? Tente de novo em 10 a 15 min.',
       ],
       timerSeconds: 180,
       avoid: ['Dar o petisco só quando voltar para dentro de casa', 'Brincar antes de ele fazer'],
@@ -98,7 +101,7 @@ const module1Lessons: Lesson[] = [
       feedback: {
         easy: 'Acertou na mosca! Repita nos 5 momentos e em uma semana vira rotina.',
         medium: 'Fez, mas demorou? Tudo bem! Com a rotina ele vai ficando mais rápido.',
-        hard: 'Não rolou dessa vez — e está tudo certo. Anote o horário e tente de novo no próximo "momento".',
+        hard: 'Tudo bem! Anote o horário e tente no próximo momento.',
       },
     },
     victory: {
@@ -128,11 +131,11 @@ const module1Lessons: Lesson[] = [
       title: 'Kit anti-acidente',
       loganSpeech: 'Vamos montar seu kit de herói da limpeza e ensaiar a reação perfeita!',
       instructions: [
-        'Separe: papel toalha, limpador enzimático (ou água + vinagre branco) e um saquinho.',
-        'Ensaie a frase de interrupção: um "Opa!" neutro, sem gritar.',
-        'Pratique a rota: do local do acidente até o tapete higiênico, com o cão na guia.',
-        'Limpe longe do cão, sem drama — ele não deve achar que é uma brincadeira.',
-        'Evite produtos com amônia: o cheiro lembra urina e atrai o cão de volta.',
+        'Separe papel toalha, limpador enzimático e saquinho.',
+        'Ensaie um "Opa!" calmo, sem gritar.',
+        'Xixi antigo? Só limpe em silêncio. Pegou no flagra agachando? Leve direto para o tapete higiênico!',
+        'Limpe longe de {pet}, sem drama.',
+        'Nada de amônia: o cheiro chama para o mesmo lugar.',
       ],
       timerSeconds: 120,
       avoid: ['Esfregar o focinho no xixi', 'Gritar ou bater jornal', 'Usar água sanitária pura'],
@@ -143,7 +146,7 @@ const module1Lessons: Lesson[] = [
       feedback: {
         easy: 'Tutor nível herói! Calma e consistência são seus superpoderes.',
         medium: 'Bom! Releia a lista "Evite" mais uma vez e o plano fica na ponta da língua.',
-        hard: 'É difícil não se frustrar, eu sei. Lembre: acidente é informação, não desobediência.',
+        hard: 'Respira! Acidente é informação, não desobediência.',
       },
     },
     victory: {
@@ -173,11 +176,11 @@ const module1Lessons: Lesson[] = [
       title: 'Treino da chegada',
       loganSpeech: 'Saia de casa por 1 minutinho e volte. Vamos simular a chegada 5 vezes!',
       instructions: [
-        'Tenha petiscos no bolso antes de entrar.',
-        'Entre em casa calmamente, sem falar "oi" animado.',
-        'Se ele pular: vire de costas, braços cruzados, olhe para o teto.',
-        'No segundo em que as 4 patas tocarem o chão: "Isso!" + petisco jogado NO CHÃO.',
-        'Repita a entrada 5 vezes seguidas. As chegadas vão ficando mais calmas.',
+        'Petiscos no bolso antes de entrar.',
+        'Entre calmo, sem "oi" animado.',
+        'Pulou? Vire de costas e cruze os braços.',
+        '4 patas no chão? "Isso!" + petisco no chão.',
+        'Repita a entrada 5 vezes.',
       ],
       targetReps: 5,
       avoid: ['Empurrar o cão com o joelho', 'Fazer festa assim que entra', 'Recompensar só às vezes o pulo (visitas devem seguir a regra também!)'],
@@ -186,7 +189,7 @@ const module1Lessons: Lesson[] = [
       feedback: {
         easy: 'Que educado! Agora peça para alguém da família repetir o treino — todo mundo precisa jogar o mesmo jogo.',
         medium: 'Ele já está entendendo! Os pulos costumam até aumentar antes de diminuir. Persistência!',
-        hard: 'Muita energia? Faça um passeio ou brincadeira ANTES do treino e tente de novo.',
+        hard: 'Muita energia? Passeie ou brinque antes e tente de novo.',
       },
     },
     victory: {
@@ -224,11 +227,11 @@ const module2Lessons: Lesson[] = [
       title: 'Isca do focinho ao céu',
       loganSpeech: 'Petisco entre os dedos, e vamos lá! 10 repetições, bem rapidinho.',
       instructions: [
-        'Segure o petisco no focinho do cão, deixando ele cheirar.',
-        'Suba a mão devagar, passando por cima da cabeça em direção às orelhas.',
-        'Quando o bumbum tocar o chão: "Isso!" + petisco.',
-        'Após 5 acertos seguidos, diga "Senta" UMA vez antes de mover a mão.',
-        'Nas últimas repetições, faça o gesto com a mão vazia e entregue o petisco do bolso.',
+        'Petisco no focinho.',
+        'Suba a mão devagar para trás.',
+        'Bumbum no chão? "Isso!" + petisco!',
+        'Após 5 acertos, diga "Senta" antes do gesto.',
+        'No fim: gesto com a mão vazia, petisco do bolso.',
       ],
       targetReps: 10,
       timerSeconds: 240,
@@ -238,7 +241,7 @@ const module2Lessons: Lesson[] = [
       feedback: {
         easy: 'Senta dominado! Agora peça antes de colocar a comida no pote.',
         medium: 'Está quase! Mantenha a isca mais perto do focinho.',
-        hard: 'Se ele dá ré em vez de sentar, treine com as costas dele perto de uma parede.',
+        hard: 'Dá ré? Treine com as costas dele perto da parede.',
       },
     },
     victory: {
@@ -267,11 +270,11 @@ const module2Lessons: Lesson[] = [
       title: 'Escadinha da duração',
       loganSpeech: 'Hoje vamos só no primeiro D: duração. Você fica pertinho, combinado?',
       instructions: [
-        'Peça "Senta". Mostre a palma da mão e diga "Fica".',
-        'Conte 2 segundos, "Isso!" e entregue o petisco NA POSIÇÃO (ele não deve levantar).',
-        'Libere com uma palavra: "Livre!" e deixe ele se mexer.',
-        'Aumente: 3s, 5s, 8s, 10s. Se ele levantar, volte ao último tempo que deu certo.',
-        'Use o timer abaixo para a série final de 15 segundos.',
+        '"Senta", palma da mão aberta e "Fica".',
+        'Conte 2 s, "Isso!" e petisco sem ele levantar.',
+        'Libere com "Livre!".',
+        'Suba: 3, 5, 8, 10 s. Levantou? Volte um tempo.',
+        'Série final: 15 s no cronômetro.',
       ],
       timerSeconds: 15,
       targetReps: 8,
@@ -281,7 +284,7 @@ const module2Lessons: Lesson[] = [
       feedback: {
         easy: 'Paciência de monge! Na próxima, dê 1 passo para trás (e volte para 3 segundos).',
         medium: 'Ótimo. Se ele levanta às vezes, entregue petiscos mais frequentes durante o fica.',
-        hard: 'Fica é difícil mesmo! Volte para 1 segundo e suba de 1 em 1.',
+        hard: 'Tudo bem! Volte para 1 segundo e suba de 1 em 1.',
       },
     },
     victory: {
@@ -309,11 +312,11 @@ const module2Lessons: Lesson[] = [
       title: 'Zona premiada',
       loganSpeech: 'Petiscos na mão esquerda, e vamos dar alguns passinhos juntos!',
       instructions: [
-        'Fique parado com o cão do seu lado esquerdo. Petiscos na mão esquerda, na altura da sua costura da calça.',
-        'Toda vez que ele estiver alinhado à sua perna: "Isso!" + petisco ali mesmo.',
-        'Dê 1 passo. Se ele acompanhar: "Isso!" + petisco.',
-        'Aumente para 2, depois 3 passos. Dica: fale "Junto" ao começar a andar.',
-        'Faça 10 repetições curtas dentro de casa.',
+        '{pet} do seu lado esquerdo, petisco na mão esquerda.',
+        'Colado na perna? "Isso!" + petisco ali.',
+        'Dê 1 passo. Acompanhou? "Isso!" + petisco.',
+        'Deu 2 passos colado na sua perna? Diga "Isso!" e entregue o petisco na altura da coxa.',
+        'Fale "Junto" ao começar. 10 rodadas em casa.',
       ],
       targetReps: 10,
       avoid: ['Entregar o petisco na frente do corpo (puxa ele para frente)', 'Treinar na rua antes de dominar em casa'],
@@ -322,7 +325,7 @@ const module2Lessons: Lesson[] = [
       feedback: {
         easy: 'Dupla dinâmica! Tente fazer uma curva para a direita mantendo a posição.',
         medium: 'Ele vai aprendendo. Mais petiscos, mais frequentes, passos mais curtos.',
-        hard: 'Muito agitado? Faça o treino depois de um passeio e em um corredor estreito.',
+        hard: 'Agitação? Treine depois do passeio, num corredor.',
       },
     },
     victory: {
@@ -350,11 +353,11 @@ const module2Lessons: Lesson[] = [
       title: 'Jogo do pingue-pongue',
       loganSpeech: 'Melhor com duas pessoas! Uma em cada ponta do cômodo. Prontos?',
       instructions: [
-        'Duas pessoas, uma em cada lado do cômodo, com petiscos especiais.',
-        'Pessoa A diz "Logan, vem!" (use o nome do SEU cão) com voz feliz e se agacha.',
-        'Quando ele chegar: "Isso!" + petisco + segurar a coleira por 1 segundo (para ele se acostumar).',
-        'Pessoa B chama em seguida. Alterne 10 vezes.',
-        'Sozinho? Jogue um petisco longe e chame quando ele terminar de comer.',
+        'Duas pessoas, uma em cada lado do cômodo.',
+        'Pessoa A agacha e chama: "{pet}, vem!"',
+        'Chegou? "Isso!" + petisco + segure a coleira 1 s.',
+        'Pessoa B chama. Alterne 10 vezes.',
+        'Sozinho? Jogue um petisco longe e chame.',
       ],
       targetReps: 10,
       timerSeconds: 180,
@@ -364,7 +367,7 @@ const module2Lessons: Lesson[] = [
       feedback: {
         easy: 'Chamado de foguete! Pratique no quintal ou em um lugar cercado.',
         medium: 'Bom! Use um petisco ainda mais gostoso só para esse comando.',
-        hard: 'Comece com 1 metro de distância e se afaste aos poucos.',
+        hard: 'Comece a 1 metro e vá se afastando.',
       },
     },
     victory: {
@@ -402,10 +405,10 @@ const module3Lessons: Lesson[] = [
       title: 'Peitoral = coisa boa',
       loganSpeech: 'Vamos fazer o peitoral virar sinônimo de festa!',
       instructions: [
-        'Mostre o peitoral: "Isso!" + petisco. Repita 3x.',
-        'Passe o petisco por dentro da abertura da cabeça para ele colocar o focinho sozinho.',
-        'Feche o peitoral, dê 3 petiscos seguidos, e retire.',
-        'Coloque a guia e caminhe 1 minuto dentro de casa, sem rumo, recompensando quando ele estiver perto.',
+        'Mostre o peitoral: "Isso!" + petisco. 3 vezes.',
+        'Petisco na abertura: {pet} enfia o focinho sozinho.',
+        'Feche, dê 3 petiscos e retire.',
+        'Guia presa: 1 min andando em casa, premiando de perto.',
       ],
       timerSeconds: 60,
       targetReps: 3,
@@ -414,7 +417,7 @@ const module3Lessons: Lesson[] = [
       feedback: {
         easy: 'Pronto para a rua! Uniforme aprovado.',
         medium: 'Ele aceita, mas com dúvidas? Repita a parte do focinho por mais 2 dias.',
-        hard: 'Vá mais devagar: só mostre o peitoral e recompense, por alguns dias, sem colocar.',
+        hard: 'Só mostre o peitoral e premie por alguns dias.',
       },
     },
     victory: {
@@ -442,11 +445,11 @@ const module3Lessons: Lesson[] = [
       title: 'Passeio de 5 minutos em modo árvore',
       loganSpeech: 'Hoje o passeio é curto e o objetivo não é chegar longe. É ensinar. Vamos?',
       instructions: [
-        'Escolha uma rua tranquila ou o corredor do prédio.',
-        'Ande normalmente. Guia esticou? PARE. Fique em silêncio.',
-        'Guia ficou em "J"? "Isso!" + petisco ao lado da sua perna + volte a andar.',
-        'Se ficar muito tempo parado, dê meia-volta (prévia da próxima missão!).',
-        'Encerre com 1 minuto de "passeio livre" para farejar à vontade.',
+        'Rua calma ou corredor do prédio.',
+        'Guia esticou? PARE, em silêncio.',
+        'Guia em "J"? "Isso!" + petisco na perna e ande.',
+        'Travou muito? Dê meia-volta.',
+        'Final: 1 min livre para farejar.',
       ],
       timerSeconds: 300,
       avoid: ['Dar trancos na guia', 'Seguir andando "só desta vez" quando ele puxa'],
@@ -455,7 +458,7 @@ const module3Lessons: Lesson[] = [
       feedback: {
         easy: 'Guia em J o tempo todo? Você é uma lenda!',
         medium: 'Ótimo! As primeiras sessões são lentas mesmo. Persistência vence.',
-        hard: 'Muita distração na rua? Treine mais 2 dias no corredor ou quintal.',
+        hard: 'Muita distração? Mais 2 dias no corredor ou quintal.',
       },
     },
     victory: {
@@ -482,11 +485,11 @@ const module3Lessons: Lesson[] = [
       title: 'Zigue-zague do herói',
       loganSpeech: 'Vamos fazer 8 meias-voltas! Capricha na voz animada.',
       instructions: [
-        'Caminhe em linha reta com guia frouxa.',
-        'Diga "Vamos!" com voz animada e vire 180° para o lado oposto ao cão.',
-        'Quando ele alcançar sua perna: "Isso!" + petisco.',
-        'Faça 8 meias-voltas em 5 minutos, em momentos aleatórios.',
-        'Bônus: inclua curvas de 90° quando ele já estiver craque.',
+        'Ande em linha reta, guia frouxa.',
+        '"Vamos!" animado e vire para o outro lado.',
+        'Alcançou sua perna? "Isso!" + petisco.',
+        '8 meias-voltas em 5 min, sem aviso.',
+        'Craque? Inclua curvas de 90°.',
       ],
       targetReps: 8,
       timerSeconds: 300,
@@ -495,7 +498,7 @@ const module3Lessons: Lesson[] = [
       feedback: {
         easy: 'Cão grudado em você! O passeio de vocês já é outro.',
         medium: 'Ele ainda se atrasa? Avise mais cedo e vire mais devagar.',
-        hard: 'Use petiscos mais valiosos na rua — lá a concorrência é grande!',
+        hard: 'Na rua, use petiscos mais valiosos.',
       },
     },
     victory: {
@@ -533,11 +536,11 @@ const module4Lessons: Lesson[] = [
       title: 'Captura da calma',
       loganSpeech: 'Sem comandos dessa vez. Só observe e recompense a calma. Respira junto comigo!',
       instructions: [
-        'Coloque um tapete ou toalha no chão e sente-se ao lado, em silêncio.',
-        'Pisou no tapete? Petisco colocado no tapete, entre as patas.',
-        'Deitou? Petisco. Deitou de lado ou suspirou? Petisco calmo + "bom" bem baixinho.',
-        'Espace cada vez mais os petiscos. A ideia é ele relaxar, não ficar agitado.',
-        'Encerre retirando o tapete enquanto ele ainda está calmo.',
+        'Tapete no chão, sente ao lado em silêncio.',
+        'Pisou no tapete? Petisco entre as patas.',
+        'Deitou ou suspirou? Petisco + "bom" baixinho.',
+        'Espace os petiscos aos poucos.',
+        'Recolha o tapete enquanto {pet} ainda relaxa.',
       ],
       timerSeconds: 300,
       avoid: ['Usar voz animada', 'Fazer sessões longas demais no começo'],
@@ -546,7 +549,7 @@ const module4Lessons: Lesson[] = [
       feedback: {
         easy: 'Zen total! Leve o tapete para outro cômodo amanhã.',
         medium: 'Ele relaxou um pouco? Já é vitória. Faça depois de um passeio.',
-        hard: 'Ansioso demais? Tente após atividade física e com um mordedor de longa duração.',
+        hard: 'Tudo bem! Tente depois de um passeio, com um mordedor.',
       },
     },
     victory: {
@@ -574,11 +577,11 @@ const module4Lessons: Lesson[] = [
       title: 'Mão fechada',
       loganSpeech: 'Petisco comum na mão fechada, petisco top na outra mão. Começou!',
       instructions: [
-        'Feche um petisco comum na mão e mostre ao cão.',
-        'Ele vai lamber, cheirar, mordiscar. Ignore e espere.',
-        'No segundo em que ele afastar o focinho: "Isso!" + petisco TOP da OUTRA mão.',
-        'Após 5 acertos, diga "Deixa" antes de mostrar a mão.',
-        'Nível 2: mão aberta. Se ele avançar, feche a mão.',
+        'Petisco comum na mão fechada.',
+        'Lambeu, mordiscou? Ignore e espere.',
+        'Afastou o focinho? "Isso!" + petisco da OUTRA mão.',
+        'Após 5 acertos, diga "Deixa" antes.',
+        'Nível 2: mão aberta. Avançou? Feche.',
       ],
       targetReps: 10,
       timerSeconds: 240,
@@ -588,7 +591,7 @@ const module4Lessons: Lesson[] = [
       feedback: {
         easy: 'Autocontrole de mestre! Tente com o petisco no chão, protegido pelo seu pé.',
         medium: 'Ele já entende que afastar funciona. Mais 2 sessões e vira hábito.',
-        hard: 'Use um petisco menos interessante na mão fechada para facilitar.',
+        hard: 'Use um petisco menos gostoso na mão fechada.',
       },
     },
     victory: {
@@ -616,11 +619,11 @@ const module4Lessons: Lesson[] = [
       title: 'Portas que voltam',
       loganSpeech: 'Vamos fazer saídas relâmpago. Ele nem vai perceber que você foi!',
       instructions: [
-        'Dê um brinquedo recheável (ex.: Kong com patê) ao cão.',
-        'Pegue as chaves, saia pela porta e feche. Conte 5 segundos e volte.',
-        'Entre sem falar nada, guarde as chaves, siga sua vida.',
-        'Repita aumentando: 10s, 20s, 30s, 1min. Se ele chorar, volte ao tempo anterior.',
-        'Anote o maior tempo sem sinais de ansiedade (choro, arranhar, latir).',
+        'Dê um brinquedo recheado para {pet}.',
+        'Pegue as chaves, saia e volte em 5 s.',
+        'Entre sem falar nada e siga sua vida.',
+        'Aumente: 10 s, 20 s, 30 s, 1 min.',
+        'Chorou? Volte ao tempo anterior.',
       ],
       timerSeconds: 60,
       targetReps: 5,
@@ -630,7 +633,7 @@ const module4Lessons: Lesson[] = [
       feedback: {
         easy: 'Ele nem ligou? Perfeito! Aumente o tempo aos poucos ao longo da semana.',
         medium: 'Pequenos sinais de ansiedade são normais. Mantenha o tempo até ficar fácil.',
-        hard: 'Se a ansiedade for intensa, consulte um veterinário comportamentalista. Eu te ajudo enquanto isso!',
+        hard: 'Ansiedade forte? Procure um veterinário comportamentalista.',
       },
     },
     victory: {
@@ -681,12 +684,12 @@ export const MODULES: Module[] = [
     id: MODULE_2,
     phase: 2,
     title: 'Comandos Básicos',
-    subtitle: 'Fase 2 · Fica, Junto, Vem',
+    subtitle: 'Fase 2 · Foco, Fica, Junto, Vem',
     description: 'Os comandos clássicos que todo cão educado precisa saber.',
     color: '#3B5CC4',
     colorDark: '#1E3A8A',
     isFree: false,
-    lessons: sequence(MODULE_2, module2Lessons.filter((l) => l.id !== 'm2-l1'), EXISTING_QUIZZES),
+    lessons: sequence(MODULE_2, [focoLesson, ...module2Lessons.filter((l) => l.id !== 'm2-l1')], EXISTING_QUIZZES),
   },
   {
     id: MODULE_3,
@@ -715,12 +718,16 @@ export const MODULES: Module[] = [
     phase: 5,
     title: 'Ansiedade & Autocontrole',
     subtitle: 'Fase 5',
-    description: 'Calma, paciência e confiança para lidar com o mundo.',
+    description: 'Calma, autocontrole e paz na porta de casa e na calçada.',
     // "Adamantium": cinza metálico
     color: '#9AA5B8',
     colorDark: '#6B7689',
     isFree: false,
-    lessons: sequence(MODULE_4, module4Lessons, EXISTING_QUIZZES),
+    lessons: sequence(
+      MODULE_4,
+      [pick(module4Lessons, 'm4-l1'), pick(module4Lessons, 'm4-l2'), soltaLesson, interfoneLesson, pick(module4Lessons, 'm4-l3')],
+      EXISTING_QUIZZES,
+    ),
   },
 ];
 

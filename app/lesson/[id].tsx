@@ -16,6 +16,7 @@ import { COLORS } from '@/constants/theme';
 import { getLessonById, getModuleById } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
 import { showConfirm } from '@/services/dialog';
+import { personalize } from '@/services/personalize';
 import { getLessonState } from '@/services/progression';
 import { type LessonCompletionResult, useAppStore } from '@/store/useAppStore';
 import type { Lesson, LessonStep, ValidationOption } from '@/types';
@@ -41,7 +42,12 @@ export default function LessonScreen() {
   const { id, review } = useLocalSearchParams<{ id: string; review?: string }>();
   // Reforço: pula a explicação e vai direto ao treino prático.
   const isReview = review === '1';
-  const lesson = id ? getLessonById(id) : undefined;
+  const petName = useAppStore((s) => s.pet?.name);
+  // Os textos usam {pet} para chamar o cão pelo nome (ex.: "{pet}, vem!").
+  const lesson = useMemo(() => {
+    const base = id ? getLessonById(id) : undefined;
+    return base ? personalize(base, petName) : undefined;
+  }, [id, petName]);
   const module = lesson ? getModuleById(lesson.moduleId) : undefined;
 
   const { modules, snapshot } = useProgression();
