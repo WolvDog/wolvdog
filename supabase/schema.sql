@@ -131,6 +131,8 @@ alter table public.experts enable row level security;
 drop policy if exists "read active experts" on public.experts;
 create policy "read active experts" on public.experts for select to anon, authenticated using (active);
 alter table public.profiles add column if not exists guide_reads jsonb not null default '{}'::jsonb;
+-- profiles libera gravação coluna por coluna (ver acima): a nova coluna precisa entrar na lista (migração 010).
+grant insert (guide_reads), update (guide_reads) on public.profiles to authenticated;
 
 -- Push do servidor (ver migrations/008_push_tokens.sql)
 create table if not exists public.push_tokens (

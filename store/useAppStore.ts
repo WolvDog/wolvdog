@@ -381,7 +381,8 @@ export const useAppStore = create<AppState>()(
             partnerInfo: s.user.partnerInfo?.code === snap.user.partnerCode ? s.user.partnerInfo : null,
           },
           // A foto ainda vive só no aparelho: preserva a local se for o mesmo pet.
-          pet: snap.pet ? { ...snap.pet, photoUri: snap.pet.photoUri ?? (s.pet?.id === snap.pet.id ? s.pet.photoUri : undefined) } : null,
+          // Nuvem sem pet (envio que falhou): mantém o pet do aparelho em vez de apagá-lo.
+          pet: snap.pet ? { ...snap.pet, photoUri: snap.pet.photoUri ?? (s.pet?.id === snap.pet.id ? s.pet.photoUri : undefined) } : s.pet,
           progress: snap.progress,
           streak: snap.streak,
           reviews: snap.reviews,

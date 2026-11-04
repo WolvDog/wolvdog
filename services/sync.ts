@@ -53,7 +53,9 @@ export async function syncOnSignIn(userId: string) {
       applyingRemote = false;
       // A sequência salva pode ter semanas fechadas desde o último envio.
       useAppStore.getState().reconcileStreakOnOpen();
-      useAppStore.getState().markSynced(userId);
+      // Nuvem sem pet, mas o aparelho tem um (envio anterior falhou): o pet local foi mantido e sobe agora.
+      if (!remote.pet && useAppStore.getState().pet) await pushNow(userId);
+      else useAppStore.getState().markSynced(userId);
     } else {
       await pushNow(userId);
     }

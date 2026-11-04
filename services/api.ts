@@ -135,8 +135,9 @@ export const repository = {
       updated_at: new Date().toISOString(),
     };
     let profile = await db.from('profiles').upsert(profileRow);
-    // Banco ainda sem a migração 007 (coluna guide_reads): salva o resto do perfil assim mesmo.
-    if (profile.error?.message?.includes('guide_reads')) {
+    // Banco sem a coluna guide_reads (migração 007) ou sem permissão de gravar nela (migração 010):
+    // salva o resto do perfil assim mesmo, para o pet e o progresso não ficarem presos.
+    if (profile.error && (profile.error.message?.includes('guide_reads') || profile.error.code === '42501')) {
       const { guide_reads: _skipped, ...withoutGuides } = profileRow;
       profile = await db.from('profiles').upsert(withoutGuides);
     }
