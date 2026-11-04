@@ -4,7 +4,7 @@ import { Oswald_500Medium, Oswald_700Bold, useFonts } from '@expo-google-fonts/o
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { AppState, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { Logan } from '@/components/Logan';
@@ -35,9 +35,12 @@ export default function RootLayout() {
     reconcileStreakOnOpen();
     const stopAuth = startAuthListener();
     const stopSync = startAutoSync();
+    // App aberto de um dia para o outro (ou virando a semana): fecha as semanas ao voltar.
+    const appState = AppState.addEventListener('change', (next) => next === 'active' && reconcileStreakOnOpen());
     return () => {
       stopAuth();
       stopSync();
+      appState.remove();
     };
   }, [hasHydrated, reconcileStreakOnOpen]);
 

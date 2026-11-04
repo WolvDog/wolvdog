@@ -138,11 +138,11 @@ const module1Lessons: Lesson[] = [
       avoid: ['Esfregar o focinho no xixi', 'Gritar ou bater jornal', 'Usar água sanitária pura'],
     },
     validation: {
-      question: 'Você se sente preparado para reagir a um acidente?',
+      question: 'Você já sabe como reagir a um acidente?',
       loganSpeech: 'Essa é mais sobre você do que sobre o cão. Como foi?',
       feedback: {
         easy: 'Tutor nível herói! Calma e consistência são seus superpoderes.',
-        medium: 'Bom! Releia a lista "Evite" mais uma vez e você estará pronto.',
+        medium: 'Bom! Releia a lista "Evite" mais uma vez e o plano fica na ponta da língua.',
         hard: 'É difícil não se frustrar, eu sei. Lembre: acidente é informação, não desobediência.',
       },
     },

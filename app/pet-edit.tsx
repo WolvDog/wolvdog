@@ -12,6 +12,7 @@ import { CHALLENGE_LABELS, PET_SEX_LABELS, PET_SIZE_LABELS } from '@/constants/l
 import { COLORS, FONTS } from '@/constants/theme';
 import { useAppStore } from '@/store/useAppStore';
 import type { BehaviorChallenge, PetSex, PetSize } from '@/types';
+import { persistPetPhoto } from '@/services/photos';
 
 const SIZES = Object.keys(PET_SIZE_LABELS) as PetSize[];
 const CHALLENGES = Object.keys(CHALLENGE_LABELS) as BehaviorChallenge[];
@@ -41,7 +42,7 @@ export default function PetEditScreen() {
       aspect: [1, 1],
       quality: 0.7,
     });
-    if (!res.canceled && res.assets[0]) setPhotoUri(res.assets[0].uri);
+    if (!res.canceled && res.assets[0]) setPhotoUri(persistPetPhoto(res.assets[0].uri));
   }
 
   function toggleChallenge(c: BehaviorChallenge) {

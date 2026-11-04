@@ -23,7 +23,7 @@ import { toDateKey, type WeekStatus } from '@/services/gamification';
 import { getLessonState, getModuleState } from '@/services/progression';
 import { getDueReviews } from '@/services/review';
 import { useAppStore } from '@/store/useAppStore';
-import type { Lesson, LoganMood } from '@/types';
+import type { Lesson, LoganMood, Pet } from '@/types';
 
 export default function MissionMapScreen() {
   const { snapshot, modules, currentLesson, completedCount, totalLessons } = useProgression();
@@ -44,12 +44,12 @@ export default function MissionMapScreen() {
   const trainedToday = xpHistory.some((e) => e.date === toDateKey() && e.source === 'lesson');
   const week = useWeekStatus();
   const dueReviews = getDueReviews(reviews);
-  const greeting = getGreeting(tutorName, petName, week, trainedToday, dueReviews.length, currentLesson);
+  const greeting = getGreeting(tutorName, petName, week, trainedToday, dueReviews.length, currentLesson, pet?.sex);
 
   const handleMissionPress = (lesson: Lesson, status: string, requiresPro: boolean) => {
     if (requiresPro) return openPaywall('locked_module');
     if (status === 'locked') {
-      return showAlert('Calma, campeão! 🐾', 'Cumpra a missão anterior para liberar esta. Um passo de cada vez!');
+      return showAlert('Calma aí! 🐾', 'Cumpra a missão anterior para liberar esta. Um passo de cada vez!');
     }
     router.push({ pathname: '/lesson/[id]', params: { id: lesson.id } });
   };
@@ -162,7 +162,7 @@ export default function MissionMapScreen() {
         <View className="mt-10 items-center px-8">
           <ClawMarks size={44} />
           <Text className="mt-2 text-center text-ink-900" style={{ fontFamily: FONTS.display, fontSize: 18 }}>
-            NOVAS FASES TODA SEMANA
+            NOVAS FASES EM BREVE
           </Text>
           <Text className="mt-1 text-center text-sm text-ink-400">Reatividade, latidos, truques e muito mais estão a caminho.</Text>
         </View>
@@ -178,12 +178,13 @@ function getGreeting(
   trainedToday: boolean,
   reviewsDue: number,
   currentLesson: Lesson | undefined,
+  petSex: Pet['sex'],
 ): { text: string; mood: LoganMood } {
   const tutor = tutorName.trim() || 'parceiro';
   const left = week.goal - week.done;
   if (trainedToday) {
     return week.goalMet
-      ? { mood: 'proud', text: `Meta da semana batida, ${tutor}! ${petName} está ficando afiado. Treino extra é sempre bem-vindo.` }
+      ? { mood: 'proud', text: `Meta da semana batida, ${tutor}! ${petName} está ficando ${petSex === 'female' ? 'afiada' : 'afiado'}. Treino extra é sempre bem-vindo.` }
       : { mood: 'excited', text: `Treino de hoje feito! Faltam ${left} ${left === 1 ? 'treino' : 'treinos'} para fechar a semana com ${petName}.` };
   }
   if (week.atRisk) {

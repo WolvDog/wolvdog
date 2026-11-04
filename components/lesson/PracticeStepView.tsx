@@ -23,16 +23,17 @@ export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProp
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [reps, setReps] = useState(0);
   const targetReached = !!step.targetReps && reps >= step.targetReps;
-  const firedRef = useRef(false);
+  // Ref: o pai recria o callback a cada render, e isso não pode cancelar o avanço automático.
+  const onTargetReachedRef = useRef(onTargetReached);
+  onTargetReachedRef.current = onTargetReached;
 
   // Bateu a meta de repetições: trava o clicker e segue para o Relatório do Treino.
   useEffect(() => {
-    if (!targetReached || firedRef.current) return;
-    firedRef.current = true;
+    if (!targetReached) return;
     tap(HapticStyle.Heavy);
-    const id = setTimeout(() => onTargetReached?.(), 1200);
+    const id = setTimeout(() => onTargetReachedRef.current?.(), 1200);
     return () => clearTimeout(id);
-  }, [targetReached, onTargetReached]);
+  }, [targetReached]);
 
   const toggle = (i: number) => {
     tap();
@@ -174,7 +175,7 @@ function RepCounter({ target, count, onChange }: { target: number; count: number
 
   const change = (delta: number) => {
     tap(delta > 0 && count + 1 === target ? HapticStyle.Heavy : HapticStyle.Light);
-    onChange(Math.max(0, count + delta));
+    onChange(Math.min(target, Math.max(0, count + delta)));
   };
 
   return (
@@ -191,6 +192,7 @@ function RepCounter({ target, count, onChange }: { target: number; count: number
         </Pressable>
         <Pressable
           onPress={() => change(1)}
+          disabled={done}
           accessibilityLabel="Adicionar repetição"
           className="flex-1 items-center rounded-lg border-2 border-ink-900 py-1.5"
           style={{ backgroundColor: COLORS.claw }}

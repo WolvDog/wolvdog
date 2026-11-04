@@ -52,7 +52,7 @@ function lessonMarkdown(lesson, n) {
     });
   }
   md();
-  const meta = [practice.targetReps ? `${practice.targetReps} repetições` : null, practice.timerSeconds ? `cronômetro de ${Math.round(practice.timerSeconds / 60) || 1} min` : null]
+  const meta = [practice.targetReps ? `${practice.targetReps} repetições` : null, practice.timerSeconds ? (practice.timerSeconds < 60 ? `cronômetro de ${practice.timerSeconds} s` : `cronômetro de ${Math.round(practice.timerSeconds / 60)} min`) : null]
     .filter(Boolean)
     .join(' · ');
   md(`**Hora do treino: ${practice.title}**${meta ? ` (${meta})` : ''}`);

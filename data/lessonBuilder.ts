@@ -28,7 +28,7 @@ function validation(lessonId: string, input: ValidationInput): ValidationStep {
     type: 'validation',
     loganMood: 'thinking',
     question: input.question ?? 'Como seu cão reagiu ao exercício?',
-    loganSpeech: input.loganSpeech ?? 'Seja sincero, tá? Não existe resposta errada — eu uso isso pra ajustar seu próximo treino!',
+    loganSpeech: input.loganSpeech ?? 'Responda com sinceridade, tá? Não existe resposta errada — eu uso isso pra ajustar seu próximo treino!',
     options: [
       { id: 'easy', emoji: '🌟', label: 'Mandou bem! Pegou rápido', difficulty: 'easy', loganFeedback: input.feedback.easy },
       { id: 'medium', emoji: '🐾', label: 'Foi indo, com algumas pausas', difficulty: 'medium', loganFeedback: input.feedback.medium },

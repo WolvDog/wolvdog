@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Clock, X } from 'lucide-react-native';
 import { type ComponentRef, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { BackHandler, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { HeroButton } from '@/components/HeroButton';
@@ -59,10 +59,22 @@ export default function LessonScreen() {
   const [answer, setAnswer] = useState<ValidationOption | null>(null);
   const [result, setResult] = useState<LessonCompletionResult | null>(null);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  // Evita cumprir a missão duas vezes com toques rápidos no botão.
+  const completedRef = useRef(false);
+  const closeRef = useRef<() => void>(() => router.back());
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [stepIndex]);
+
+  // Botão "voltar" do Android: mesmo fluxo do X (pergunta e guarda o progresso).
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      closeRef.current();
+      return true;
+    });
+    return () => sub.remove();
+  }, []);
 
   if (!lesson || !module) {
     return (
@@ -84,7 +96,7 @@ export default function LessonScreen() {
           text={
             access.requiresPro
               ? 'Essa missão faz parte do WolverBark Pro. Bora desbloquear juntos?'
-              : 'Calma, campeão! Cumpra as missões anteriores para liberar esta.'
+              : 'Calma! Cumpra as missões anteriores para liberar esta.'
           }
         />
         {access.requiresPro && (
@@ -109,10 +121,12 @@ export default function LessonScreen() {
     if (!isReview) saveLessonDraft(lesson.id, stepIndex);
     router.back();
   };
+  closeRef.current = () => void handleClose();
 
   const handleNext = () => {
     if (step.type === 'validation') {
-      if (!answer) return;
+      if (!answer || completedRef.current) return;
+      completedRef.current = true;
       setResult(completeLesson(lesson.id, answer.difficulty, quizCorrect));
     }
     if (isVictory) return router.back();
@@ -153,7 +167,7 @@ export default function LessonScreen() {
           />
         )}
         {step.type === 'practice' && (
-          <PracticeStepView key={step.id} step={step} onTargetReached={() => setStepIndex((i) => i + 1)} />
+          <PracticeStepView key={step.id} step={step} onTargetReached={() => setStepIndex((i) => Math.min(i + 1, flow.length - 1))} />
         )}
         {step.type === 'validation' && (
           <ValidationStepView step={step} selectedId={answer?.id ?? null} onSelect={setAnswer} />

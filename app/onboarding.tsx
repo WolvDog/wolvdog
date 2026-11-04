@@ -34,6 +34,7 @@ import { formatTime, isPresetTime, REMINDER_TIMES, remindersSupported, requestRe
 import { isSupabaseConfigured } from '@/services/supabase';
 import { useAppStore } from '@/store/useAppStore';
 import type { BehaviorChallenge, PartnerInfo, PetSex, PetSize, TutorGender, User, WeeklyGoalDays } from '@/types';
+import { persistPetPhoto } from '@/services/photos';
 
 const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'focus', 'goal', 'reminder', 'plan'] as const;
 type Step = (typeof STEPS)[number];
@@ -104,7 +105,7 @@ export default function OnboardingScreen() {
 
   async function pickPhoto() {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.7 });
-    if (!res.canceled && res.assets[0]) setPhotoUri(res.assets[0].uri);
+    if (!res.canceled && res.assets[0]) setPhotoUri(persistPetPhoto(res.assets[0].uri));
   }
 
   function next() {

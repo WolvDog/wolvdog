@@ -84,6 +84,10 @@ interface AppState {
   /** Diário de comportamento semanal. */
   behaviorLog: BehaviorLog;
   lessonDrafts: Record<string, number>;
+  /** Conta cujos dados estão neste aparelho (última sincronização bem-sucedida). */
+  syncedUserId: string | null;
+  /** Há mudanças locais que ainda não chegaram à nuvem (ex.: treino feito offline). */
+  pendingPush: boolean;
 
   // --- estado efêmero ---
   hasHydrated: boolean;
@@ -119,6 +123,8 @@ interface AppState {
   skipAuth: () => void;
   requestLogin: (requested: boolean) => void;
   setSyncStatus: (status: SyncStatus) => void;
+  markPendingPush: () => void;
+  markSynced: (userId: string) => void;
   getCloudSnapshot: () => CloudSnapshot;
   applyCloudSnapshot: (snap: CloudSnapshot) => void;
   /** Ao sair da conta: limpa os dados locais para não misturar contas no mesmo aparelho. */
@@ -149,6 +155,8 @@ export const useAppStore = create<AppState>()(
       reviews: {},
       behaviorLog: {},
       lessonDrafts: {},
+      syncedUserId: null,
+      pendingPush: false,
 
       hasHydrated: false,
       authReady: false,
@@ -271,8 +279,10 @@ export const useAppStore = create<AppState>()(
       reconcileStreakOnOpen: () => {
         const { streak, progress, user } = get();
         const result = reconcileWeeks(streak, progress.xpHistory, user.weeklyGoalDays);
-        if (result.streak !== streak) set({ streak: result.streak });
-        if (result.event === 'none') return;
+        if (result.event === 'none') {
+          if (result.streak !== streak) set({ streak: result.streak });
+          return;
+        }
         set({ streak: result.streak, lastStreakEvent: { event: result.event, freezesUsed: result.freezesUsed } });
       },
 
@@ -300,6 +310,12 @@ export const useAppStore = create<AppState>()(
       requestLogin: (loginRequested) => set({ loginRequested }),
 
       setSyncStatus: (syncStatus) => set({ syncStatus }),
+
+      markPendingPush: () => {
+        if (!get().pendingPush) set({ pendingPush: true });
+      },
+
+      markSynced: (syncedUserId) => set({ syncedUserId, pendingPush: false, syncStatus: 'synced' }),
 
       getCloudSnapshot: () => {
         const s = get();
@@ -356,6 +372,8 @@ export const useAppStore = create<AppState>()(
           lessonDrafts: {},
           lastStreakEvent: null,
           syncStatus: 'idle',
+          syncedUserId: null,
+          pendingPush: false,
         }),
     }),
     {
@@ -373,6 +391,8 @@ export const useAppStore = create<AppState>()(
         reviews: s.reviews,
         behaviorLog: s.behaviorLog,
         lessonDrafts: s.lessonDrafts,
+        syncedUserId: s.syncedUserId,
+        pendingPush: s.pendingPush,
       }),
       migrate: (persisted, version) => {
         const state = persisted as Partial<AppState>;

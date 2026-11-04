@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Check, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -16,6 +16,8 @@ import type { SubscriptionPlan } from '@/types';
 
 import { HeroButton } from './HeroButton';
 import { Logan } from './Logan';
+
+const STORE_NAME = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
 
 const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
   locked_module: {
@@ -70,12 +72,18 @@ export function PaywallModal() {
 
   async function handlePurchase() {
     setPurchasing(true);
-    const result = await PurchasesService.purchase(selected);
-    setPurchasing(false);
+    let result;
+    try {
+      result = await PurchasesService.purchase(selected);
+    } catch {
+      result = { isPro: false, error: 'Não foi possível concluir agora. Tente de novo em instantes.' };
+    } finally {
+      setPurchasing(false);
+    }
     if (result.isPro) {
       setPro(true);
       close();
-      showAlert('Bem-vindo ao Pro! 🎉', `Seu teste grátis de ${selected.trialDays} dias começou. Todas as fases foram liberadas!`);
+      showAlert('Pro ativado! 🎉', `Seu teste grátis de ${selected.trialDays} dias começou. Todas as fases foram liberadas!`);
     } else if (result.error) {
       showAlert('Ops!', result.error);
     }
@@ -83,8 +91,14 @@ export function PaywallModal() {
 
   async function handleRestore() {
     setRestoring(true);
-    const result = await PurchasesService.restore();
-    setRestoring(false);
+    let result;
+    try {
+      result = await PurchasesService.restore();
+    } catch {
+      result = { isPro: false, error: 'Não foi possível verificar suas compras agora.' };
+    } finally {
+      setRestoring(false);
+    }
     if (result.isPro) {
       setPro(true);
       close();
@@ -173,7 +187,7 @@ export function PaywallModal() {
             onPress={handlePurchase}
           />
           <Text className="mt-3 text-center text-xs leading-4 text-ink-400">
-            Após o teste, {selected.priceLabel}. Renovação automática pela App Store / Google Play.
+            Após o teste, {selected.priceLabel}. Renovação automática pela {STORE_NAME}. Cancele quando quiser nas assinaturas da loja.
           </Text>
           <Pressable onPress={handleRestore} disabled={restoring} className="mt-2 py-1">
             <Text className="text-center text-sm font-bold text-hero-500">
