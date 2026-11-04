@@ -8,10 +8,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Chip, Field, TextField } from '@/components/form';
 import { HeroButton } from '@/components/HeroButton';
 import { LoganSays } from '@/components/LoganSays';
-import { CHALLENGE_LABELS, PET_SEX_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
+import { CHALLENGE_LABELS, PET_ENERGY_LABELS, PET_EXPERIENCE_LABELS, PET_SEX_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
 import { COLORS, FONTS } from '@/constants/theme';
 import { useAppStore } from '@/store/useAppStore';
-import type { BehaviorChallenge, PetSex, PetSize } from '@/types';
+import type { BehaviorChallenge, PetEnergy, PetExperience, PetSex, PetSize } from '@/types';
 import { persistPetPhoto } from '@/services/photos';
 
 const SIZES = Object.keys(PET_SIZE_LABELS) as PetSize[];
@@ -28,6 +28,8 @@ export default function PetEditScreen() {
   const [weight, setWeight] = useState(pet?.weightKg ? String(pet.weightKg).replace('.', ',') : '');
   const [size, setSize] = useState<PetSize>(pet?.size ?? 'medio');
   const [sex, setSex] = useState<PetSex | undefined>(pet?.sex);
+  const [energyLevel, setEnergyLevel] = useState<PetEnergy | undefined>(pet?.energyLevel);
+  const [commandExperience, setCommandExperience] = useState<PetExperience | undefined>(pet?.commandExperience);
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>(pet?.challenges ?? []);
   const [photoUri, setPhotoUri] = useState(pet?.photoUri);
 
@@ -57,6 +59,8 @@ export default function PetEditScreen() {
       ageMonths,
       size,
       sex,
+      energyLevel,
+      commandExperience,
       weightKg: weightKg > 0 ? weightKg : undefined,
       challenges,
       photoUri,
@@ -117,6 +121,27 @@ export default function PetEditScreen() {
             <View className="flex-row flex-wrap gap-2">
               {SIZES.map((s) => (
                 <Chip key={s} label={PET_SIZE_LABELS[s]} active={size === s} onPress={() => setSize(s)} />
+              ))}
+            </View>
+          </Field>
+
+          <Field label="Energia no dia a dia">
+            <View className="flex-row flex-wrap gap-2">
+              {(Object.keys(PET_ENERGY_LABELS) as PetEnergy[]).map((e) => (
+                <Chip key={e} label={`${PET_ENERGY_LABELS[e].emoji} ${PET_ENERGY_LABELS[e].short}`} active={energyLevel === e} onPress={() => setEnergyLevel(e)} />
+              ))}
+            </View>
+          </Field>
+
+          <Field label="Comandos que já sabe">
+            <View className="flex-row flex-wrap gap-2">
+              {(Object.keys(PET_EXPERIENCE_LABELS) as PetExperience[]).map((x) => (
+                <Chip
+                  key={x}
+                  label={`${PET_EXPERIENCE_LABELS[x].emoji} ${PET_EXPERIENCE_LABELS[x].short}`}
+                  active={commandExperience === x}
+                  onPress={() => setCommandExperience(x)}
+                />
               ))}
             </View>
           </Field>

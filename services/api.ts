@@ -70,6 +70,8 @@ export const repository = {
             ageMonths: petRow.age_months,
             size: petRow.size as PetSize,
             sex: petRow.sex ?? undefined,
+            energyLevel: petRow.energy_level ?? undefined,
+            commandExperience: petRow.command_experience ?? undefined,
             weightKg: petRow.weight_kg != null ? Number(petRow.weight_kg) : undefined,
             photoUri: petRow.photo_url ?? undefined,
             challenges: (petRow.challenges ?? []) as BehaviorChallenge[],
@@ -153,21 +155,28 @@ export const repository = {
     ];
 
     if (snap.pet) {
-      writes.push(
-        db.from('pets').upsert({
-          id: snap.pet.id,
-          owner_id: userId,
-          name: snap.pet.name,
-          breed: snap.pet.breed,
-          age_months: snap.pet.ageMonths,
-          size: snap.pet.size,
-          sex: snap.pet.sex ?? null,
-          weight_kg: snap.pet.weightKg ?? null,
-          // Fotos locais (file://) ainda não vão para o Storage — só URLs públicas.
-          photo_url: snap.pet.photoUri?.startsWith('http') ? snap.pet.photoUri : null,
-          challenges: snap.pet.challenges,
-        }),
-      );
+      const petRow = {
+        id: snap.pet.id,
+        owner_id: userId,
+        name: snap.pet.name,
+        breed: snap.pet.breed,
+        age_months: snap.pet.ageMonths,
+        size: snap.pet.size,
+        sex: snap.pet.sex ?? null,
+        energy_level: snap.pet.energyLevel ?? null,
+        command_experience: snap.pet.commandExperience ?? null,
+        weight_kg: snap.pet.weightKg ?? null,
+        // Fotos locais (file://) ainda não vão para o Storage — só URLs públicas.
+        photo_url: snap.pet.photoUri?.startsWith('http') ? snap.pet.photoUri : null,
+        challenges: snap.pet.challenges,
+      };
+      let pet = await db.from('pets').upsert(petRow);
+      // Banco ainda sem a migração 009 (energia/experiência): salva o resto do pet assim mesmo.
+      if (pet.error && /energy_level|command_experience/.test(pet.error.message ?? '')) {
+        const { energy_level: _e, command_experience: _c, ...withoutProfile } = petRow;
+        pet = await db.from('pets').upsert(withoutProfile);
+      }
+      if (pet.error) throw pet.error;
     }
 
     const completions = Object.values(snap.progress.completedLessons);

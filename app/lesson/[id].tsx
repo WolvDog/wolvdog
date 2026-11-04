@@ -17,6 +17,7 @@ import { getLessonById, getModuleById } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
 import { showConfirm } from '@/services/dialog';
 import { personalize } from '@/services/personalize';
+import { SPECIAL_MODULE_ID } from '@/data/specials';
 import { getLessonState } from '@/services/progression';
 import { type LessonCompletionResult, useAppStore } from '@/store/useAppStore';
 import type { Lesson, LessonStep, ValidationOption } from '@/types';
@@ -29,6 +30,13 @@ function buildFlow(lesson: Lesson): FlowStep[] {
   const quiz: FlowStep[] = lesson.quiz?.length ? [{ type: 'quiz', id: `${lesson.id}-quiz` }] : [];
   return [concept, ...quiz, practice, validation, victory];
 }
+
+/** Treino com o cão x leitura x preparar o ambiente: o botão diz o que o tutor acabou de fazer. */
+const PRACTICE_CTA = {
+  practice: 'Treino feito',
+  knowledge: 'Li e entendi',
+  checklist: 'Preparativos feitos',
+} as const;
 
 const CTA_LABEL = {
   concept: 'Entendi!',
@@ -43,11 +51,12 @@ export default function LessonScreen() {
   // Reforço: pula a explicação e vai direto ao treino prático.
   const isReview = review === '1';
   const petName = useAppStore((s) => s.pet?.name);
-  // Os textos usam {pet} para chamar o cão pelo nome (ex.: "{pet}, vem!").
+  const petSex = useAppStore((s) => s.pet?.sex);
+  // Os textos usam {pet}, {o_pet}, {para_pet}… para chamar o cão pelo nome com o artigo certo.
   const lesson = useMemo(() => {
     const base = id ? getLessonById(id) : undefined;
-    return base ? personalize(base, petName) : undefined;
-  }, [id, petName]);
+    return base ? personalize(base, { name: petName, sex: petSex }) : undefined;
+  }, [id, petName, petSex]);
   const module = lesson ? getModuleById(lesson.moduleId) : undefined;
 
   const { modules, snapshot } = useProgression();
@@ -92,7 +101,9 @@ export default function LessonScreen() {
   }
 
   // Protege contra deep links para lições ainda bloqueadas (a vitória recém-conquistada não conta).
-  const access = getLessonState(lesson, module, modules, snapshot);
+  // Missões especiais (ex.: fogos de fim de ano) ficam fora da trilha e sempre liberadas.
+  const access =
+    lesson.moduleId === SPECIAL_MODULE_ID ? ({ status: 'available', requiresPro: false } as const) : getLessonState(lesson, module, modules, snapshot);
   if (access.status === 'locked' && !result) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white px-8">
@@ -185,7 +196,7 @@ export default function LessonScreen() {
       {step.type !== 'quiz' && (
         <View className="border-t-2 border-ink-900 px-5 pb-4 pt-4">
           <HeroButton
-            label={CTA_LABEL[step.type]}
+            label={step.type === 'practice' ? PRACTICE_CTA[step.kind ?? 'practice'] : CTA_LABEL[step.type]}
             variant={isVictory ? 'hero' : 'primary'}
             disabled={step.type === 'validation' && !answer}
             onPress={handleNext}

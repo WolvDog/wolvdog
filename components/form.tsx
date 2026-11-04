@@ -2,6 +2,7 @@ import { type ComponentProps, type ReactNode, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { COLORS, FONTS } from '@/constants/theme';
+import { tap } from '@/services/haptics';
 
 export function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -45,7 +46,10 @@ export function TextField({ suffix, onFocus, onBlur, ...props }: ComponentProps<
 export function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        tap();
+        onPress();
+      }}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: active }}
       className="rounded-lg border-2 px-3 py-2"
@@ -76,7 +80,10 @@ export function OptionCard({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        tap();
+        onPress();
+      }}
       accessibilityRole={role}
       accessibilityState={role === 'radio' ? { selected: active } : { checked: active }}
       className="mb-2.5 flex-row items-center rounded-xl border-2 px-4 py-3.5"

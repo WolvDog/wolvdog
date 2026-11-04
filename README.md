@@ -23,7 +23,7 @@ Expo SDK 58 · Expo Router · TypeScript estrito · NativeWind v4 · Zustand (pe
 | `components/` | Logan (SVG), LoganSays, MissionRow, ModuleBanner, StatsHeader, HeroButton, form, icons, ProgressBar, PaywallModal, `lesson/*` |
 | `store/` | `useAppStore` — pet, progresso, XP, streak, escudos, `isPro`, paywall |
 | `services/` | Regras puras de gamificação e progressão, mock RevenueCat, repositório Supabase-ready, diálogos |
-| `data/` | `mockData.ts` (fases, planos), `missionsExtra.ts` (missões novas e quizzes), `lessonBuilder.ts` — 5 fases, 21 missões |
+| `data/` | `mockData.ts` (fases, planos), `missionsExtra.ts` (missões novas e quizzes), `lessonBuilder.ts`, `specials.ts` (missões especiais de época), `guides.ts` (Guia do Tutor) — 6 fases, 25 missões |
 | `types/` | Schema do domínio |
 | `supabase/` | `schema.sql` com RLS |
 
@@ -52,7 +52,10 @@ Paleta do uniforme do Wolverine (amarelo `#FFC72C`, azul `#1E3A8A`, preto e bran
 - **Quizzes:** missões teóricas têm 3–5 perguntas de múltipla escolha entre a Dica do Logan e o treino (+2 garras por acerto, só na primeira vez).
 - **Clicker com parada automática:** ao atingir as repetições da missão, o clicker trava e segue para o Relatório do Treino.
 - **Mídia de demonstração:** `practice.media` aceita Lottie (`.json`) ou vídeo curto (`.mp4`) em `assets/demos/`.
-- Fase 1 (grátis) inclui Senta e Caminha; demais fases exigem Pro e a conclusão da fase anterior.
+- Ordem pedagógica: Fase 1 Boas Maneiras & Conexão (grátis), 2 Comandos Essenciais, 3 Sanitário, 4 Passeio & Socialização, 5 Faro & Enriquecimento, 6 Ansiedade & Autocontrole. Da Fase 2 em diante exige Pro e a conclusão da fase anterior.
+- Tipos de lição (`kind` da etapa prática): `practice` (clicker, repetições, cronômetro), `knowledge` e `checklist` (sem clicker nem cronômetro; botão "Li e entendi" / "Preparativos feitos").
+- Missão especial "Réveillon sem medo" (`data/specials.ts`): card no topo da Home de novembro a janeiro, sons sintéticos de fogos/rojão/trovão com 5 níveis de volume. Fica fora da trilha e da contagem de missões.
+- Textos com o nome do cão usam marcadores com artigo (`{pet}`, `{o_pet}`, `{do_pet}`, `{para_pet}`, `{com_pet}`, `{no_pet}`, `{ao_pet}`, `{ele}`, `{o/a}`), resolvidos pelo sexo do pet em `services/personalize.ts`.
 
 ## Planos (WolverBark Pro)
 
@@ -91,8 +94,22 @@ Projeto EAS: `@maarcosramalhos-team/wolverbark`. Perfis em `eas.json`:
 - `eas build -p android --profile preview` → APK para instalar e testar
 - `eas build --profile production` → builds das lojas
 
+## Push do servidor (Android)
+
+Firebase (FCM V1): `google-services.json` no projeto; a chave de servidor fica nas credenciais do EAS. Cada aparelho logado e com notificações permitidas salva seu Expo push token na tabela `push_tokens` (migração 008, `services/push.ts`); ao sair da conta o token é removido. Teste manual: pegue o token no Supabase e envie por https://expo.dev/notifications.
+
+## Versão web (iPhone)
+
+PWA publicada em https://wolverbark.expo.app (EAS Hosting). Para atualizar: `npx expo export --platform web` e `npx eas-cli deploy --prod`. No iPhone: Safari → Compartilhar → Adicionar à Tela de Início. Sem vibração, lembretes ou push.
+
 ## Próximos passos de integração
 
+- **Push automático (escopo):** uma rotina no Supabase (Edge Function + agendamento) decide para quem e quando enviar pela Expo Push API:
+  - reengajar quem não treina há 7 dias;
+  - avisar quando uma fase nova é liberada;
+  - recado da especialista parceira.
+  Precisa de limite de frequência por tutor e de uma opção de desligar nos ajustes.
+- **Push no iPhone:** app nativo exige conta Apple Developer + APNs; a PWA pode usar Web Push (iOS 16.4+), por outro caminho.
 - **RevenueCat:** `npx expo install react-native-purchases` e implementar `services/purchases.ts` (interface já pronta). `is_pro` no banco só deve ser alterado pelo webhook do RevenueCat.
 - **Fotos do pet:** enviar para o Supabase Storage (hoje ficam só no aparelho).
 - **Login com Google/Apple:** exige development build (não funciona no Expo Go).

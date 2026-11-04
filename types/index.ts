@@ -37,6 +37,12 @@ export interface PartnerInfo {
 export type TutorGender = 'male' | 'female' | 'undisclosed';
 export type PetSex = 'male' | 'female';
 
+/** Nível de energia do cão no dia a dia (onboarding). */
+export type PetEnergy = 'high' | 'balanced' | 'calm';
+
+/** O quanto o cão já sabe de comandos antes do app. */
+export type PetExperience = 'none' | 'basic' | 'advanced';
+
 export type WeeklyGoalDays = 3 | 4 | 5 | 7;
 
 export interface ReminderSettings {
@@ -66,6 +72,8 @@ export interface Pet {
   ageMonths: number;
   size: PetSize;
   sex?: PetSex;
+  energyLevel?: PetEnergy;
+  commandExperience?: PetExperience;
   weightKg?: number;
   photoUri?: string;
   challenges: BehaviorChallenge[];
@@ -97,9 +105,24 @@ export interface ConceptStep extends BaseStep {
 }
 
 /** 2. Passo a passo prático com timer e/ou contador de repetições. */
+/**
+ * Tipo da etapa "Hora do treino":
+ * - practice: treino com o cão (clicker, repetições e cronômetro);
+ * - knowledge: leitura/orientação (sem clicker nem cronômetro);
+ * - checklist: preparar o ambiente ou o material (sem clicker nem cronômetro).
+ */
+export type PracticeKind = 'practice' | 'knowledge' | 'checklist';
+
+/** Sons de treino de dessensibilização (assets/sounds). */
+export type TrainingSound = 'fogos' | 'rojao' | 'trovao';
+
 export interface PracticeStep extends BaseStep {
   type: 'practice';
   title: string;
+  /** Padrão: 'practice'. */
+  kind?: PracticeKind;
+  /** Sons para tocar durante o treino (ex.: fogos), com controle de volume. */
+  sounds?: TrainingSound[];
   instructions: string[];
   timerSeconds?: number;
   targetReps?: number;

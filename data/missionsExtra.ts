@@ -84,6 +84,7 @@ export const areaSeguraLesson: Lesson = lesson({
   },
   practice: {
     title: 'Montando a área segura',
+    kind: 'checklist',
     loganSpeech: 'Bora montar meu QG! Escolha um cantinho tranquilo da casa.',
     instructions: [
       'Escolha um cômodo pequeno ou um cercadinho.',
@@ -92,7 +93,6 @@ export const areaSeguraLesson: Lesson = lesson({
       'Jogue 3 petiscos lá dentro e deixe explorar.',
       'Use quando não puder vigiar. Nunca como castigo.',
     ],
-    timerSeconds: 180,
     avoid: ['Usar a área como castigo', 'Tapete colado na caminha ou no pote de comida', 'Liberar a casa toda logo no primeiro dia'],
   },
   validation: {
@@ -158,9 +158,9 @@ export const caminhaLesson: Lesson = lesson({
     title: 'Subiu, ganhou!',
     loganSpeech: 'Escolha um tapete ou a caminha e separe 10 petiscos. Vamos lá!',
     instructions: [
-      'Tapete no chão. Atraia {pet} com um petisco até subir.',
+      'Tapete no chão. Atraia {o_pet} com um petisco até subir.',
       'Patas no tapete? "Isso!" + petisco em cima dele.',
-      'Jogue um petisco fora para {pet} sair. Repita.',
+      'Jogue um petisco fora {para_pet} sair. Repita.',
       'Subiu no tapete com as 4 patas? Peça "Senta" ou espere ele relaxar e entregue o petisco!',
       'Após 5 acertos, diga "Caminha!" antes. Libere com "Livre!".',
     ],
@@ -177,7 +177,7 @@ export const caminhaLesson: Lesson = lesson({
   },
   victory: {
     loganSpeech: 'FASE 1 COMPLETA! Caminha dominada e boas maneiras de super-herói. Tô orgulhoso!',
-    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". Na Fase 2: Fica, Junto e Vem.',
+    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". Na Fase 2: Senta, Fica, Junto e Vem.',
   },
 });
 
@@ -202,6 +202,7 @@ export const passeioCalorLesson: Lesson = lesson({
   },
   practice: {
     title: 'Checklist do passeio seguro',
+    kind: 'checklist',
     loganSpeech: 'Antes do próximo passeio, faça este checklist comigo.',
     instructions: [
       'No verão: antes das 9h ou depois das 17h.',
@@ -210,7 +211,6 @@ export const passeioCalorLesson: Lesson = lesson({
       'Rota com sombra, grama ou terra.',
       'Língua muito pra fora ou babando? Pare na sombra.',
     ],
-    timerSeconds: 60,
     avoid: ['Passear ao meio-dia no verão', 'Deixar o cão no carro, mesmo por pouco tempo', 'Correr com o cão em dias quentes'],
   },
   validation: {
@@ -270,7 +270,7 @@ export const socializacaoLesson: Lesson = lesson({
     title: 'Jogo do "Olha isso"',
     loganSpeech: 'Sente num banco de praça comigo e vamos observar o movimento!',
     instructions: [
-      'Fique longe o bastante para {pet} ficar calmo.',
+      'Fique longe o bastante {para_pet} ficar calm{o/a}.',
       'Olhou para pessoa, cão ou barulho? "Isso!" + petisco.',
       'Ficou tenso? Aumente a distância.',
       '8 repetições e vá embora ainda tranquilo.',
@@ -288,8 +288,8 @@ export const socializacaoLesson: Lesson = lesson({
     },
   },
   victory: {
-    loganSpeech: 'FASE 3 CONCLUÍDA! Passeios leves e um mundo cheio de boas experiências. Cada uma vira coragem!',
-    nextTip: 'Varie os lugares: praça, porta de padaria, estacionamento — sempre de longe no começo. Na Fase 4: alimentação e enriquecimento.',
+    loganSpeech: 'FASE 4 CONCLUÍDA! Passeios leves e um mundo cheio de boas experiências. Cada uma vira coragem!',
+    nextTip: 'Varie os lugares: praça, porta de padaria, estacionamento — sempre de longe no começo. Na Fase 5: faro e brincadeiras que cansam a mente.',
   },
 });
 
@@ -301,7 +301,7 @@ export const module5Lessons: Lesson[] = [
   lesson({
     id: 'm5-l1',
     title: 'Comida com calma',
-    summary: 'Nada de pular no pote: senta, espera e só come quando liberado.',
+    summary: 'Nada de pular no pote: espera com calma e só come quando liberado.',
     durationMinutes: 5,
     xpReward: 20,
     icon: '🥣',
@@ -309,19 +309,20 @@ export const module5Lessons: Lesson[] = [
       title: 'A refeição também é treino',
       loganSpeech: 'Duas vezes por dia eu fico doido com o pote. Mas aprendi que esperar faz a comida chegar mais rápido!',
       body:
-        'Cada refeição é uma chance de treinar autocontrole. Peça "Senta", desça o pote devagar e, se ele levantar, suba o pote de novo. ' +
-        'Quando o pote chegar ao chão com ele sentado, libere com "Pode!". Também vale dividir a ração diária em 2 ou 3 refeições em horários fixos.',
+        'Cada refeição é uma chance de treinar autocontrole. Com o pote na mão, espere o cão parar de pular, sentado ou em pé. ' +
+        'Desça o pote devagar e, se ele pular, suba o pote de novo, em silêncio. Pote no chão com calma? Libere com "Pode!". ' +
+        'Também vale dividir a ração diária em 2 ou 3 refeições em horários fixos.',
       whyItWorks: 'O cão aprende que a calma (e não a agitação) é o que faz a comida chegar — autocontrole aplicado ao dia a dia.',
     },
     practice: {
-      title: 'Pote descendo, cão sentado',
+      title: 'Pote descendo, cão calmo',
       loganSpeech: 'Use a próxima refeição para este treino. Paciência de herói!',
       instructions: [
-        'Pote na mão, peça "Senta".',
-        'Desça o pote. Levantou? Suba de novo, em silêncio.',
-        'Pote no chão e {pet} ainda no "Senta"? Conte 1 s.',
-        'Libere: "Pode!".',
-        'Próximas refeições: 3 s, depois 5 s.',
+        'Pote na mão. Fique paradinho e espere.',
+        'Pulou? Suba o pote de novo, em silêncio.',
+        'Ficou quiet{o/a}? Desça o pote devagar.',
+        'Pote no chão e {o_pet} esperando? Conte 1 s e diga "Pode!".',
+        'Próximas refeições: espere 3 s, depois 5 s.',
       ],
       targetReps: 3,
       avoid: ['Mexer no pote enquanto ele come', 'Deixar ração à vontade o dia todo', 'Esperas longas demais no começo'],
@@ -358,7 +359,7 @@ export const module5Lessons: Lesson[] = [
       instructions: [
         'Separe um punhado da ração do dia.',
         'Espalhe num tapete ou na grama.',
-        '"Procura!" e deixe {pet} achar tudo.',
+        '"Procura!" e deixe {o_pet} achar tudo.',
         'Fácil? Enrole a ração numa toalha.',
         'Pare antes de perder a graça.',
       ],
@@ -397,7 +398,7 @@ export const module5Lessons: Lesson[] = [
       instructions: [
         'Rolo de papel vazio: dobre uma ponta.',
         'Ponha uns grãos de ração e dobre a outra.',
-        'Entregue e acompanhe {pet} abrir.',
+        'Entregue e acompanhe {o_pet} abrir.',
         'Recolha o papelão no final.',
         'Faça rodízio de brinquedos na semana.',
       ],
@@ -469,9 +470,9 @@ export const focoLesson: Lesson = lesson({
   },
   practice: {
     title: 'Psiu, olha aqui!',
-    loganSpeech: 'Petisco na mão e {pet} na sua frente. Bora treinar o olhar!',
+    loganSpeech: 'Petisco na mão e {o_pet} na sua frente. Bora treinar o olhar!',
     instructions: [
-      'Petisco na mão, {pet} na sua frente.',
+      'Petisco na mão, {o_pet} na sua frente.',
       'Faça um estalo com a boca ou diga "{pet}!".',
       'Olhou no seu olho? Clique + petisco!',
       'Acertou 5? Leve o treino para o corredor.',
@@ -489,7 +490,7 @@ export const focoLesson: Lesson = lesson({
     },
   },
   victory: {
-    loganSpeech: 'Olho no olho! Agora {pet} sabe onde está a diversão: em você.',
+    loganSpeech: 'Olho no olho! Agora {o_pet} sabe onde está a diversão: em você.',
     nextTip: 'No passeio, use o estalo antes que ele trave em algo.',
   },
 });
@@ -512,9 +513,9 @@ export const soltaLesson: Lesson = lesson({
   },
   practice: {
     title: 'Troca premiada',
-    loganSpeech: 'Um brinquedo de que {pet} goste e petiscos bem cheirosos. Começou a troca!',
+    loganSpeech: 'Um brinquedo de que {o_pet} goste e petiscos bem cheirosos. Começou a troca!',
     instructions: [
-      'Dê um brinquedo para {pet} brincar.',
+      'Dê um brinquedo {para_pet} brincar.',
       'Petisco cheiroso bem na frente do focinho.',
       'Abriu a boca? Diga "Solta!" + petisco.',
       'Recolha o brinquedo e devolva. Ele não perde nada!',
@@ -532,7 +533,7 @@ export const soltaLesson: Lesson = lesson({
     },
   },
   victory: {
-    loganSpeech: 'Solta, pega, ganha! {pet} aprendeu que trocar com você sempre compensa.',
+    loganSpeech: 'Solta, pega, ganha! {O_pet} aprendeu que trocar com você sempre compensa.',
     nextTip: 'Engoliu algo perigoso? Ligue para o veterinário na hora.',
   },
 });
@@ -558,8 +559,8 @@ export const interfoneLesson: Lesson = lesson({
     instructions: [
       'Alguém toca a campainha ou o interfone.',
       'Na hora, jogue 3 petiscos na caminha.',
-      '{pet} correu pra lá? "Isso!" + mais um petisco.',
-      'Só abra a porta com {pet} na caminha.',
+      '{O_pet} correu pra lá? "Isso!" + mais um petisco.',
+      'Só abra a porta {com_pet} na caminha.',
       'Repita 5 vezes, com pausas entre os toques.',
     ],
     targetReps: 5,
@@ -576,5 +577,47 @@ export const interfoneLesson: Lesson = lesson({
   victory: {
     loganSpeech: 'Ding-dong, petisco na caminha! A porta ficou bem mais tranquila.',
     nextTip: 'Deixe um pote de petiscos perto do interfone para não perder a hora.',
+  },
+});
+
+export const nomeLesson: Lesson = lesson({
+  id: 'm1-nome',
+  title: 'Atende pelo nome',
+  summary: 'Chamou pelo nome, virou a cabeça: o primeiro "sim" de toda conversa.',
+  durationMinutes: 4,
+  xpReward: 15,
+  icon: '📛',
+  concept: {
+    title: 'O nome é o melhor som do mundo',
+    loganSpeech: 'Quando meu tutor fala "Logan", eu já sei: vem coisa boa! Seu cão também pode pensar assim.',
+    body:
+      'O nome do cão deve significar "olha pra mim, vem coisa boa". Diga o nome uma vez, espere ele virar a cabeça e marque com "Isso!" + petisco. ' +
+      'Nunca use o nome para dar bronca ou chamar para algo chato, como banho ou remédio: isso ensina a ignorar o nome.',
+    whyItWorks: 'Cada vez que o nome vem seguido de petisco, ele vira um sinal de atenção. É a base para o "Vem!" e para qualquer outro comando.',
+  },
+  practice: {
+    title: 'Nome = petisco',
+    loganSpeech: 'Petiscos pequenos na mão. Espere {o_pet} se distrair um pouquinho e comece!',
+    instructions: [
+      '{O_pet} olhando para outro lado? Diga "{pet}" uma vez.',
+      'Virou a cabeça para você? "Isso!" + petisco.',
+      'Não virou? Faça um barulhinho e tente de novo depois.',
+      'Mude de cômodo a cada 3 acertos.',
+      'Fácil? Chame com a TV ligada.',
+    ],
+    targetReps: 10,
+    avoid: ['Repetir o nome várias vezes seguidas', 'Usar o nome para dar bronca', 'Chamar pelo nome para algo de que ele não gosta'],
+  },
+  validation: {
+    question: '{O_pet} virou para você quando ouviu o nome?',
+    feedback: {
+      easy: 'Atenção de herói! Agora chame de outro cômodo.',
+      medium: 'Está pegando! Use petiscos mais gostosos e chame só uma vez.',
+      hard: 'Tudo bem! Treine num cômodo silencioso, bem pertinho.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Nome atendido! Agora {o_pet} sabe que ouvir o próprio nome é sinal de coisa boa.',
+    nextTip: 'Use o nome só para coisas boas. Para o resto, vá até {o_pet}.',
   },
 });

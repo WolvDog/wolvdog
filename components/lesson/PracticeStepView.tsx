@@ -8,13 +8,20 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { COLORS, FONTS } from '@/constants/theme';
 import { useCountdown } from '@/hooks/useCountdown';
 import { HapticStyle, tap } from '@/services/haptics';
-import type { PracticeStep } from '@/types';
+import type { PracticeKind, PracticeStep } from '@/types';
 
 import { Clicker } from './Clicker';
+import { SoundBoard } from './SoundBoard';
 import { DemoMedia } from './DemoMedia';
 import { StepHeading } from './StepHeading';
 
 const FANFARE = require('@/assets/sounds/fanfare.wav');
+
+const KICKER: Record<PracticeKind, string> = {
+  practice: 'Hora do treino',
+  knowledge: 'Para saber',
+  checklist: 'Preparação',
+};
 
 interface PracticeStepViewProps {
   step: PracticeStep;
@@ -53,9 +60,11 @@ export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProp
     });
   };
 
+  const isPractice = (step.kind ?? 'practice') === 'practice';
+
   return (
     <View>
-      <StepHeading kicker="Hora do treino" color={COLORS.hero} title={step.title} />
+      <StepHeading kicker={KICKER[step.kind ?? 'practice']} color={COLORS.hero} title={step.title} />
 
       <LoganSays text={step.loganSpeech} mood={step.loganMood} size={80} />
 
@@ -92,18 +101,22 @@ export function PracticeStepView({ step, onTargetReached }: PracticeStepViewProp
         })}
       </View>
 
+      {step.sounds && step.sounds.length > 0 && <SoundBoard sounds={step.sounds} />}
+
+      {isPractice && !step.sounds?.length && (
       <Clicker
         countsReps={!!step.targetReps}
         disabled={targetReached}
         onClick={() => step.targetReps && setReps((r) => Math.min(step.targetReps!, r + 1))}
       />
+      )}
       {targetReached && (
         <View className="mt-3 rounded-xl border-2 border-ink-900 bg-claw-500 p-3">
           <Text className="text-center font-bold text-ink-900">🎯 Meta de repetições batida! Indo para o relatório…</Text>
         </View>
       )}
 
-      {(step.timerSeconds || step.targetReps) && (
+      {isPractice && (step.timerSeconds || step.targetReps) && (
         <View className="mt-3 flex-row gap-3">
           {step.timerSeconds ? (
             <TimerCard

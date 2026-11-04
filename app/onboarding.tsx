@@ -15,12 +15,14 @@ import { SegmentedProgress } from '@/components/ProgressBar';
 import { TERMS } from '@/constants/brand';
 import {
   BREED_SUGGESTIONS,
-  CHALLENGE_FOCUS_PHASE,
+  CHALLENGE_FOCUS_MODULE,
   CHALLENGE_LABELS,
   formatAge,
   formatWeight,
   maskBirthDate,
   parseBirthDate,
+  PET_ENERGY_LABELS,
+  PET_EXPERIENCE_LABELS,
   PET_SEX_LABELS,
   PET_SIZE_DETAILS,
   PET_SIZE_LABELS,
@@ -33,14 +35,17 @@ import { MODULES } from '@/data/mockData';
 import { formatTime, isPresetTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { useAppStore } from '@/store/useAppStore';
-import type { BehaviorChallenge, PartnerInfo, PetSex, PetSize, TutorGender, User, WeeklyGoalDays } from '@/types';
+import type { BehaviorChallenge, PartnerInfo, PetEnergy, PetExperience, PetSex, PetSize, TutorGender, User, WeeklyGoalDays } from '@/types';
+import { getPetGrammar } from '@/services/personalize';
 import { persistPetPhoto } from '@/services/photos';
 
-const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'focus', 'goal', 'reminder', 'plan'] as const;
+const STEPS = ['welcome', 'tutor', 'petName', 'breed', 'size', 'age', 'profile', 'focus', 'goal', 'reminder', 'plan'] as const;
 type Step = (typeof STEPS)[number];
 
 const SIZES = Object.keys(PET_SIZE_LABELS) as PetSize[];
 const CHALLENGES = Object.keys(CHALLENGE_LABELS) as BehaviorChallenge[];
+const ENERGIES = Object.keys(PET_ENERGY_LABELS) as PetEnergy[];
+const EXPERIENCES = Object.keys(PET_EXPERIENCE_LABELS) as PetExperience[];
 const GOALS: { minutes: User['dailyGoalMinutes']; emoji: string }[] = [
   { minutes: 5, emoji: '🐾' },
   { minutes: 10, emoji: '⚡' },
@@ -66,6 +71,8 @@ export default function OnboardingScreen() {
   const [years, setYears] = useState('');
   const [months, setMonths] = useState('');
   const [challenges, setChallenges] = useState<BehaviorChallenge[]>([]);
+  const [energy, setEnergy] = useState<PetEnergy | null>(null);
+  const [experience, setExperience] = useState<PetExperience | null>(null);
   const [goal, setGoal] = useState<User['dailyGoalMinutes']>(10);
   const [weeklyDays, setWeeklyDays] = useState<WeeklyGoalDays>(4);
   const [partner, setPartner] = useState<PartnerInfo | null>(null);
@@ -73,7 +80,10 @@ export default function OnboardingScreen() {
   const [askingPermission, setAskingPermission] = useState(false);
 
   const step: Step = STEPS[stepIndex]!;
-  const dog = petName.trim() || 'seu pet';
+  // Com artigo quando o sexo já foi escolhido: "a raça da Lola", "quanto o Thor pesa".
+  const g = getPetGrammar(petName.trim() ? { name: petName, sex: petSex } : null);
+  const named = petName.trim().length > 0;
+  const dog = { o: named ? g.o : 'seu pet', do: named ? g.do : 'do seu pet' };
   const tutor = tutorName.trim();
   const weightKg = parseFloat(weight.replace(',', '.'));
   const ageMonths = (parseInt(years, 10) || 0) * 12 + (parseInt(months, 10) || 0);
@@ -85,6 +95,7 @@ export default function OnboardingScreen() {
     breed: breed.trim().length > 0,
     size: size !== null,
     age: ageMonths > 0,
+    profile: energy !== null && experience !== null,
     focus: true,
     goal: true,
     reminder: true,
@@ -92,8 +103,8 @@ export default function OnboardingScreen() {
   };
 
   const focusPhases = useMemo(() => {
-    const phases = new Set(challenges.map((c) => CHALLENGE_FOCUS_PHASE[c]));
-    return MODULES.filter((m) => phases.has(m.phase));
+    const focus = new Set(challenges.map((c) => CHALLENGE_FOCUS_MODULE[c]));
+    return MODULES.filter((m) => focus.has(m.id));
   }, [challenges]);
 
   function handleWeight(text: string) {
@@ -123,6 +134,8 @@ export default function OnboardingScreen() {
         pet: {
           name: petName.trim(),
           sex: petSex ?? undefined,
+          energyLevel: energy ?? undefined,
+          commandExperience: experience ?? undefined,
           breed: breed.trim(),
           ageMonths,
           size: size ?? 'medio',
@@ -256,7 +269,7 @@ export default function OnboardingScreen() {
 
           {step === 'breed' && (
             <>
-              <LoganSays mood="thinking" text={`Qual a raça de ${dog}? Cada raça tem seu jeitinho de aprender.`} />
+              <LoganSays mood="thinking" text={`Qual a raça ${dog.do}? Cada raça tem seu jeitinho de aprender.`} />
               <Field label="Raça">
                 <TextField value={breed} onChangeText={setBreed} placeholder="Digite ou escolha abaixo" />
               </Field>
@@ -270,7 +283,7 @@ export default function OnboardingScreen() {
 
           {step === 'size' && (
             <>
-              <LoganSays mood="happy" text={`Quanto ${dog} pesa? Se não souber exato, escolha o porte mesmo.`} />
+              <LoganSays mood="happy" text={`Quanto ${dog.o} pesa? Se não souber exato, escolha o porte mesmo.`} />
               <Field label="Peso (opcional)">
                 <TextField value={weight} onChangeText={handleWeight} placeholder="Ex: 12,5" keyboardType="decimal-pad" suffix="kg" />
               </Field>
@@ -294,7 +307,7 @@ export default function OnboardingScreen() {
 
           {step === 'age' && (
             <>
-              <LoganSays mood="thinking" text={`E quantos anos ${dog} tem? Filhotes e adultos treinam um pouco diferente.`} />
+              <LoganSays mood="thinking" text={`E quantos anos ${dog.o} tem? Filhotes e adultos treinam um pouco diferente.`} />
               <Field label="Idade">
                 <View className="flex-row gap-3">
                   <View className="flex-1">
@@ -315,9 +328,39 @@ export default function OnboardingScreen() {
             </>
           )}
 
+          {step === 'profile' && (
+            <>
+              <LoganSays mood="excited" text={`Me conta um pouco do jeito ${dog.do}. Assim eu ajusto o treino!`} />
+              <Field label="Como é a bateria do seu parceiro no dia a dia?">
+                {ENERGIES.map((e) => (
+                  <OptionCard
+                    key={e}
+                    title={PET_ENERGY_LABELS[e].title}
+                    subtitle={PET_ENERGY_LABELS[e].subtitle}
+                    emoji={PET_ENERGY_LABELS[e].emoji}
+                    active={energy === e}
+                    onPress={() => setEnergy(e)}
+                  />
+                ))}
+              </Field>
+              <Field label="Já sabe algum comando de treino?">
+                {EXPERIENCES.map((x) => (
+                  <OptionCard
+                    key={x}
+                    title={PET_EXPERIENCE_LABELS[x].title}
+                    subtitle={PET_EXPERIENCE_LABELS[x].subtitle}
+                    emoji={PET_EXPERIENCE_LABELS[x].emoji}
+                    active={experience === x}
+                    onPress={() => setExperience(x)}
+                  />
+                ))}
+              </Field>
+            </>
+          )}
+
           {step === 'focus' && (
             <>
-              <LoganSays mood="hero" text={`Agora o mais importante: o que ${dog} precisa melhorar? Pode marcar vários.`} />
+              <LoganSays mood="hero" text={`Agora o mais importante: o que ${dog.o} precisa melhorar? Pode marcar vários.`} />
               <Field label="Foco do treinamento" hint="Isso define por onde começa o plano.">
                 {CHALLENGES.map((c) => (
                   <OptionCard
@@ -364,7 +407,7 @@ export default function OnboardingScreen() {
             <>
               <LoganSays
                 mood="happy"
-                text={`Posso te lembrar todo dia da missão de ${dog}? Prometo não encher o saco: se você já treinou, eu fico quietinho.`}
+                text={`Posso te lembrar todo dia da missão ${dog.do}? Prometo não encher o saco: se você já treinou, eu fico quietinho.`}
               />
               <Field label="Horário do lembrete">
                 {REMINDER_TIMES.map((t) => (
@@ -395,7 +438,7 @@ export default function OnboardingScreen() {
 
           {step === 'plan' && (
             <>
-              <LoganSays layout="top" size={110} mood="proud" text={`Plano pronto, ${tutor}! Eu e ${dog} vamos formar uma dupla imbatível.`} />
+              <LoganSays layout="top" size={110} mood="proud" text={`Plano pronto, ${tutor}! Eu e ${dog.o} vamos formar uma dupla imbatível.`} />
 
               <View className="mt-6 overflow-hidden rounded-xl border-2 border-ink-900 bg-white">
                 <View className="flex-row items-center bg-ink-900 px-4 py-3">
@@ -423,7 +466,7 @@ export default function OnboardingScreen() {
                   <SummaryRow label="Primeira missão" value="O marcador mágico" />
                   <Text className="mb-2 mt-3 text-xs font-bold uppercase text-ink-400">Fases prioritárias</Text>
                   {focusPhases.length === 0 ? (
-                    <Text className="text-sm text-ink-600">Começaremos pela base: Fase 1 — Boas Maneiras.</Text>
+                    <Text className="text-sm text-ink-600">Começaremos pela base: Fase 1 — Boas Maneiras & Conexão.</Text>
                   ) : (
                     focusPhases.map((m) => (
                       <View key={m.id} className="mb-1.5 flex-row items-center">

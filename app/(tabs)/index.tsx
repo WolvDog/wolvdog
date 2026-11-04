@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { HeroButton } from '@/components/HeroButton';
 import { DiaryPrompt } from '@/components/DiaryPrompt';
+import { SeasonalCard } from '@/components/SeasonalCard';
 import { ClawMarks } from '@/components/icons';
 import { LoganSays } from '@/components/LoganSays';
 import { MissionRow } from '@/components/MissionRow';
@@ -22,6 +23,7 @@ import { showAlert } from '@/services/dialog';
 import { toDateKey, type WeekStatus } from '@/services/gamification';
 import { getLessonState, getModuleState } from '@/services/progression';
 import { getDueReviews } from '@/services/review';
+import { getPetGrammar } from '@/services/personalize';
 import { useAppStore } from '@/store/useAppStore';
 import type { Lesson, LoganMood, Pet } from '@/types';
 
@@ -40,11 +42,11 @@ export default function MissionMapScreen() {
     })),
   );
 
-  const petName = pet?.name ?? 'seu pet';
+  const journeyTitle = pet ? `JORNADA ${getPetGrammar(pet).do}` : 'SUA JORNADA';
   const trainedToday = xpHistory.some((e) => e.date === toDateKey() && e.source === 'lesson');
   const week = useWeekStatus();
   const dueReviews = getDueReviews(reviews);
-  const greeting = getGreeting(tutorName, petName, week, trainedToday, dueReviews.length, currentLesson, pet?.sex);
+  const greeting = getGreeting(tutorName, pet, week, trainedToday, dueReviews.length, currentLesson, completedCount);
 
   const handleMissionPress = (lesson: Lesson, status: string, requiresPro: boolean) => {
     if (requiresPro) return openPaywall('locked_module');
@@ -76,6 +78,9 @@ export default function MissionMapScreen() {
           </Pressable>
         )}
 
+        {/* Temporada de fogos (nov–jan): missão especial fixa no topo. */}
+        <SeasonalCard />
+
         {/* Briefing diário do Logan */}
         <View className="mx-4 mt-4 rounded-xl border-2 border-ink-900 bg-white p-4">
           <LoganSays text={greeting.text} mood={greeting.mood} size={72} />
@@ -85,7 +90,7 @@ export default function MissionMapScreen() {
           <View className="mt-4">
             <View className="mb-1.5 flex-row items-center justify-between">
               <Text style={{ fontFamily: FONTS.displayMedium, fontSize: 12, letterSpacing: 1, color: COLORS.inkSoft }}>
-                JORNADA DE {petName.toUpperCase()}
+                {journeyTitle.toUpperCase()}
               </Text>
               <View className="flex-row items-center">
                 <Target size={12} color={COLORS.inkSoft} />
@@ -173,31 +178,46 @@ export default function MissionMapScreen() {
 
 function getGreeting(
   tutorName: string,
-  petName: string,
+  pet: Pet | null,
   week: WeekStatus,
   trainedToday: boolean,
   reviewsDue: number,
   currentLesson: Lesson | undefined,
-  petSex: Pet['sex'],
+  completedCount: number,
 ): { text: string; mood: LoganMood } {
   const tutor = tutorName.trim() || 'parceiro';
+  const g = getPetGrammar(pet);
   const left = week.goal - week.done;
   if (trainedToday) {
     return week.goalMet
-      ? { mood: 'proud', text: `Meta da semana batida, ${tutor}! ${petName} está ficando ${petSex === 'female' ? 'afiada' : 'afiado'}. Treino extra é sempre bem-vindo.` }
-      : { mood: 'excited', text: `Treino de hoje feito! Faltam ${left} ${left === 1 ? 'treino' : 'treinos'} para fechar a semana com ${petName}.` };
+      ? { mood: 'proud', text: `Meta da semana batida, ${tutor}! ${g.O} está ficando afiad${g.oA}. Treino extra é sempre bem-vindo.` }
+      : { mood: 'excited', text: `Treino de hoje feito! Faltam ${left} ${left === 1 ? 'treino' : 'treinos'} para fechar a semana ${g.com}.` };
   }
   if (week.atRisk) {
     return {
       mood: 'thinking',
-      text: `${tutor}, a meta da semana está em risco: faltam ${left} ${left === 1 ? 'treino' : 'treinos'}. Bora treinar ${petName} hoje?`,
+      text: `${tutor}, a meta da semana está em risco: faltam ${left} ${left === 1 ? 'treino' : 'treinos'}. Bora treinar ${g.o} hoje?`,
     };
   }
   if (reviewsDue > 0) {
-    return { mood: 'hero', text: `Au au, ${tutor}! Separei ${reviewsDue === 1 ? 'um reforço rápido' : `${reviewsDue} reforços rápidos`} para ${petName} não esquecer o que aprendeu.` };
+    return { mood: 'hero', text: `Au au, ${tutor}! Separei ${reviewsDue === 1 ? 'um reforço rápido' : `${reviewsDue} reforços rápidos`} ${g.para} não esquecer o que aprendeu.` };
   }
   if (!currentLesson) {
-    return { mood: 'proud', text: `Você cumpriu tudo que está liberado, ${tutor}! Revise uma missão favorita com ${petName}.` };
+    return { mood: 'proud', text: `Você cumpriu tudo que está liberado, ${tutor}! Revise uma missão favorita ${g.com}.` };
   }
-  return { mood: 'happy', text: `Au au, ${tutor}! Bora treinar ${petName} hoje? Próxima missão: ${currentLesson.title}` };
+  const next = `Próxima missão: ${currentLesson.title}`;
+  // Primeiros passos: o Logan comenta o que o tutor contou no onboarding.
+  if (completedCount === 0 && pet?.commandExperience === 'advanced') {
+    return { mood: 'excited', text: `Como ${g.o} já manja de truques, as primeiras missões vão voar! ${next}` };
+  }
+  if (completedCount === 0 && pet?.commandExperience === 'none') {
+    return { mood: 'happy', text: `Começando do zero? Perfeito: cada petisco conta, ${tutor}. ${next}` };
+  }
+  if (pet?.energyLevel === 'high') {
+    return { mood: 'hero', text: `Sabia que cães elétricos aprendem ainda mais rápido quando gastam energia mental no treino? Vamos nessa! ${next}` };
+  }
+  if (pet?.energyLevel === 'calm') {
+    return { mood: 'happy', text: `Cães tranquilos rendem muito com sessões curtinhas e um petisco bem gostoso. ${next}` };
+  }
+  return { mood: 'happy', text: `Au au, ${tutor}! Bora treinar ${g.o} hoje? ${next}` };
 }

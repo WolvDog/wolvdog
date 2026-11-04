@@ -8,13 +8,15 @@ import {
   focoLesson,
   interfoneLesson,
   module5Lessons,
+  nomeLesson,
   passeioCalorLesson,
   socializacaoLesson,
   soltaLesson,
 } from './missionsExtra';
+import { SPECIAL_LESSONS, SPECIAL_MODULE, SPECIAL_MODULE_ID } from './specials';
 
 // ---------------------------------------------------------------------------
-// FASE 1 — Boas Maneiras & Xixi no Lugar Certo (gratuita)
+// Missões-base 1 (a ordem nas fases é definida em MODULES, no fim do arquivo)
 // ---------------------------------------------------------------------------
 
 const MODULE_1 = 'm1-boas-maneiras';
@@ -45,8 +47,8 @@ const module1Lessons: Lesson[] = [
         'Cômodo calmo, 15 petiscos pequenos na mão.',
         'Diga "Isso!" e dê o petisco em até 1 segundo.',
         'Espere 3 segundos em silêncio. Repita.',
-        '{pet} não precisa fazer nada ainda.',
-        'Teste: "Isso!" quando {pet} olhar para outro lado. Virou? Sucesso!',
+        '{O_pet} não precisa fazer nada ainda.',
+        'Teste: "Isso!" quando {o_pet} olhar para outro lado. Virou? Sucesso!',
       ],
       targetReps: 15,
       timerSeconds: 180,
@@ -87,7 +89,7 @@ const module1Lessons: Lesson[] = [
       title: 'Primeira ida guiada ao banheiro',
       loganSpeech: 'Vamos treinar agora mesmo! Se ele acabou de comer, brincar ou acordar, é a hora perfeita.',
       instructions: [
-        'Leve {pet} na guia até o tapete higiênico.',
+        'Leve {o_pet} na guia até o tapete higiênico.',
         'Fique parado e sem graça por até 3 min.',
         'Começou a fazer? Silêncio total.',
         'Terminou? "Isso!" + petisco ali mesmo.',
@@ -129,15 +131,15 @@ const module1Lessons: Lesson[] = [
     },
     practice: {
       title: 'Kit anti-acidente',
+      kind: 'checklist',
       loganSpeech: 'Vamos montar seu kit de herói da limpeza e ensaiar a reação perfeita!',
       instructions: [
         'Separe papel toalha, limpador enzimático e saquinho.',
         'Ensaie um "Opa!" calmo, sem gritar.',
         'Xixi antigo? Só limpe em silêncio. Pegou no flagra agachando? Leve direto para o tapete higiênico!',
-        'Limpe longe de {pet}, sem drama.',
+        'Limpe longe {do_pet}, sem drama.',
         'Nada de amônia: o cheiro chama para o mesmo lugar.',
       ],
-      timerSeconds: 120,
       avoid: ['Esfregar o focinho no xixi', 'Gritar ou bater jornal', 'Usar água sanitária pura'],
     },
     validation: {
@@ -150,8 +152,8 @@ const module1Lessons: Lesson[] = [
       },
     },
     victory: {
-      loganSpeech: 'Você aprendeu a lição mais difícil para humanos: paciência! Au au!',
-      nextTip: 'Se os acidentes acontecem sempre no mesmo lugar, coloque o pote de comida ali — cães evitam sujar onde comem.',
+      loganSpeech: 'FASE 3 CONCLUÍDA! Você aprendeu a lição mais difícil para humanos: paciência! Au au!',
+      nextTip: 'Se os acidentes acontecem sempre no mesmo lugar, coloque o pote de comida ali: cães evitam sujar onde comem. Na Fase 4: passeio sem puxar.',
     },
   }),
   lesson({
@@ -194,13 +196,13 @@ const module1Lessons: Lesson[] = [
     },
     victory: {
       loganSpeech: 'Quatro patas no chão, cumprimento de herói! As chegadas em casa nunca mais vão ser um caos.',
-      nextTip: 'Combine com a família: ninguém dá atenção para pulos, nem as visitas. A seguir vem o comando mais útil de todos: o Senta.',
+      nextTip: 'Combine com a família: ninguém dá atenção para pulos, nem as visitas. A seguir: a Caminha, o cantinho de calma {do_pet}.',
     },
   }),
 ];
 
 // ---------------------------------------------------------------------------
-// FASE 2 — Comandos Básicos (Senta, Fica, Junto)
+// Missões-base 2: comandos (Senta, Fica, Junto, Vem)
 // ---------------------------------------------------------------------------
 
 const MODULE_2 = 'm2-comandos-basicos';
@@ -312,7 +314,7 @@ const module2Lessons: Lesson[] = [
       title: 'Zona premiada',
       loganSpeech: 'Petiscos na mão esquerda, e vamos dar alguns passinhos juntos!',
       instructions: [
-        '{pet} do seu lado esquerdo, petisco na mão esquerda.',
+        '{O_pet} do seu lado esquerdo, petisco na mão esquerda.',
         'Colado na perna? "Isso!" + petisco ali.',
         'Dê 1 passo. Acompanhou? "Isso!" + petisco.',
         'Deu 2 passos colado na sua perna? Diga "Isso!" e entregue o petisco na altura da coxa.',
@@ -372,13 +374,13 @@ const module2Lessons: Lesson[] = [
     },
     victory: {
       loganSpeech: 'FASE 2 CONCLUÍDA! Senta, Fica, Junto e Vem: seu cão tem um arsenal de herói!',
-      nextTip: 'Próxima fase: passeios sem puxar e socialização. Vai ser leve como uma pena!',
+      nextTip: 'Próxima fase: banheiro sem acidentes, no tapete ou no quintal.',
     },
   }),
 ];
 
 // ---------------------------------------------------------------------------
-// FASE 3 — Passeio sem Puxar a Guia
+// Missões-base 3: passeio sem puxar a guia
 // ---------------------------------------------------------------------------
 
 const MODULE_3 = 'm3-passeio';
@@ -406,7 +408,7 @@ const module3Lessons: Lesson[] = [
       loganSpeech: 'Vamos fazer o peitoral virar sinônimo de festa!',
       instructions: [
         'Mostre o peitoral: "Isso!" + petisco. 3 vezes.',
-        'Petisco na abertura: {pet} enfia o focinho sozinho.',
+        'Petisco na abertura: {o_pet} enfia o focinho sozinh{o/a}.',
         'Feche, dê 3 petiscos e retire.',
         'Guia presa: 1 min andando em casa, premiando de perto.',
       ],
@@ -509,7 +511,7 @@ const module3Lessons: Lesson[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// FASE 4 — Controle de Ansiedade & Autocontrole
+// Missões-base 4: ansiedade e autocontrole
 // ---------------------------------------------------------------------------
 
 const MODULE_4 = 'm4-ansiedade';
@@ -540,7 +542,7 @@ const module4Lessons: Lesson[] = [
         'Pisou no tapete? Petisco entre as patas.',
         'Deitou ou suspirou? Petisco + "bom" baixinho.',
         'Espace os petiscos aos poucos.',
-        'Recolha o tapete enquanto {pet} ainda relaxa.',
+        'Recolha o tapete enquanto {o_pet} ainda relaxa.',
       ],
       timerSeconds: 300,
       avoid: ['Usar voz animada', 'Fazer sessões longas demais no começo'],
@@ -619,7 +621,7 @@ const module4Lessons: Lesson[] = [
       title: 'Portas que voltam',
       loganSpeech: 'Vamos fazer saídas relâmpago. Ele nem vai perceber que você foi!',
       instructions: [
-        'Dê um brinquedo recheado para {pet}.',
+        'Dê um brinquedo recheado {para_pet}.',
         'Pegue as chaves, saia e volte em 5 s.',
         'Entre sem falar nada e siga sua vida.',
         'Aumente: 10 s, 20 s, 30 s, 1 min.',
@@ -655,47 +657,56 @@ const pick = (list: Lesson[], id: string): Lesson => {
 
 const MODULE_5 = 'm5-alimentacao';
 
+/** Sanitário saiu da fase grátis: comandos dão vitórias rápidas; banheiro depende de semanas de rotina. */
+const MODULE_SANITARIO = 'm-sanitario';
+
 export const MODULES: Module[] = [
   {
     id: MODULE_1,
     phase: 1,
-    title: 'Boas Maneiras & Xixi no Lugar Certo',
+    title: 'Boas Maneiras & Conexão',
     subtitle: 'Fase 1 · Grátis',
-    description: 'A base de tudo: comunicação, banheiro, área segura, Senta e Caminha.',
+    description: 'Atenção ao nome, olho no olho, calma na hora da comida e regras da casa.',
     color: '#FFC72C',
     colorDark: '#E5A800',
     isFree: true,
     lessons: sequence(
       MODULE_1,
-      [
-        pick(module1Lessons, 'm1-l1'),
-        pick(module1Lessons, 'm1-l2'),
-        pick(module1Lessons, 'm1-l3'),
-        areaSeguraLesson,
-        pick(module1Lessons, 'm1-l4'),
-        // "Senta" e "Caminha" são prioritários e ficam na fase gratuita.
-        pick(module2Lessons, 'm2-l1'),
-        caminhaLesson,
-      ],
+      [pick(module1Lessons, 'm1-l1'), nomeLesson, focoLesson, pick(module5Lessons, 'm5-l1'), pick(module1Lessons, 'm1-l4'), caminhaLesson],
       EXISTING_QUIZZES,
     ),
   },
   {
     id: MODULE_2,
     phase: 2,
-    title: 'Comandos Básicos',
-    subtitle: 'Fase 2 · Foco, Fica, Junto, Vem',
-    description: 'Os comandos clássicos que todo cão educado precisa saber.',
+    title: 'Comandos Essenciais',
+    subtitle: 'Fase 2 · Senta, Fica, Junto, Vem',
+    description: 'Vitórias rápidas: comandos que funcionam em minutos, com petisco e clicker.',
     color: '#3B5CC4',
     colorDark: '#1E3A8A',
     isFree: false,
-    lessons: sequence(MODULE_2, [focoLesson, ...module2Lessons.filter((l) => l.id !== 'm2-l1')], EXISTING_QUIZZES),
+    lessons: sequence(MODULE_2, module2Lessons, EXISTING_QUIZZES),
+  },
+  {
+    id: MODULE_SANITARIO,
+    phase: 3,
+    title: 'Sanitário à Prova de Falhas',
+    subtitle: 'Fase 3',
+    description: 'Tapete higiênico ou quintal, rotina certa e zero bronca nos acidentes.',
+    color: '#34C38F',
+    colorDark: '#1E9C6E',
+    isFree: false,
+    lessons: sequence(
+      MODULE_SANITARIO,
+      [pick(module1Lessons, 'm1-l2'), areaSeguraLesson, pick(module1Lessons, 'm1-l3')],
+      EXISTING_QUIZZES,
+    ),
   },
   {
     id: MODULE_3,
-    phase: 3,
+    phase: 4,
     title: 'Passeio & Socialização',
-    subtitle: 'Fase 3',
+    subtitle: 'Fase 4',
     description: 'Passeio sem puxar, rotina no calor e um mundo cheio de boas experiências.',
     color: '#F28C28',
     colorDark: '#D9721A',
@@ -704,20 +715,20 @@ export const MODULES: Module[] = [
   },
   {
     id: MODULE_5,
-    phase: 4,
-    title: 'Alimentação & Enriquecimento',
-    subtitle: 'Fase 4',
-    description: 'Refeições com calma, faro e brincadeiras que cansam a mente.',
+    phase: 5,
+    title: 'Faro & Enriquecimento',
+    subtitle: 'Fase 5',
+    description: 'Faro e brincadeiras que cansam a mente (e salvam o sofá).',
     color: '#60A5FA',
     colorDark: '#3B82F6',
     isFree: false,
-    lessons: sequence(MODULE_5, module5Lessons, EXISTING_QUIZZES),
+    lessons: sequence(MODULE_5, module5Lessons.filter((l) => l.id !== 'm5-l1'), EXISTING_QUIZZES),
   },
   {
     id: MODULE_4,
-    phase: 5,
+    phase: 6,
     title: 'Ansiedade & Autocontrole',
-    subtitle: 'Fase 5',
+    subtitle: 'Fase 6',
     description: 'Calma, autocontrole e paz na porta de casa e na calçada.',
     // "Adamantium": cinza metálico
     color: '#9AA5B8',
@@ -731,13 +742,15 @@ export const MODULES: Module[] = [
   },
 ];
 
+/** Missões da trilha (as especiais ficam de fora da contagem e da ordem). */
 export const ALL_LESSONS: Lesson[] = MODULES.flatMap((m) => m.lessons);
 
 export function getLessonById(id: string): Lesson | undefined {
-  return ALL_LESSONS.find((l) => l.id === id);
+  return ALL_LESSONS.find((l) => l.id === id) ?? SPECIAL_LESSONS.find((l) => l.id === id);
 }
 
 export function getModuleById(id: string): Module | undefined {
+  if (id === SPECIAL_MODULE_ID) return SPECIAL_MODULE;
   return MODULES.find((m) => m.id === id);
 }
 

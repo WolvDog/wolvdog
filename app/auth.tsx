@@ -9,6 +9,7 @@ import { HeroButton } from '@/components/HeroButton';
 import { LoganSays } from '@/components/LoganSays';
 import { COLORS, FONTS } from '@/constants/theme';
 import { authErrorMessage, supabase } from '@/services/supabase';
+import { getPetGrammar } from '@/services/personalize';
 import { useAppStore } from '@/store/useAppStore';
 
 /** Deve bater com "Email OTP Length" em Authentication → Providers → Email no Supabase. */
@@ -24,7 +25,8 @@ type Step = 'email' | 'code';
 export default function AuthScreen() {
   const params = useLocalSearchParams<{ mode?: 'signup' | 'login' }>();
   const hasOnboarded = useAppStore((s) => s.hasOnboarded);
-  const petName = useAppStore((s) => s.pet?.name);
+  const pet = useAppStore((s) => s.pet);
+  const petName = pet?.name;
   const skipAuth = useAppStore((s) => s.skipAuth);
   const requestLogin = useAppStore((s) => s.requestLogin);
 
@@ -98,7 +100,7 @@ export default function AuthScreen() {
     step === 'code'
       ? `Mandei um código de ${CODE_LENGTH} dígitos para ${normalizedEmail}. Dá uma farejada na caixa de entrada (e no spam)!`
       : isSignup
-        ? `Salve a jornada${petName ? ` de ${petName}` : ''} na nuvem. Sem senha pra decorar: é só confirmar um código no seu e-mail.`
+        ? `Salve a jornada${petName ? ` ${getPetGrammar(pet).do}` : ''} na nuvem. Sem senha pra decorar: é só confirmar um código no seu e-mail.`
         : 'Que bom te ver de novo! Informe seu e-mail e eu te mando um código para entrar.';
 
   return (

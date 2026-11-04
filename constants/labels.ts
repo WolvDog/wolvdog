@@ -1,4 +1,4 @@
-import type { BehaviorChallenge, Difficulty, PetSex, PetSize, TutorGender } from '@/types';
+import type { BehaviorChallenge, Difficulty, PetEnergy, PetExperience, PetSex, PetSize, TutorGender } from '@/types';
 
 export const PET_SIZE_LABELS: Record<PetSize, string> = {
   mini: 'Mini',
@@ -51,16 +51,16 @@ export const CHALLENGE_LABELS: Record<BehaviorChallenge, { label: string; emoji:
   reatividade: { label: 'Reatividade', emoji: '⚡' },
 };
 
-/** Fase da trilha que mais ajuda em cada desafio — usada para montar o plano do onboarding. */
-export const CHALLENGE_FOCUS_PHASE: Record<BehaviorChallenge, number> = {
-  xixi_fora_do_lugar: 1,
-  pula_nas_pessoas: 1,
-  nao_atende_chamado: 2,
-  puxa_a_guia: 3,
-  reatividade: 3,
-  ansiedade_separacao: 4,
-  destroi_objetos: 4,
-  late_demais: 4,
+/** Fase (id do módulo) que mais ajuda em cada desafio — usada para montar o plano do onboarding. */
+export const CHALLENGE_FOCUS_MODULE: Record<BehaviorChallenge, string> = {
+  xixi_fora_do_lugar: 'm-sanitario',
+  pula_nas_pessoas: 'm1-boas-maneiras',
+  nao_atende_chamado: 'm2-comandos-basicos',
+  puxa_a_guia: 'm3-passeio',
+  reatividade: 'm3-passeio',
+  ansiedade_separacao: 'm4-ansiedade',
+  destroi_objetos: 'm5-alimentacao',
+  late_demais: 'm4-ansiedade',
 };
 
 export const DIFFICULTY_LABELS: Record<Difficulty, { label: string; emoji: string }> = {
@@ -99,6 +99,18 @@ export const TUTOR_GENDER_LABELS: Record<TutorGender, string> = {
 export const PET_SEX_LABELS: Record<PetSex, { label: string; emoji: string }> = {
   male: { label: 'Macho', emoji: '♂️' },
   female: { label: 'Fêmea', emoji: '♀️' },
+};
+
+export const PET_ENERGY_LABELS: Record<PetEnergy, { emoji: string; title: string; subtitle: string; short: string }> = {
+  high: { emoji: '⚡', title: 'Elétrico, ligado no 220v', subtitle: 'Não para um segundo', short: 'Energia alta' },
+  balanced: { emoji: '🐾', title: 'Equilibrado', subtitle: 'Gosta de brincar, mas sabe descansar', short: 'Energia equilibrada' },
+  calm: { emoji: '🛋️', title: 'Tranquilão', subtitle: 'Adora uma soneca e sombra fresca', short: 'Tranquilão' },
+};
+
+export const PET_EXPERIENCE_LABELS: Record<PetExperience, { emoji: string; title: string; subtitle: string; short: string }> = {
+  none: { emoji: '🟢', title: 'Zero bala', subtitle: 'Começando do zero absoluto', short: 'Começando do zero' },
+  basic: { emoji: '🟡', title: 'O básico', subtitle: 'Já senta quando vê um petisco', short: 'Sabe o básico' },
+  advanced: { emoji: '🔵', title: 'Já manja', subtitle: 'Sabe vários truques', short: 'Já manja de truques' },
 };
 
 /** Máscara DD/MM/AAAA enquanto o tutor digita. */

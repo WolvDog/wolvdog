@@ -18,18 +18,19 @@ import { useAppStore } from '@/store/useAppStore';
 
 export default function GuideDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const { expert, petName, readOn, markGuideRead } = useAppStore(
+  const { expert, petName, petSex, readOn, markGuideRead } = useAppStore(
     useShallow((s) => ({
       expert: s.expert,
       petName: s.pet?.name,
+      petSex: s.pet?.sex,
       readOn: slug ? s.guideReads[slug] : undefined,
       markGuideRead: s.markGuideRead,
     })),
   );
   const guide = useMemo(() => {
     const found = getGuideBySlug(slug);
-    return found ? personalize(found, petName) : undefined;
-  }, [slug, petName]);
+    return found ? personalize(found, { name: petName, sex: petSex }) : undefined;
+  }, [slug, petName, petSex]);
 
   const close = () => (router.canGoBack() ? router.back() : router.replace('/guide'));
 

@@ -28,7 +28,7 @@ export const TUTOR_GUIDES: TutorGuide[] = [
       'Em uma emergência, o objetivo é estabilizar e chegar rápido ao veterinário, não tratar em casa. ' +
       'Mesmo um cão dócil pode morder quando sente dor, então proteja-se antes de tocar nele.',
     loganSteps: [
-      'Afaste {pet} do perigo e ligue para a clínica avisando que está a caminho.',
+      'Afaste {o_pet} do perigo e ligue para a clínica avisando que está a caminho.',
       'Sangramento? Pressione firme com um pano limpo e não tire para olhar.',
       'Engoliu algo tóxico? Não force vômito: leve a embalagem ao veterinário.',
     ],
@@ -48,7 +48,7 @@ export const TUTOR_GUIDES: TutorGuide[] = [
       'Asfalto ao sol pode passar de 50 °C e queimar as almofadas das patas em poucos minutos.',
     loganSteps: [
       'Dorso da mão no chão por 7 segundos. Não aguentou? Não é hora de passear.',
-      'Passeie antes das 9h ou depois das 17h, pela sombra, com água para {pet}.',
+      'Passeie antes das 9h ou depois das 17h, pela sombra, com água {para_pet}.',
       'Ofegando muito ou cambaleando? Sombra, água fresca no corpo e veterinário.',
     ],
     warning:
@@ -66,7 +66,7 @@ export const TUTOR_GUIDES: TutorGuide[] = [
       'Brigas em parque quase sempre começam com sinais que passam despercebidos: corpo travado, olhar fixo e pelos eriçados. ' +
       'Cães cansados, com medo ou disputando brinquedo e petisco têm bem menos paciência.',
     loganSteps: [
-      'Corpo duro ou olhar fixo? Chame {pet} com voz animada e saia andando.',
+      'Corpo duro ou olhar fixo? Chame {o_pet} com voz animada e saia andando.',
       'Começou a briga? Mãos longe das bocas: palmas fortes ou um jato de água.',
       'Depois, examine orelhas, pescoço e patas, e encerre o passeio por hoje.',
     ],
@@ -83,9 +83,9 @@ export const TUTOR_GUIDES: TutorGuide[] = [
       'Montar nem sempre é sexual: cães castrados e fêmeas também montam para aliviar excitação, estresse ou brincadeira intensa. ' +
       'Os hormônios aumentam a frequência em machos não castrados, mas a castração sozinha não desfaz um hábito já formado.',
     loganSteps: [
-      'Começou a montar? Interrompa com calma: chame {pet} e peça "Senta".',
+      'Começou a montar? Interrompa com calma: chame {o_pet} e peça "Senta".',
       'Sentou? "Isso!" + petisco, e ofereça um brinquedo ou faro no lugar.',
-      'Montaram em {pet}? Afaste com calma e dê uma pausa aos dois.',
+      'Montaram {no_pet}? Afaste com calma e dê uma pausa aos dois.',
     ],
     warning: 'Monta frequente com lambedura excessiva ou desconforto para fazer xixi? Procure o veterinário.',
   },
@@ -101,11 +101,11 @@ export const TUTOR_GUIDES: TutorGuide[] = [
       'Cansaço forte, muita sede ou fezes amolecidas nos primeiros dias costumam ser estresse, não doença.',
     loganSteps: [
       'Na 1ª semana, meio período em dias alternados. Aumente aos poucos.',
-      'Na entrada, despedida curta e animada: entregue {pet} e vá embora.',
+      'Na entrada, despedida curta e animada: entregue {o_pet} e vá embora.',
       'No dia seguinte, rotina calma em casa: descanso, faro e passeio leve.',
     ],
     warning:
-      'Vacinas e antipulgas em dia antes do primeiro dia. Se {pet} parar de comer, se esconder ou piorar depois de uma semana, ' +
+      'Vacinas e antipulgas em dia antes do primeiro dia. Se {o_pet} parar de comer, se esconder ou piorar depois de uma semana, ' +
       'converse com a creche e com o veterinário.',
   },
 ];

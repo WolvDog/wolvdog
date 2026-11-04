@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { MODULES } from '@/data/mockData';
+import { ALL_LESSONS, MODULES } from '@/data/mockData';
 import { getLevelInfo } from '@/services/gamification';
 import { getCurrentLesson, type ProgressSnapshot } from '@/services/progression';
 import { useAppStore } from '@/store/useAppStore';
@@ -20,7 +20,8 @@ export function useProgression() {
   return useMemo(() => {
     const snapshot: ProgressSnapshot = { completedLessons, lessonDrafts, isPro };
     const totalLessons = MODULES.reduce((sum, m) => sum + m.lessons.length, 0);
-    const completedCount = Object.keys(completedLessons).length;
+    // Só missões da trilha: as especiais (ex.: fogos) não entram no "x/y missões".
+    const completedCount = ALL_LESSONS.filter((l) => completedLessons[l.id]).length;
     return {
       snapshot,
       modules: MODULES,
