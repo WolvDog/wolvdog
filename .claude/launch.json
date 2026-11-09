@@ -4,14 +4,38 @@
     {
       "name": "wolverbark-web",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["expo", "start", "--web", "--port", "8081", "--clear"],
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8081",
+        "--clear"
+      ],
       "port": 8081
     },
     {
       "name": "wolverbark-dist",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["expo", "serve", "--port", "8090"],
+      "runtimeArgs": [
+        "expo",
+        "serve",
+        "--port",
+        "8090"
+      ],
       "port": 8090
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8095",
+        "--directory",
+        "Site"
+      ],
+      "port": 8095
     }
   ]
 }

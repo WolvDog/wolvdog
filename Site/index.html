@@ -17,8 +17,10 @@
     <meta property="og:title" content="WolvDog — Transforme a rotina do seu cão em 5 min/dia" />
     <meta property="og:description" content="Adestramento gamificado com reforço positivo, guiado pelo Logan. Entre na lista de espera." />
     <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content="https://wolvdog.com/img/logan-512.png" />
 
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231850BE'/%3E%3Cg stroke='%23111111' stroke-width='3' fill='%23FFC72C'%3E%3Cpath d='M16 50 L24 12 L29 12 L23 50Z'/%3E%3Cpath d='M28 52 L33 12 L38 12 L35 52Z'/%3E%3Cpath d='M40 50 L42 12 L47 12 L47 50Z'/%3E%3C/g%3E%3C/svg%3E" />
+    <link rel="icon" type="image/png" href="img/logan-64.png" />
+    <link rel="apple-touch-icon" href="img/logan-180.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -81,16 +83,7 @@
     <header class="sticky top-0 z-50 border-b-[3px] border-ink bg-white/95 backdrop-blur">
       <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <a href="#topo" class="flex items-center gap-2" aria-label="WolvDog, página inicial">
-          <!-- Marca: três garras -->
-          <span class="flex h-10 w-10 items-center justify-center rounded-xl border-[3px] border-ink bg-splash shadow-hq-sm">
-            <svg viewBox="0 0 32 32" class="h-6 w-6" aria-hidden="true">
-              <g fill="#FFC72C" stroke="#111111" stroke-width="1.6" stroke-linejoin="round">
-                <path d="M7 27 L11 5 L14 5 L11 27Z" />
-                <path d="M13.5 28 L16 5 L19 5 L17.5 28Z" />
-                <path d="M20 27 L21.5 5 L24.5 5 L24 27Z" />
-              </g>
-            </svg>
-          </span>
+          <img src="img/logan-64.png" alt="" width="40" height="40" class="h-10 w-10 rounded-xl border-[3px] border-ink shadow-hq-sm" />
           <span class="font-display text-2xl font-bold tracking-wide">WOLV<span class="text-splash">DOG</span></span>
         </a>
 
@@ -162,28 +155,25 @@
             </div>
 
             <div class="relative flex items-end justify-center gap-4 pt-24">
-              <!-- Ilustração do Logan (placeholder) -->
-              <div
-                class="relative z-10 -mr-12 mb-6 flex h-32 w-32 shrink-0 flex-col items-center justify-center rounded-full border-[3px] border-dashed border-ink bg-akita text-center shadow-hq sm:-mr-10 sm:h-52 sm:w-52"
-                role="img"
-                aria-label="Espaço reservado para a ilustração do Logan"
-              >
-                <span class="text-4xl sm:text-5xl" aria-hidden="true">🐕</span>
-                <span class="mt-1 font-display text-xs font-bold uppercase tracking-wider sm:text-sm">Ilustração<br />do Logan</span>
-              </div>
+              <!-- Logan -->
+              <img
+                src="img/logan-512.png"
+                alt="Logan, o mascote Akita do WolvDog, com máscara de herói"
+                width="512"
+                height="512"
+                class="relative z-10 -mr-12 mb-6 h-32 w-32 shrink-0 -rotate-6 rounded-[1.6rem] border-[3px] border-ink shadow-hq sm:-mr-10 sm:h-48 sm:w-48 sm:rounded-[2rem]"
+              />
 
-              <!-- Celular com a tela do app (placeholder) -->
+              <!-- Celular com a tela do app -->
               <div class="relative w-48 shrink-0 rounded-[2.2rem] border-[3px] border-ink bg-ink p-2 shadow-hq-lg sm:w-64">
                 <div class="mx-auto mb-2 h-1.5 w-16 rounded-full bg-ink-soft" aria-hidden="true"></div>
-                <div
-                  class="flex aspect-[9/19] flex-col items-center justify-center rounded-[1.6rem] border-[3px] border-dashed border-hero-mid bg-hero-light p-6 text-center"
-                  role="img"
-                  aria-label="Espaço reservado para a captura de tela do app"
-                >
-                  <span class="text-4xl" aria-hidden="true">📱</span>
-                  <span class="mt-2 font-display text-lg font-bold uppercase text-hero">Tela do app</span>
-                  <span class="mt-1 text-xs text-ink-soft">Mapa de missões (9:19)</span>
-                </div>
+                <img
+                  src="img/app-missoes.jpg"
+                  alt="Tela inicial do app WolvDog: missão especial de Réveillon, recado do Logan, meta da semana e treinos de reforço"
+                  width="560"
+                  height="1141"
+                  class="block w-full rounded-[1.6rem] border-2 border-ink"
+                />
               </div>
             </div>
           </div>
