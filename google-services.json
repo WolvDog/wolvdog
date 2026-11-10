@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "248779168426",
-    "project_id": "wolverbark",
-    "storage_bucket": "wolverbark.firebasestorage.app"
+    "project_number": "612376738778",
+    "project_id": "wolvdog-8633f",
+    "storage_bucket": "wolvdog-8633f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:248779168426:android:3f2c633581b40522034ed3",
+        "mobilesdk_app_id": "1:612376738778:android:620dbdb0282753b4389ee3",
         "android_client_info": {
-          "package_name": "com.wolverbark.app"
+          "package_name": "com.wolvdog.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyApiFxZIuAJOKlxPgVTC86DFAxHOFHM05I"
+          "current_key": "AIzaSyBOTO2_9GZxL_fPilmbaDaT1FbCsL4SvRc"
         }
       ],
       "services": {
