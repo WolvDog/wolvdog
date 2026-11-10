@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "WolvDog",
-    "slug": "wolverbark",
+    "slug": "wolvdog",
     "scheme": "wolvdog",
     "version": "0.1.0",
     "orientation": "portrait",
@@ -14,7 +14,10 @@
       "package": "com.wolvdog.app",
       "googleServicesFile": "./google-services.json",
       "permissions": [
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -63,10 +66,15 @@
       "typedRoutes": true
     },
     "icon": "./assets/icon.png",
-    "owner": "maarcosramalhos-team",
+    "owner": "wolvdogs-team",
     "extra": {
       "eas": {
-        "projectId": "cfe3ee50-f603-4b70-8920-cfdb3965b3d3"
+        "projectId": "4d766ba4-60a5-45dd-ba2d-9d60f6021e0e"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
       }
     },
     "runtimeVersion": {
