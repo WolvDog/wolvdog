@@ -89,7 +89,7 @@ Notificações locais (`services/notifications.ts`) agendadas para os próximos 
 
 ## Build (APK / lojas)
 
-Projeto EAS: `@maarcosramalhos-team/wolvdog`. Perfis em `eas.json`:
+Projeto EAS: `@wolvdogs-team/wolvdog` (conta Expo do contato@wolvdog.com). Perfis em `eas.json`:
 
 - `eas build -p android --profile preview` → APK para instalar e testar
 - `eas build --profile production` → builds das lojas
