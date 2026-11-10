@@ -1,4 +1,4 @@
--- WolverBark — migração 009: perfil do cão no onboarding (energia e experiência com comandos)
+-- WolvDog — migração 009: perfil do cão no onboarding (energia e experiência com comandos)
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 -- O sexo do cão já existe (coluna `sex`, migração 004) e é usado na gramática dos textos (o/a, do/da…).
 

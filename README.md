@@ -1,4 +1,4 @@
-# WolverBark 🐕‍🦺
+# WolvDog 🐕‍🦺
 
 App de adestramento pet por assinatura, com experiência gamificada estilo Duolingo e o mascote **Logan** (Akita Inu herói).
 
@@ -57,13 +57,13 @@ Paleta do uniforme do Wolverine (amarelo `#FFC72C`, azul `#1E3A8A`, preto e bran
 - Missão especial "Réveillon sem medo" (`data/specials.ts`): card no topo da Home de novembro a janeiro, sons sintéticos de fogos/rojão/trovão com 5 níveis de volume. Fica fora da trilha e da contagem de missões.
 - Textos com o nome do cão usam marcadores com artigo (`{pet}`, `{o_pet}`, `{do_pet}`, `{para_pet}`, `{com_pet}`, `{no_pet}`, `{ao_pet}`, `{ele}`, `{o/a}`), resolvidos pelo sexo do pet em `services/personalize.ts`.
 
-## Planos (WolverBark Pro)
+## Planos (WolvDog Pro)
 
 | Plano | Preço | Por cão adicional (50%) | Pacote RevenueCat |
 | --- | --- | --- | --- |
-| Mensal | R$ 34,99/mês | R$ 17,49/mês | `$rc_monthly` + `wolverbark_extra_pet_monthly` |
-| Semestral | R$ 179,99/semestre | R$ 89,99/semestre | `$rc_six_month` + `wolverbark_extra_pet_semiannual` |
-| Anual (melhor valor) | R$ 259,99/ano | R$ 129,99/ano | `$rc_annual` + `wolverbark_extra_pet_annual` |
+| Mensal | R$ 34,99/mês | R$ 17,49/mês | `$rc_monthly` + `wolvdog_extra_pet_monthly` |
+| Semestral | R$ 179,99/semestre | R$ 89,99/semestre | `$rc_six_month` + `wolvdog_extra_pet_semiannual` |
+| Anual (melhor valor) | R$ 259,99/ano | R$ 129,99/ano | `$rc_annual` + `wolvdog_extra_pet_annual` |
 
 O plano cobre 1 cão; o cálculo do total por número de cães está em `services/pricing.ts`.
 - Primeiro acesso passa pelo onboarding (`app/onboarding.tsx`): tutor, cão, raça, peso/porte, idade, foco, meta semanal e lembrete.
@@ -75,7 +75,7 @@ Sem `.env` o app roda 100% local (sem login). Para ativar:
 1. Crie um projeto em [supabase.com](https://supabase.com) (plano grátis).
 2. **SQL Editor →** cole e rode `supabase/schema.sql` (projetos que já rodaram uma versão anterior: rode também os arquivos de `supabase/migrations/`).
 3. **Authentication → Sign In / Providers → Email:** desligue "Confirm email" e confirme que **Email OTP Length = 6**.
-4. **Authentication → Emails → Magic Link** (e **Confirm signup**): cole o conteúdo de `supabase/email-codigo.html` (assunto: `Seu código WolverBark: {{ .Token }}`). Sem isso o e-mail chega com um link em vez do código.
+4. **Authentication → Emails → Magic Link** (e **Confirm signup**): cole o conteúdo de `supabase/email-codigo.html` (assunto: `Seu código WolvDog: {{ .Token }}`). Sem isso o e-mail chega com um link em vez do código.
 5. **Project Settings → API:** copie a *Project URL* e a *anon public key* para um arquivo `.env` (veja `.env.example`).
 6. Reinicie o Expo com `--clear`.
 
@@ -89,7 +89,7 @@ Notificações locais (`services/notifications.ts`) agendadas para os próximos 
 
 ## Build (APK / lojas)
 
-Projeto EAS: `@maarcosramalhos-team/wolverbark`. Perfis em `eas.json`:
+Projeto EAS: `@maarcosramalhos-team/wolvdog`. Perfis em `eas.json`:
 
 - `eas build -p android --profile preview` → APK para instalar e testar
 - `eas build --profile production` → builds das lojas
@@ -100,7 +100,7 @@ Firebase (FCM V1): `google-services.json` no projeto; a chave de servidor fica n
 
 ## Versão web (iPhone)
 
-PWA publicada em https://wolverbark.expo.app (EAS Hosting). Para atualizar: `npx expo export --platform web` e `npx eas-cli deploy --prod`. No iPhone: Safari → Compartilhar → Adicionar à Tela de Início. Sem vibração, lembretes ou push.
+PWA publicada em https://wolvdog.expo.app (EAS Hosting). Para atualizar: `npx expo export --platform web` e `npx eas-cli deploy --prod`. No iPhone: Safari → Compartilhar → Adicionar à Tela de Início. Sem vibração, lembretes ou push.
 
 ## Próximos passos de integração
 

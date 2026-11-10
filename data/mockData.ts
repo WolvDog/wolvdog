@@ -36,7 +36,7 @@ const module1Lessons: Lesson[] = [
       loganSpeech: 'Au! Eu sou o Logan, e hoje vou te contar meu superpoder secreto: uma palavrinha que faz qualquer cão prestar atenção!',
       body:
         'O marcador é uma palavra curta ("Isso!") dita no EXATO segundo em que o cão faz algo certo. Logo depois vem o petisco. ' +
-        'Com repetição, o cão entende que "Isso!" = "o que eu acabei de fazer dá prêmio". É a base de TODO o treino do WolverBark.',
+        'Com repetição, o cão entende que "Isso!" = "o que eu acabei de fazer dá prêmio". É a base de TODO o treino do WolvDog.',
       whyItWorks:
         'É condicionamento clássico: o som vira uma ponte entre o comportamento e a recompensa, permitindo marcar ações rápidas com precisão.',
     },
@@ -639,7 +639,7 @@ const module4Lessons: Lesson[] = [
       },
     },
     victory: {
-      loganSpeech: 'TODAS AS FASES COMPLETAS! Você é oficialmente um Tutor Herói WolverBark! AUUUUU!',
+      loganSpeech: 'TODAS AS FASES COMPLETAS! Você é oficialmente um Tutor Herói WolvDog! AUUUUU!',
       nextTip: 'Revise as missões favoritas toda semana — treino é como músculo: se não usar, enfraquece.',
     },
   }),
@@ -761,7 +761,7 @@ export function getModuleById(id: string): Module | undefined {
 export const MOCK_USER: User = {
   id: 'user-demo',
   name: 'Tutor',
-  email: 'tutor@wolverbark.app',
+  email: 'tutor@wolvdog.app',
   createdAt: new Date().toISOString(),
   dailyGoalMinutes: 10,
   weeklyGoalDays: 3,
@@ -784,14 +784,14 @@ export const MOCK_PET: Pet = {
 };
 
 /**
- * Planos do WolverBark Pro. O plano cobre 1 cão; cada cão adicional custa 50% do plano base
+ * Planos do WolvDog Pro. O plano cobre 1 cão; cada cão adicional custa 50% do plano base
  * (assinatura adicional `extraPetProductId` nas lojas). Labels em services/pricing.ts.
  */
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
-    id: 'wolverbark_pro_annual',
+    id: 'wolvdog_pro_annual',
     revenueCatPackageId: '$rc_annual',
-    extraPetProductId: 'wolverbark_extra_pet_annual',
+    extraPetProductId: 'wolvdog_extra_pet_annual',
     period: 'annual',
     title: 'Anual',
     priceCents: 25999,
@@ -804,9 +804,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     savingsPercent: 38,
   },
   {
-    id: 'wolverbark_pro_semiannual',
+    id: 'wolvdog_pro_semiannual',
     revenueCatPackageId: '$rc_six_month',
-    extraPetProductId: 'wolverbark_extra_pet_semiannual',
+    extraPetProductId: 'wolvdog_extra_pet_semiannual',
     period: 'semiannual',
     title: 'Semestral',
     priceCents: 17999,
@@ -818,9 +818,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     savingsPercent: 14,
   },
   {
-    id: 'wolverbark_pro_monthly',
+    id: 'wolvdog_pro_monthly',
     revenueCatPackageId: '$rc_monthly',
-    extraPetProductId: 'wolverbark_extra_pet_monthly',
+    extraPetProductId: 'wolvdog_extra_pet_monthly',
     period: 'monthly',
     title: 'Mensal',
     priceCents: 3499,

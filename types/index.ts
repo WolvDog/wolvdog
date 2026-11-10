@@ -1,5 +1,5 @@
 /**
- * Schema de domínio do WolverBark.
+ * Schema de domínio do WolvDog.
  * Os nomes dos campos espelham as tabelas planejadas no Supabase (snake_case lá, camelCase aqui).
  */
 

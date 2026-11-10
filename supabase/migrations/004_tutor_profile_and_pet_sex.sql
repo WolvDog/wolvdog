@@ -1,4 +1,4 @@
--- WolverBark — migração 004: dados de segmentação (gênero e nascimento do tutor, sexo do cão)
+-- WolvDog — migração 004: dados de segmentação (gênero e nascimento do tutor, sexo do cão)
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 
 alter table public.profiles add column if not exists tutor_gender text

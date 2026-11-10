@@ -1,4 +1,4 @@
-# WolverBark — briefing do produto (para discussão de retenção)
+# WolvDog — briefing do produto (para discussão de retenção)
 
 > Documento para compartilhar com outras IAs/consultores. Descreve o que já existe no app e abre a discussão sobre retenção de longo prazo.
 
@@ -34,14 +34,14 @@ As missões são liberadas em sequência: a próxima só abre quando a anterior 
 | Conceito | Nome no app | Regra atual |
 | --- | --- | --- |
 | XP | **Garras** | 10 a 30 por missão, + bônus de dificuldade (0/3/5); refazer uma missão rende 50% |
-| Nível | **Patente** | 6 patentes (Filhote Curioso → Lenda WolverBark), de 0 a 400 garras |
+| Nível | **Patente** | 6 patentes (Filhote Curioso → Lenda WolvDog), de 0 a 400 garras |
 | Streak | **Sequência** | +1 por dia com pelo menos 1 missão; a cada 7 dias, +50 garras |
 | Streak freeze | **Osso Reserva** | Cobre dias perdidos automaticamente; ganha-se 1 (grátis) ou 2 (Pro) a cada 7 dias, máximo de 2 |
 | Lembrete | Notificação do Logan | Diária, no horário escolhido; pulada se o tutor já treinou no dia |
 
 ## 5. Monetização
 
-**WolverBark Pro:** teste grátis de 7 dias, depois R$ 29,90/mês ou R$ 199,90/ano (−44%). Benefícios:
+**WolvDog Pro:** teste grátis de 7 dias, depois R$ 29,90/mês ou R$ 199,90/ano (−44%). Benefícios:
 - todas as fases liberadas;
 - comportamentos complexos;
 - vários perfis de pets;

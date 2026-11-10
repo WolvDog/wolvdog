@@ -1,5 +1,5 @@
 /**
- * Vocabulário da marca WolverBark. Centralizado aqui para manter a identidade própria
+ * Vocabulário da marca WolvDog. Centralizado aqui para manter a identidade própria
  * (e facilitar ajustes futuros de nomenclatura).
  */
 export const TERMS = {

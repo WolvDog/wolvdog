@@ -2,13 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "wolverbark-web",
+      "name": "wolvdog-web",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["expo", "start", "--web", "--port", "8081", "--clear"],
       "port": 8081
     },
     {
-      "name": "wolverbark-dist",
+      "name": "wolvdog-dist",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["expo", "serve", "--port", "8090"],
       "port": 8090

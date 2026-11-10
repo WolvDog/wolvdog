@@ -17,7 +17,7 @@ errorUtils?.setGlobalHandler?.((error, isFatal) => {
     .slice(0, 8)
     .join('\n');
   try {
-    Alert.alert('WolverBark encontrou um erro', `${message}\n\n${stack}\n\nTire um print desta tela e envie para o suporte.`);
+    Alert.alert('WolvDog encontrou um erro', `${message}\n\n${stack}\n\nTire um print desta tela e envie para o suporte.`);
   } catch {
     previousHandler?.(error, isFatal);
   }

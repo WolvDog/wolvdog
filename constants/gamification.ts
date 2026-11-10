@@ -43,5 +43,5 @@ export const LEVELS = [
   { level: 3, minXp: 100, title: 'Cão Educado' },
   { level: 4, minXp: 180, title: 'Parceiro de Passeio' },
   { level: 5, minXp: 280, title: 'Cão Herói' },
-  { level: 6, minXp: 400, title: 'Lenda WolverBark' },
+  { level: 6, minXp: 400, title: 'Lenda WolvDog' },
 ] as const;

@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "WolverBark",
+    "name": "WolvDog",
     "slug": "wolverbark",
-    "scheme": "wolverbark",
+    "scheme": "wolvdog",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.wolverbark.app"
+      "bundleIdentifier": "com.wolvdog.app"
     },
     "android": {
-      "package": "com.wolverbark.app",
+      "package": "com.wolvdog.app",
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "POST_NOTIFICATIONS"
@@ -25,8 +25,8 @@
       "bundler": "metro",
       "output": "single",
       "favicon": "./assets/favicon.png",
-      "name": "WolverBark",
-      "shortName": "WolverBark",
+      "name": "WolvDog",
+      "shortName": "WolvDog",
       "lang": "pt-BR",
       "themeColor": "#FFFFFF",
       "backgroundColor": "#1850BE"

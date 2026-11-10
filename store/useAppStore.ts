@@ -410,7 +410,7 @@ export const useAppStore = create<AppState>()(
         }),
     }),
     {
-      name: 'wolverbark-store',
+      name: 'wolvdog-store',
       version: 6,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({

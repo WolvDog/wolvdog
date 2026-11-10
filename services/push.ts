@@ -24,7 +24,7 @@ export async function registerPushToken(userId: string): Promise<void> {
     // Canal usado pelos pushes do servidor (o Expo envia para "default" quando o push não indica outro).
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync(PUSH_CHANNEL_ID, {
-        name: 'Avisos do WolverBark',
+        name: 'Avisos do WolvDog',
         importance: Notifications.AndroidImportance.HIGH,
         lightColor: '#FFC72C',
       });

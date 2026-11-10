@@ -1,4 +1,4 @@
--- WolverBark — migração 002: sequência semanal + reforço adaptativo
+-- WolvDog — migração 002: sequência semanal + reforço adaptativo
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 
 alter table public.profiles add column if not exists weekly_goal_days smallint not null default 3;

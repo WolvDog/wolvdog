@@ -129,7 +129,7 @@ export function PaywallModal() {
             <View className="mt-2 items-center">
               <Logan size={120} mood="hero" />
               <View className="mt-3 rotate-[-2deg] rounded-md border-2 border-ink-900 bg-claw-500 px-3 py-1">
-                <Text style={{ fontFamily: FONTS.display, fontSize: 13, letterSpacing: 2, color: COLORS.ink }}>WOLVERBARK PRO</Text>
+                <Text style={{ fontFamily: FONTS.display, fontSize: 13, letterSpacing: 2, color: COLORS.ink }}>WOLVDOG PRO</Text>
               </View>
               <Text className="mt-3 text-center" style={{ fontFamily: FONTS.display, fontSize: 32, color: COLORS.white }}>
                 {headline.title}

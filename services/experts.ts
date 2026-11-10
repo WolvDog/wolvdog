@@ -4,7 +4,7 @@ import { supabase } from './supabase';
 
 /**
  * Especialista que assina o Guia do Tutor (tabela `experts`, migração 007).
- * Nenhum nome fica fixo no app: sem cadastro ativo, o Guia aparece como conteúdo WolverBark genérico.
+ * Nenhum nome fica fixo no app: sem cadastro ativo, o Guia aparece como conteúdo WolvDog genérico.
  * Retorna `undefined` se não deu para consultar (sem internet), para o app manter o que já tinha salvo.
  */
 export async function fetchActiveExpert(): Promise<Expert | null | undefined> {
@@ -33,7 +33,7 @@ export async function fetchActiveExpert(): Promise<Expert | null | undefined> {
 
 /** Selo exibido no guia: só diz "validado" se a especialista aprovou aquele guia. */
 export function guideSeal(expert: Expert | null, slug: string): { label: string; validated: boolean } {
-  if (!expert) return { label: 'Conteúdo WolverBark · siga sempre a orientação do seu veterinário', validated: false };
+  if (!expert) return { label: 'Conteúdo WolvDog · siga sempre a orientação do seu veterinário', validated: false };
   const who = expert.registry ? `${expert.displayName} (${expert.registry})` : expert.displayName;
   return expert.validatedGuides.includes(slug)
     ? { label: `Validado por ${who}`, validated: true }

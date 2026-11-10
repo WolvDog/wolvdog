@@ -14,7 +14,7 @@ interface LoganProps {
 }
 
 /**
- * Logan — Akita Inu mascote do WolverBark, desenhado em SVG para escalar sem assets.
+ * Logan — Akita Inu mascote do WolvDog, desenhado em SVG para escalar sem assets.
  * Pelagem avermelhada/dourada, urajiro (máscara branca) no focinho e bochechas,
  * orelhas eretas, máscara de herói azul e bandana vermelha com o emblema "W".
  */

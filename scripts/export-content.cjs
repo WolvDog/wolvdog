@@ -10,7 +10,7 @@ const ts = require('typescript');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.resolve(process.argv[2] || path.join(ROOT, 'docs', 'conteudo'));
-const BUILD = fs.mkdtempSync(path.join(os.tmpdir(), 'wolverbark-content-'));
+const BUILD = fs.mkdtempSync(path.join(os.tmpdir(), 'wolvdog-content-'));
 
 // Transpila os arquivos de conteúdo para CommonJS (os imports de tipos somem na transpilação).
 for (const file of ['mockData.ts', 'lessonBuilder.ts', 'missionsExtra.ts']) {
@@ -80,7 +80,7 @@ for (const module of MODULES) {
   lines.length = 0;
   md(`## Fase ${module.phase}: ${module.title}`);
   md();
-  md(`${module.description} ${module.isFree ? 'Fase gratuita.' : 'Fase do WolverBark Pro.'} ${module.lessons.length} missões.`);
+  md(`${module.description} ${module.isFree ? 'Fase gratuita.' : 'Fase do WolvDog Pro.'} ${module.lessons.length} missões.`);
   md();
   module.lessons.forEach((l, i) => lessonMarkdown(l, i + 1));
   fs.writeFileSync(path.join(OUT, `fase-${module.phase}.md`), lines.join('\n').replace(/\{pet\}/g, 'Caramelo').trimEnd() + '\n');

@@ -51,7 +51,7 @@ export function StatsHeader() {
         <Pressable
           onPress={() => !isPro && openPaywall('profile')}
           accessibilityRole="button"
-          accessibilityLabel={isPro ? 'Você é Pro' : 'Assinar WolverBark Pro'}
+          accessibilityLabel={isPro ? 'Você é Pro' : 'Assinar WolvDog Pro'}
           className="rounded-md border-2 p-0.5"
           style={{ backgroundColor: isPro ? COLORS.claw : COLORS.white, borderColor: isPro ? COLORS.ink : COLORS.locked }}
         >

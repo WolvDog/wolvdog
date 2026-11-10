@@ -68,7 +68,7 @@ export default function RootLayout() {
       <View className="flex-1 items-center justify-center" style={{ backgroundColor: COLORS.splash }}>
         <Logan size={140} mood="sleepy" />
         <Text className="mt-4 text-lg font-bold" style={{ color: COLORS.claw }}>
-          {restoringAccount ? 'Buscando sua jornada…' : 'WOLVERBARK'}
+          {restoringAccount ? 'Buscando sua jornada…' : 'WOLVDOG'}
         </Text>
       </View>
     );

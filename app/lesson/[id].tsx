@@ -112,7 +112,7 @@ export default function LessonScreen() {
           mood="thinking"
           text={
             access.requiresPro
-              ? 'Essa missão faz parte do WolverBark Pro. Bora desbloquear juntos?'
+              ? 'Essa missão faz parte do WolvDog Pro. Bora desbloquear juntos?'
               : 'Calma! Cumpra as missões anteriores para liberar esta.'
           }
         />

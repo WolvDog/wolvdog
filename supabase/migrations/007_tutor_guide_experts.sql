@@ -1,9 +1,9 @@
--- WolverBark — migração 007: Guia do Tutor (especialista parceira + leitura dos guias)
+-- WolvDog — migração 007: Guia do Tutor (especialista parceira + leitura dos guias)
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 --
 -- Os textos dos guias ficam dentro do app (funcionam sem internet).
 -- Quem assina o guia (veterinária parceira) é cadastrada aqui — nenhum nome fica fixo no app.
--- Sem especialista ativa, o app mostra o Guia como conteúdo WolverBark genérico.
+-- Sem especialista ativa, o app mostra o Guia como conteúdo WolvDog genérico.
 
 create table if not exists public.experts (
   id text primary key,                                  -- ex.: 'vet-parceira'

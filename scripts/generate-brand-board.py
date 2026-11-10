@@ -1,5 +1,5 @@
 """
-Gera a prancha de identidade visual do WolverBark (docs/identidade-visual/prancha-identidade.png).
+Gera a prancha de identidade visual do WolvDog (docs/identidade-visual/prancha-identidade.png).
 
 Uso:  python scripts/generate-brand-board.py
 Usa as fontes reais do app (Oswald) e capturas de docs/identidade-visual/telas/.
@@ -62,7 +62,7 @@ def main() -> None:
     # Cabeçalho
     d.rectangle([0, 0, W, 170], fill=INK)
     d.rectangle([0, 170, W, 186], fill=HERO)
-    d.text((70, 28), "WOLVERBARK", font=font(OSWALD_BOLD, 96), fill=CLAW)
+    d.text((70, 28), "WOLVDOG", font=font(OSWALD_BOLD, 96), fill=CLAW)
     d.text((700, 62), "Guia de identidade visual  ·  app de adestramento gamificado", font=font(BODY, 40), fill=WHITE)
     d.text((W - 170, 40), "///", font=font(OSWALD_BOLD, 80), fill=CLAW)
 

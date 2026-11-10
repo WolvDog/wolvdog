@@ -232,7 +232,7 @@ export default function ProfileScreen() {
         <View className="mt-4 rounded-xl border-2 border-ink-900 bg-white p-5">
           <View className="flex-row items-center">
             <Crown size={24} color={COLORS.ink} fill={isPro ? COLORS.claw : 'transparent'} />
-            <Text className="ml-2" style={SECTION_TITLE}>{isPro ? 'WolverBark Pro ativo' : 'Plano gratuito'}</Text>
+            <Text className="ml-2" style={SECTION_TITLE}>{isPro ? 'WolvDog Pro ativo' : 'Plano gratuito'}</Text>
           </View>
           <Text className="mt-1 text-sm text-ink-600">
             {isPro ? 'Todas as fases e recursos liberados. Obrigado por apoiar o Logan!' : 'Fase 1 liberada. Desbloqueie todas as fases com o Pro.'}

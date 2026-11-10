@@ -1,4 +1,4 @@
--- WolverBark — migração 003: código de parceiro (piloto com creches) + diário de comportamento
+-- WolvDog — migração 003: código de parceiro (piloto com creches) + diário de comportamento
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 
 alter table public.profiles add column if not exists partner_code text;

@@ -164,7 +164,7 @@ export default function OnboardingScreen() {
       <SafeAreaView className="flex-1 bg-hero-500">
         <View className="flex-1 items-center justify-center px-8">
           <Logan size={190} mood="hero" />
-          <Text style={{ fontFamily: FONTS.display, fontSize: 40, color: COLORS.claw, marginTop: 16 }}>WOLVERBARK</Text>
+          <Text style={{ fontFamily: FONTS.display, fontSize: 40, color: COLORS.claw, marginTop: 16 }}>WOLVDOG</Text>
           <Text className="mt-2 text-center text-base leading-6 text-white/90">
             Au! Eu sou o Logan. Em poucos minutos por dia, vou te ajudar a transformar seu cão em um parceiro de respeito.
           </Text>

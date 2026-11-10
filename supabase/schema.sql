@@ -1,4 +1,4 @@
--- WolverBark — schema (Supabase / Postgres)
+-- WolvDog — schema (Supabase / Postgres)
 -- Rode no SQL Editor do projeto Supabase. Pode ser executado de novo sem erro.
 
 -- Perfil do tutor (1:1 com auth.users) ---------------------------------------

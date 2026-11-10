@@ -1,4 +1,4 @@
--- WolverBark — migração 008: endereços de push dos aparelhos (Expo Push / FCM)
+-- WolvDog — migração 008: endereços de push dos aparelhos (Expo Push / FCM)
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 --
 -- Cada celular com notificações permitidas registra aqui o seu Expo push token.

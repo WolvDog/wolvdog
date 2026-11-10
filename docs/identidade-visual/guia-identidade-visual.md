@@ -1,4 +1,4 @@
-# WolverBark — Guia de Identidade Visual
+# WolvDog — Guia de Identidade Visual
 
 > Referência para criar materiais de apoio (apresentações, one-pagers, posts, e-mails, PDFs) com a mesma cara do app.
 > Acompanha: `prancha-identidade.png` (resumo visual) e a pasta `telas/` (capturas reais do app).
@@ -88,10 +88,10 @@ Oswald é gratuita no Google Fonts.
 | XP / pontos | **Garras** |
 | Streak (dias seguidos) | **Sequência** (contada em semanas) |
 | Streak freeze | **Osso Reserva** |
-| Nível | **Patente** (Filhote Curioso → Lenda WolverBark) |
+| Nível | **Patente** (Filhote Curioso → Lenda WolvDog) |
 | Revisão | **Treino de Reforço** |
 | Trilha | **Mapa de Missões** |
-| Assinatura | **WolverBark Pro** |
+| Assinatura | **WolvDog Pro** |
 
 **Etapas de cada missão:**
 1. Dica do Logan
@@ -125,7 +125,7 @@ Oswald é gratuita no Google Fonts.
 | `05-missao-cumprida.jpg` | Tela de vitória: "Missão cumprida!" |
 | `06-diario-de-comportamento.jpg` | Diário de comportamento com evolução semanal |
 | `07-perfil-do-pet.jpg` | Perfil do pet: patente, sequência, garras |
-| `08-paywall-pro.jpg` | WolverBark Pro com benefício de parceiro (código de teste) |
+| `08-paywall-pro.jpg` | WolvDog Pro com benefício de parceiro (código de teste) |
 | `09-quiz-do-logan.jpg` | Quiz de múltipla escolha de uma missão teórica |
 
 ## 9. Do's & Don'ts
@@ -137,7 +137,7 @@ Oswald é gratuita no Google Fonts.
 - Títulos curtos em Oswald, em MAIÚSCULAS.
 
 **Evite**
-- Verde-limão e o visual arredondado e "fofo" típico do Duolingo. O WolverBark é mais gráfico e heroico.
+- Verde-limão e o visual arredondado e "fofo" típico do Duolingo. O WolvDog é mais gráfico e heroico.
 - Sombras com desfoque ou gradientes exagerados. A exceção é o degradê preto → azul do paywall.
 - Usar o nome ou a marca "Wolverine". A inspiração é só estética.
 - Linguagem punitiva ("bronca", "falhou", "errado").

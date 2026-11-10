@@ -156,7 +156,7 @@ export default function MissionMapScreen() {
 
               {moduleState.requiresPro && module.phase === 2 && (
                 <View className="mx-4 mt-2 rounded-xl border-2 border-ink-900 bg-hero-500 p-4">
-                  <Text className="mb-3 text-center font-bold text-white">As próximas fases fazem parte do WolverBark Pro 👑</Text>
+                  <Text className="mb-3 text-center font-bold text-white">As próximas fases fazem parte do WolvDog Pro 👑</Text>
                   <HeroButton label="Teste grátis de 7 dias" onPress={() => openPaywall('locked_module')} />
                 </View>
               )}

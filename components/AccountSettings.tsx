@@ -47,7 +47,7 @@ export function AccountSettings() {
 
   async function toggleReminder(enabled: boolean) {
     if (enabled && !(await requestReminderPermission())) {
-      return showAlert('Notificações bloqueadas', 'Ative as notificações do WolverBark nos ajustes do celular.');
+      return showAlert('Notificações bloqueadas', 'Ative as notificações do WolvDog nos ajustes do celular.');
     }
     setReminder({ ...reminder, enabled });
   }

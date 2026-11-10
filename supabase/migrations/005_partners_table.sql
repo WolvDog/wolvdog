@@ -1,4 +1,4 @@
--- WolverBark — migração 005: códigos de parceiro (B2B2C) dinâmicos
+-- WolvDog — migração 005: códigos de parceiro (B2B2C) dinâmicos
 -- Os parceiros saem do código do app e passam a ser cadastrados aqui.
 -- Rode no SQL Editor do Supabase (pode ser executada de novo sem erro).
 

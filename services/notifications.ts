@@ -74,7 +74,7 @@ function buildMessage(ctx: ReminderContext, dayOffset: number): { title: string;
     { title: `${petName} está te esperando! 🦴`, body: 'A missão de hoje leva poucos minutos. O Logan já separou tudo.' },
     { title: 'Hora do treino! ⚡', body: `Pequenos treinos todo dia fazem ${petName} evoluir rápido.` },
     { title: 'Au au! Missão do dia disponível', body: `${tutor}, que tal treinar com ${petName} agora?` },
-    { title: `${petName} quer aprender algo novo 🐶`, body: 'Abra o WolverBark e cumpra a missão de hoje.' },
+    { title: `${petName} quer aprender algo novo 🐶`, body: 'Abra o WolvDog e cumpra a missão de hoje.' },
     { title: 'O Logan passou aqui 👀', body: `Ainda dá tempo de garantir as garras de hoje com ${petName}.` },
   ];
   return pool[(dayOffset + new Date().getDate()) % pool.length]!;
