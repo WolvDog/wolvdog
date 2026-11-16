@@ -47,6 +47,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
             <Text style={{ fontFamily: FONTS.display, fontSize: 19, color: COLORS.ink }} accessibilityRole="header">
               {section.title}
             </Text>
+            {section.lead ? <Text className="mt-2 text-base leading-6 text-ink-900">{section.lead}</Text> : null}
             {section.bullets?.map((b) => (
               <View key={b} className="mt-2 flex-row">
                 <Text className="mr-2 text-base leading-6 text-hero-500">•</Text>

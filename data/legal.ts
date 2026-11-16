@@ -5,6 +5,8 @@
  */
 export interface LegalSection {
   title: string;
+  /** Frase que vem antes da lista (ex.: "...são estes:"). */
+  lead?: string;
   paragraphs?: string[];
   bullets?: string[];
 }
@@ -62,7 +64,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     },
     {
       title: 'Com quem compartilhamos',
-      paragraphs: ['Não vendemos seus dados. Usamos empresas que processam dados em nosso nome, apenas para o app funcionar:'],
+      lead: 'Não vendemos seus dados. Usamos empresas que processam dados em nosso nome, apenas para o app funcionar:',
       bullets: [
         'Supabase: banco de dados e login (servidores em São Paulo).',
         'Expo: hospedagem da versão web e envio de notificações.',
@@ -106,7 +108,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     },
     {
       title: 'Mudanças nesta política',
-      paragraphs: ['Se esta política mudar, atualizamos a data abaixo e avisamos no app quando a mudança for importante.'],
+      paragraphs: ['Se esta política mudar, atualizamos a data no topo desta página e avisamos no app quando a mudança for importante.'],
     },
   ],
 };
