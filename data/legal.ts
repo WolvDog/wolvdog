@@ -7,6 +7,8 @@ export interface LegalSection {
   title: string;
   /** Frase que vem antes da lista (ex.: "...são estes:"). */
   lead?: string;
+  /** Aviso em destaque (caixa com borda, negrito) no fim da seção. */
+  highlight?: string;
   paragraphs?: string[];
   bullets?: string[];
 }
@@ -39,7 +41,7 @@ export const PRIVACY_POLICY: LegalDoc = {
       title: 'Dados que coletamos',
       bullets: [
         'Conta: seu e-mail, usado para entrar com um código.',
-        'Tutor: nome, gênero e data de nascimento informados no cadastro.',
+        'Tutor: nome; gênero e data de nascimento só se você quiser informar (são opcionais).',
         'Cão: nome, sexo, raça, idade, porte, peso, nível de energia, comandos que já sabe e desafios de comportamento.',
         'Uso do app: missões cumpridas, garras, sequência semanal, diário de comportamento, guias lidos, meta semanal e horário do lembrete.',
         'Código de parceiro, se você usar um (por exemplo, de uma creche).',
@@ -54,7 +56,7 @@ export const PRIVACY_POLICY: LegalDoc = {
         'Fazer o app funcionar: salvar seu progresso e sincronizar entre aparelhos.',
         'Personalizar o treino e os textos, como o nome do seu cão nas missões.',
         'Enviar lembretes e avisos sobre o treino, se você permitir notificações.',
-        'Entender, de forma agregada, como o app é usado, para melhorar o conteúdo e planejar campanhas.',
+        'Entender, de forma agregada, como o app é usado, para melhorar o conteúdo e planejar campanhas. Gênero e data de nascimento, quando informados, servem só para isso.',
         'Liberar benefícios de parceiros quando você informa um código.',
         'Responder suas mensagens de suporte.',
       ],
@@ -75,7 +77,8 @@ export const PRIVACY_POLICY: LegalDoc = {
     {
       title: 'Transferência internacional',
       paragraphs: [
-        'Alguns desses serviços podem processar dados fora do Brasil, com as garantias exigidas pela LGPD.',
+        'Nossos parceiros de tecnologia (os operadores listados acima) usam infraestrutura global. Por isso, seus dados podem ser transferidos e processados fora do Brasil, inclusive nos Estados Unidos, mesmo com o nosso banco de dados em São Paulo.',
+        'Trabalhamos apenas com operadores que se comprometem contratualmente com padrões de proteção de dados compatíveis com a LGPD, nos termos do artigo 33 da lei.',
       ],
     },
     {
@@ -127,15 +130,18 @@ export const TERMS_OF_USE: LegalDoc = {
     {
       title: 'Conteúdo educativo, não substitui profissionais',
       paragraphs: [
-        'As orientações do app são educativas e não substituem a consulta com veterinário nem o acompanhamento de um adestrador. ' +
-          'Em caso de doença, ferimento, agressividade ou emergência, procure um profissional.',
+        'As orientações do app são educativas. Em caso de doença, ferimento, agressividade ou emergência, procure um profissional.',
       ],
+      highlight:
+        'O WolvDog não substitui, de forma alguma, o acompanhamento de um médico-veterinário ou de um adestrador comportamental presencial.',
     },
     {
       title: 'Sua responsabilidade com o cão',
       paragraphs: [
-        'Você é responsável pela segurança e pelo bem-estar do seu cão e de outras pessoas durante os treinos. Respeite os limites dele e interrompa o treino se ele mostrar sinais de estresse ou dor.',
+        'Você é o único responsável pela integridade física do seu cão e de outras pessoas e animais durante os treinos. Respeite os limites dele.',
       ],
+      highlight:
+        'Se o seu cão se mostrar reativo ou agressivo, ou apresentar sinais de dor ou de estresse, suspenda o uso do app e procure um médico-veterinário ou um adestrador comportamental presencial.',
     },
     {
       title: 'Conta',
@@ -150,8 +156,10 @@ export const TERMS_OF_USE: LegalDoc = {
         'O Pro é uma assinatura com renovação automática, cobrada pela App Store ou pelo Google Play na conta da loja.',
         'O teste grátis, quando oferecido, vira assinatura paga ao fim do período, a menos que você cancele antes.',
         'Você cancela quando quiser nas assinaturas da loja do celular; o acesso continua até o fim do período já pago.',
-        'Reembolsos seguem as regras da App Store e do Google Play.',
+        'Pedidos de reembolso, inclusive o de arrependimento previsto no Código de Defesa do Consumidor, seguem as regras da App Store e do Google Play.',
       ],
+      highlight:
+        'Como a assinatura é processada e cobrada pela Apple ou pelo Google, todo pedido de cancelamento ou reembolso deve ser feito diretamente nos ajustes da sua conta na respectiva loja.',
     },
     {
       title: 'Códigos de parceiros',

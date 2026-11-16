@@ -59,6 +59,11 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
                 {p}
               </Text>
             ))}
+            {section.highlight ? (
+              <View className="mt-3 rounded-xl border-2 border-ink-900 p-4" style={{ backgroundColor: COLORS.clawLight }}>
+                <Text className="text-base font-bold leading-6 text-ink-900">{section.highlight}</Text>
+              </View>
+            ) : null}
           </View>
         ))}
 

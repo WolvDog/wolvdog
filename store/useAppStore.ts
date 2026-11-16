@@ -66,8 +66,8 @@ export interface OnboardingInput {
   weeklyGoalDays: WeeklyGoalDays;
   reminder: ReminderSettings;
   partner: PartnerInfo | null;
-  tutorGender: TutorGender;
-  tutorBirthDate: string;
+  tutorGender: TutorGender | null;
+  tutorBirthDate: string | null;
   pet: PetInput;
 }
 

@@ -90,7 +90,8 @@ export default function OnboardingScreen() {
 
   const canContinue: Record<Step, boolean> = {
     welcome: true,
-    tutor: tutor.length > 0 && tutorGender !== null && tutorBirthDate !== null,
+    // Gênero e data de nascimento são opcionais (LGPD: só o necessário); a data, se digitada, precisa ser válida.
+    tutor: tutor.length > 0 && (birthInput.length === 0 || tutorBirthDate !== null),
     petName: petName.trim().length > 0 && petSex !== null,
     breed: breed.trim().length > 0,
     size: size !== null,
@@ -123,8 +124,8 @@ export default function OnboardingScreen() {
     if (step === 'plan') {
       completeOnboarding({
         tutorName: tutor,
-        tutorGender: tutorGender ?? 'undisclosed',
-        tutorBirthDate: tutorBirthDate ?? '',
+        tutorGender,
+        tutorBirthDate,
         dailyGoalMinutes: goal,
         weeklyGoalDays: weeklyDays,
         partner,
@@ -216,14 +217,14 @@ export default function OnboardingScreen() {
               <Field label="Seu nome">
                 <TextField value={tutorName} onChangeText={setTutorName} placeholder="Ex: João Silva" autoFocus autoCapitalize="words" />
               </Field>
-              <Field label="Você é">
+              <Field label="Você é (opcional)" hint="Usamos só para entender quem usa o app e planejar o conteúdo. Pode pular.">
                 <View className="flex-row flex-wrap gap-2">
                   {(Object.keys(TUTOR_GENDER_LABELS) as TutorGender[]).map((g) => (
                     <Chip key={g} label={TUTOR_GENDER_LABELS[g]} active={tutorGender === g} onPress={() => setTutorGender(g)} />
                   ))}
                 </View>
               </Field>
-              <Field label="Data de nascimento">
+              <Field label="Data de nascimento (opcional)">
                 <TextField
                   value={birthInput}
                   onChangeText={(t) => setBirthInput(maskBirthDate(t))}
