@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Check, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Linking, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -16,6 +16,9 @@ import type { SubscriptionPlan } from '@/types';
 
 import { HeroButton } from './HeroButton';
 import { Logan } from './Logan';
+
+/** Endereço público do app na web (páginas de termos e privacidade). */
+const PUBLIC_SITE_URL = 'https://wolvdog.expo.app';
 
 const STORE_NAME = Platform.OS === 'ios' ? 'App Store' : 'Google Play';
 
@@ -69,6 +72,9 @@ export function PaywallModal() {
 
   const headline = HEADLINES[source ?? 'profile'];
   const selected = plans.find((p) => p.id === selectedId) ?? plans[0]!;
+
+  // Abre a página pública no navegador e mantém o Pro aberto: quem está assinando não perde o lugar.
+  const openLegal = (path: '/termos-de-uso' | '/privacidade') => void Linking.openURL(`${PUBLIC_SITE_URL}${path}`);
 
   async function handlePurchase() {
     setPurchasing(true);
@@ -194,6 +200,15 @@ export function PaywallModal() {
               {restoring ? 'Restaurando…' : 'Restaurar compras'}
             </Text>
           </Pressable>
+          {/* A Apple exige os links de termos e privacidade na tela de assinatura. */}
+          <View className="mt-1 flex-row justify-center">
+            <Pressable onPress={() => openLegal('/termos-de-uso')} accessibilityRole="link" className="px-2 py-1">
+              <Text className="text-xs text-ink-400 underline">Termos de uso</Text>
+            </Pressable>
+            <Pressable onPress={() => openLegal('/privacidade')} accessibilityRole="link" className="px-2 py-1">
+              <Text className="text-xs text-ink-400 underline">Política de privacidade</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>

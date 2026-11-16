@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Bell, Cloud, CloudOff, LogOut } from 'lucide-react-native';
+import { Bell, Cloud, CloudOff, LogOut, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, Switch, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
@@ -9,7 +9,7 @@ import { COLORS, FONTS } from '@/constants/theme';
 import { showAlert, showConfirm } from '@/services/dialog';
 import { formatTime, isPresetTime, REMINDER_TIMES, remindersSupported, requestReminderPermission } from '@/services/notifications';
 import { isSupabaseConfigured } from '@/services/supabase';
-import { signOut } from '@/services/sync';
+import { deleteAccount, signOut } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
 import type { PartnerInfo } from '@/types';
 
@@ -58,6 +58,23 @@ export function AccountSettings() {
       destructive: true,
     });
     if (ok) await signOut();
+  }
+
+  // Exigência das lojas: o tutor apaga a conta e todos os dados dela pelo próprio app.
+  async function handleDeleteAccount() {
+    const ok = await showConfirm(
+      'Excluir sua conta?',
+      'Isso apaga para sempre sua conta, o perfil do seu cão, as missões, as garras e a sequência. Não dá para desfazer. ' +
+        'Se você assina o Pro, cancele também a assinatura na loja do celular.',
+      { confirmText: 'Excluir conta', destructive: true },
+    );
+    if (!ok) return;
+    try {
+      await deleteAccount();
+      showAlert('Conta excluída', 'Seus dados foram apagados. Obrigado por treinar com o Logan!');
+    } catch {
+      showAlert('Não foi possível excluir agora', 'Confira sua internet e tente de novo. Se continuar, escreva para contato@wolvdog.com.');
+    }
   }
 
   return (
@@ -159,6 +176,14 @@ export function AccountSettings() {
                 <Text className="ml-1.5 text-sm font-bold" style={{ color: COLORS.danger }}>
                   Sair da conta
                 </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => void handleDeleteAccount()}
+                accessibilityRole="button"
+                className="mt-1 flex-row items-center self-start py-1"
+              >
+                <Trash2 size={16} color={COLORS.inkSoft} />
+                <Text className="ml-1.5 text-sm text-ink-600 underline">Excluir conta e dados</Text>
               </Pressable>
             </>
           ) : (

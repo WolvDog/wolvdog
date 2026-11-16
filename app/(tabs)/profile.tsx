@@ -255,6 +255,16 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* Links públicos exigidos pelas lojas */}
+        <View className="mt-6 flex-row flex-wrap justify-center">
+          <Pressable onPress={() => router.push('/privacidade')} accessibilityRole="link" className="px-2 py-1">
+            <Text className="text-xs text-ink-400 underline">Política de privacidade</Text>
+          </Pressable>
+          <Pressable onPress={() => router.push('/termos-de-uso')} accessibilityRole="link" className="px-2 py-1">
+            <Text className="text-xs text-ink-400 underline">Termos de uso</Text>
+          </Pressable>
+        </View>
+
         {__DEV__ && (
           <View className="mt-6 rounded-2xl border-2 border-dashed border-gray-300 p-4">
             <Text className="mb-3 text-xs font-bold uppercase text-ink-400">Ferramentas de desenvolvimento</Text>

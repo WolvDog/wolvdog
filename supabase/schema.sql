@@ -151,3 +151,20 @@ grant select, insert, update, delete on public.push_tokens to authenticated;
 -- Perfil do cão (ver migrations/009_pet_energy_experience.sql)
 alter table public.pets add column if not exists energy_level text check (energy_level in ('high', 'balanced', 'calm'));
 alter table public.pets add column if not exists command_experience text check (command_experience in ('none', 'basic', 'advanced'));
+
+-- Excluir a própria conta pelo app (ver migrations/011_delete_account.sql)
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'not authenticated';
+  end if;
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;

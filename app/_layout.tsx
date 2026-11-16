@@ -92,6 +92,13 @@ export default function RootLayout() {
         <Stack.Protected guard={isSupabaseConfigured && !authUserId && (hasOnboarded || loginRequested)}>
           <Stack.Screen name="auth" />
         </Stack.Protected>
+        {/* Páginas públicas (links exigidos pelas lojas): sempre liberadas e declaradas POR ÚLTIMO,
+            senão o router abre uma delas no lugar do onboarding para quem ainda não se cadastrou.
+            Atenção: quando uma tela está bloqueada, o router cai na rota liberada de NOME MAIS CURTO;
+            por isso essas rotas precisam ter nomes mais longos que "onboarding" (10 letras). */}
+        <Stack.Screen name="privacidade" />
+        <Stack.Screen name="termos-de-uso" />
+        <Stack.Screen name="excluir-conta" />
       </Stack>
       <PaywallModal />
     </>

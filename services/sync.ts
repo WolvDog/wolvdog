@@ -9,6 +9,8 @@ import { isSupabaseConfigured, supabase } from './supabase';
 const PUSH_DEBOUNCE_MS = 1500;
 
 let applyingRemote = false;
+/** Saindo ou excluindo a conta: nada mais é enviado para a nuvem. */
+let leaving = false;
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 /** Mudou algo depois que o último envio tirou a foto do estado? */
 let changedDuringPush = false;
@@ -71,7 +73,7 @@ export function startAutoSync(): () => void {
   if (!isSupabaseConfigured) return () => {};
 
   const unsubscribe = useAppStore.subscribe((state, prev) => {
-    if (applyingRemote || !state.authUserId) return;
+    if (applyingRemote || leaving || !state.authUserId) return;
     const changed =
       state.progress !== prev.progress ||
       state.streak !== prev.streak ||
@@ -128,8 +130,36 @@ export async function signOut() {
   if (pushTimer) clearTimeout(pushTimer);
   pushTimer = null;
   reconciledFor = null;
-  // Antes de sair (ainda autenticado): este aparelho para de receber os pushes da conta.
-  await unregisterPushToken();
-  await supabase?.auth.signOut();
-  useAppStore.getState().clearLocalData();
+  leaving = true;
+  try {
+    // Antes de sair (ainda autenticado): este aparelho para de receber os pushes da conta.
+    await unregisterPushToken();
+    await supabase?.auth.signOut();
+    useAppStore.getState().setAuth(null);
+    useAppStore.getState().clearLocalData();
+  } finally {
+    leaving = false;
+  }
+}
+
+/**
+ * Exclui a conta e todos os dados dela na nuvem (função delete_my_account, migração 011)
+ * e limpa este aparelho. Exigência da App Store e do Google Play. Lança erro se a nuvem recusar.
+ */
+export async function deleteAccount(): Promise<void> {
+  if (!supabase) throw new Error('Sem conexão com a nuvem.');
+  if (pushTimer) clearTimeout(pushTimer);
+  pushTimer = null;
+  leaving = true;
+  try {
+    const { error } = await supabase.rpc('delete_my_account');
+    if (error) throw error;
+    reconciledFor = null;
+    // O token de push já foi apagado junto com a conta; só encerra a sessão local.
+    await supabase.auth.signOut().catch(() => {});
+    useAppStore.getState().setAuth(null);
+    useAppStore.getState().clearLocalData();
+  } finally {
+    leaving = false;
+  }
 }
