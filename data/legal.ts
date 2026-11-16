@@ -45,6 +45,7 @@ export const PRIVACY_POLICY: LegalDoc = {
         'Cão: nome, sexo, raça, idade, porte, peso, nível de energia, comandos que já sabe e desafios de comportamento.',
         'Uso do app: missões cumpridas, garras, sequência semanal, diário de comportamento, guias lidos, meta semanal e horário do lembrete.',
         'Código de parceiro, se você usar um (por exemplo, de uma creche).',
+        'Lista de espera do site wolvdog.com: seu e-mail e, se quiser, o nome do cão, usados só para avisar do lançamento.',
         'Aparelho: um identificador para enviar notificações, se você permitir.',
         'Assinatura: se você é assinante do plano Pro. O pagamento é feito pela App Store ou pelo Google Play; não recebemos dados do seu cartão.',
       ],

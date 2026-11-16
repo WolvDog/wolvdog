@@ -168,3 +168,23 @@ end;
 $$;
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
+
+-- Lista de espera da landing page (ver migrations/012_waitlist.sql)
+create table if not exists public.waitlist (
+  id bigint generated always as identity primary key,
+  email text not null unique check (email = lower(email) and email ~ '^[^\s@]+@[^\s@]+\.[^\s@]{2,}$' and length(email) <= 254),
+  dog_name text check (dog_name is null or length(dog_name) <= 40),
+  source text not null default 'landing' check (length(source) <= 40),
+  created_at timestamptz not null default now()
+);
+
+alter table public.waitlist enable row level security;
+
+drop policy if exists "anyone can join waitlist" on public.waitlist;
+create policy "anyone can join waitlist" on public.waitlist for insert to anon, authenticated with check (true);
+
+-- Só inserir: sem leitura, edição ou exclusão pelo site.
+revoke all on public.waitlist from anon, authenticated;
+grant insert (email, dog_name, source) on public.waitlist to anon, authenticated;
+
+-- Ver a lista (no SQL Editor):

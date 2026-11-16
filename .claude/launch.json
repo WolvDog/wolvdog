@@ -12,6 +12,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["expo", "serve", "--port", "8090"],
       "port": 8090
+    },
+    {
+      "name": "wolvdog-site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8095", "--directory", "Site"],
+      "port": 8095
     }
   ]
 }
