@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Mail } from 'lucide-react-native';
+import { ArrowLeft, KeyRound, Mail } from 'lucide-react-native';
 import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +16,14 @@ import { useAppStore } from '@/store/useAppStore';
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 60;
 
-type Step = 'email' | 'code';
+/**
+ * Conta de demonstração das lojas: o revisor da Apple e do Google não recebe o código por e-mail,
+ * então só esta conta entra com senha (criada no Supabase em Authentication → Users, com "Auto Confirm").
+ * A senha vai nas notas da revisão de cada loja; nenhuma outra conta tem login por senha no app.
+ */
+const REVIEW_ACCOUNT_EMAIL = 'revisao@wolvdog.com';
+
+type Step = 'email' | 'code' | 'password';
 
 /**
  * Login sem senha: o tutor informa o e-mail, recebe um código de 6 dígitos e entra.
@@ -37,6 +44,7 @@ export default function AuthScreen() {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendIn, setResendIn] = useState(0);
@@ -52,6 +60,12 @@ export default function AuthScreen() {
 
   async function sendCode() {
     if (!supabase) return;
+    if (normalizedEmail === REVIEW_ACCOUNT_EMAIL) {
+      setError(null);
+      setPassword('');
+      setStep('password');
+      return;
+    }
     setLoading(true);
     setError(null);
     const { error: otpError } = await supabase.auth.signInWithOtp({
@@ -78,15 +92,24 @@ export default function AuthScreen() {
     // Com a sessão criada, o listener de auth sincroniza os dados e as rotas protegidas trocam de tela sozinhas.
   }
 
+  async function signInWithPassword() {
+    if (!supabase || !password) return;
+    setLoading(true);
+    setError(null);
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+    setLoading(false);
+    if (signInError) setError(authErrorMessage(signInError.message));
+  }
+
   function handleCodeChange(value: string) {
     const digits = value.replace(/\D/g, '').slice(0, CODE_LENGTH);
     setCode(digits);
     if (digits.length === CODE_LENGTH && !loading) void verifyCode(digits);
   }
 
-  const showBack = step === 'code' || router.canGoBack() || !hasOnboarded;
+  const showBack = step !== 'email' || router.canGoBack() || !hasOnboarded;
   function goBack() {
-    if (step === 'code') {
+    if (step !== 'email') {
       setStep('email');
       setError(null);
       return;
@@ -97,7 +120,9 @@ export default function AuthScreen() {
   }
 
   const loganText =
-    step === 'code'
+    step === 'password'
+      ? 'Conta de demonstração: digite a senha informada nas notas da revisão.'
+      : step === 'code'
       ? `Mandei um código de ${CODE_LENGTH} dígitos para ${normalizedEmail}. Dá uma farejada na caixa de entrada (e no spam)!`
       : isSignup
         ? `Salve a jornada${petName ? ` ${getPetGrammar(pet).do}` : ''} na nuvem. Sem senha pra decorar: é só confirmar um código no seu e-mail.`
@@ -116,7 +141,7 @@ export default function AuthScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
           <Text style={{ fontFamily: FONTS.display, fontSize: 30, color: COLORS.ink, marginBottom: 16 }}>
-            {step === 'code' ? 'CONFIRA SEU E-MAIL' : isSignup ? 'SALVE SUA JORNADA' : 'ENTRAR'}
+            {step === 'code' ? 'CONFIRA SEU E-MAIL' : step === 'password' ? 'DEMONSTRAÇÃO' : isSignup ? 'SALVE SUA JORNADA' : 'ENTRAR'}
           </Text>
           <LoganSays mood={step === 'code' ? 'thinking' : isSignup ? 'hero' : 'happy'} text={loganText} />
 
@@ -143,6 +168,34 @@ export default function AuthScreen() {
                 icon={<Mail size={18} color={validEmail ? COLORS.ink : COLORS.lockedDark} />}
                 onPress={sendCode}
               />
+            </>
+          ) : step === 'password' ? (
+            <>
+              <Field label="Senha">
+                <TextField
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Senha da conta de demonstração"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoComplete="password"
+                  textContentType="password"
+                  returnKeyType="go"
+                  onSubmitEditing={() => void signInWithPassword()}
+                />
+              </Field>
+              <HeroButton
+                className="mt-6"
+                label="Entrar"
+                variant="hero"
+                disabled={!password}
+                loading={loading}
+                icon={<KeyRound size={18} color={password ? COLORS.white : COLORS.lockedDark} />}
+                onPress={signInWithPassword}
+              />
+              <Pressable onPress={goBack} className="mt-4 py-1">
+                <Text className="text-center text-sm text-ink-400">Usar outro e-mail</Text>
+              </Pressable>
             </>
           ) : (
             <>
