@@ -1,7 +1,7 @@
 import { PURCHASES_MOCK } from '@/constants/revenuecat';
 import { SUBSCRIPTION_PLANS } from '@/data/mockData';
 
-import { mockPurchases } from './purchases.mock';
+import { mockPurchases, withLocalDiscount } from './purchases.mock';
 import type { PurchasesApi } from './purchases.types';
 
 export { PRO_ENTITLEMENT_ID, type PurchaseResult } from './purchases.types';
@@ -18,8 +18,8 @@ export const PurchasesService: PurchasesApi = {
 
   async identify() {},
 
-  async getPlans() {
-    return PURCHASES_MOCK ? mockPurchases.getPlans() : SUBSCRIPTION_PLANS;
+  async getPlans(partner) {
+    return PURCHASES_MOCK ? mockPurchases.getPlans(partner) : withLocalDiscount(SUBSCRIPTION_PLANS, partner);
   },
 
   async purchase(plan) {

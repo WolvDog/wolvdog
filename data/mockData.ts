@@ -799,7 +799,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     currency: 'BRL',
     priceLabel: 'R$ 259,99/ano',
     pricePerMonthLabel: 'R$ 21,67/mês',
-    trialDays: 7,
+    trialDays: 0,
     badge: 'MELHOR VALOR',
     savingsPercent: 38,
   },
@@ -814,7 +814,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     currency: 'BRL',
     priceLabel: 'R$ 179,99/semestre',
     pricePerMonthLabel: 'R$ 30,00/mês',
-    trialDays: 7,
+    trialDays: 0,
     savingsPercent: 14,
   },
   {
@@ -828,13 +828,14 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     currency: 'BRL',
     priceLabel: 'R$ 34,99/mês',
     pricePerMonthLabel: 'R$ 34,99/mês',
-    trialDays: 7,
+    trialDays: 0,
   },
 ];
 
 export const PRO_BENEFITS = [
-  { icon: '📚', title: '+50 missões ilimitadas', description: 'Todas as fases desbloqueadas, com conteúdo novo todo mês.' },
+  { icon: '📚', title: '+50 missões ilimitadas', description: 'Todas as fases e missões especiais, com conteúdo novo todo mês.' },
+  { icon: '🔁', title: 'Reforço inteligente', description: 'O app lembra a hora certa de revisar cada comando para ele não esquecer.' },
   { icon: '🧠', title: 'Comportamentos complexos', description: 'Reatividade, ansiedade, latidos e destruição de objetos.' },
   { icon: '🐾', title: 'Mais de um cão', description: 'Cada cão adicional por apenas 50% do valor do plano.' },
-  { icon: '🦴', title: 'Ossos Reserva em dobro', description: 'Ganhe um Osso Reserva a cada 2 semanas de meta batida.' },
+  { icon: '🦴', title: 'Ossos Reserva', description: 'Ganhe um Osso Reserva a cada 2 semanas de meta batida e não perca a sequência.' },
 ] as const;

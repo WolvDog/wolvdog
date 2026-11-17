@@ -55,7 +55,7 @@ export interface LessonCompletionResult {
   quizBonusXp: number;
 }
 
-export type PaywallSource = 'locked_module' | 'profile' | 'streak_freeze' | 'add_pet';
+export type PaywallSource = 'locked_module' | 'profile' | 'streak_freeze' | 'add_pet' | 'review';
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 type PetInput = Omit<Pet, 'id' | 'ownerId' | 'createdAt'> & Partial<Pick<Pet, 'id'>>;

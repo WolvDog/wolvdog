@@ -18,7 +18,8 @@ export const WEEK_GOAL_BONUS_XP = 30;
 
 export const MAX_STREAK_FREEZES = 2;
 /** A cada N semanas seguidas com a meta cumprida, o tutor ganha 1 Osso Reserva. */
-export const FREEZE_EVERY_WEEKS = { free: 4, pro: 2 } as const;
+/** Semanas de meta batida seguidas para ganhar um Osso Reserva. Só o Pro ganha (plano grátis: nenhum). */
+export const FREEZE_EVERY_WEEKS = 2;
 
 export const WEEKLY_GOAL_OPTIONS = [
   { days: 3, title: '3x por semana', subtitle: 'Leve — ótimo para começar' },

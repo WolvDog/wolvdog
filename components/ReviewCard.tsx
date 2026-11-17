@@ -4,6 +4,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { COLORS, FONTS } from '@/constants/theme';
 import { getLessonById } from '@/data/mockData';
+import { useAppStore } from '@/store/useAppStore';
 import type { ReviewItem } from '@/types';
 
 const REASON = {
@@ -14,6 +15,8 @@ const REASON = {
 
 /** "Treino de Reforço": missões já cumpridas que voltam para revisão (repetição espaçada). */
 export function ReviewCard({ items }: { items: ReviewItem[] }) {
+  const isPro = useAppStore((s) => s.isPro);
+  const openPaywall = useAppStore((s) => s.openPaywall);
   if (items.length === 0) return null;
 
   return (
@@ -32,7 +35,9 @@ export function ReviewCard({ items }: { items: ReviewItem[] }) {
         return (
           <Pressable
             key={item.lessonId}
-            onPress={() => router.push({ pathname: '/lesson/[id]', params: { id: lesson.id, review: '1' } })}
+            onPress={() =>
+              isPro ? router.push({ pathname: '/lesson/[id]', params: { id: lesson.id, review: '1' } }) : openPaywall('review')
+            }
             accessibilityRole="button"
             accessibilityLabel={`Reforçar ${lesson.title}`}
             className="flex-row items-center px-4 py-3"

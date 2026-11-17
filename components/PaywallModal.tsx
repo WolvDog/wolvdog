@@ -1,18 +1,18 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Check, X } from 'lucide-react-native';
+import { Check, Ticket, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Linking, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
 import { COLORS, FONTS } from '@/constants/theme';
 import { PRO_BENEFITS, SUBSCRIPTION_PLANS } from '@/data/mockData';
 import { showAlert } from '@/services/dialog';
-import { lookupPartner } from '@/services/partners';
+import { lookupPartner, normalizePartnerCode } from '@/services/partners';
 import { extraPetLabel } from '@/services/pricing';
 import { PurchasesService } from '@/services/purchases';
 import { type PaywallSource, useAppStore } from '@/store/useAppStore';
-import type { SubscriptionPlan } from '@/types';
+import type { PartnerInfo, SubscriptionPlan } from '@/types';
 
 import { HeroButton } from './HeroButton';
 import { Logan } from './Logan';
@@ -33,7 +33,11 @@ const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
   },
   streak_freeze: {
     title: 'Proteja sua sequência',
-    logan: 'No Pro eu guardo 2 Ossos Reserva por semana pra você. Nada de perder a sequência!',
+    logan: 'No Pro você ganha Ossos Reserva: perdeu uma semana, a sequência continua!',
+  },
+  review: {
+    title: 'Reforço inteligente',
+    logan: 'Eu lembro a hora certa de revisar cada comando, pra ele nunca esquecer. Isso é coisa de Pro!',
   },
   add_pet: {
     title: 'Mais pets, mais diversão',
@@ -59,15 +63,32 @@ export function PaywallModal() {
   const [selectedId, setSelectedId] = useState(SUBSCRIPTION_PLANS[0]!.id);
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponStatus, setCouponStatus] = useState<'idle' | 'checking' | 'invalid'>('idle');
 
   useEffect(() => {
     if (visible && partnerCode && !partner) void lookupPartner(partnerCode).then((p) => p && setPartner(p));
   }, [visible, partnerCode, partner, setPartner]);
 
-  // Preços e teste grátis vêm da loja (RevenueCat); sem loja, ficam os planos locais.
+  // Preços vêm da loja (RevenueCat); com cupom de parceiro, cada plano traz também o preço com desconto.
   useEffect(() => {
-    if (visible) void PurchasesService.getPlans().then(setPlans);
-  }, [visible]);
+    if (visible) void PurchasesService.getPlans(partner).then(setPlans);
+  }, [visible, partner]);
+
+  // O cupom vale para a conta: fica salvo no perfil (atribuição ao parceiro) e já vem aplicado na próxima vez.
+  async function applyCoupon() {
+    const code = normalizePartnerCode(couponInput);
+    if (!code) return;
+    setCouponStatus('checking');
+    const found = await lookupPartner(code);
+    if (found) {
+      setPartner(found);
+      setCouponInput('');
+      setCouponStatus('idle');
+    } else {
+      setCouponStatus('invalid');
+    }
+  }
 
   const headline = HEADLINES[source ?? 'profile'];
   const selected = plans.find((p) => p.id === selectedId) ?? plans[0]!;
@@ -151,14 +172,6 @@ export function PaywallModal() {
           </LinearGradient>
 
           <View className="px-5 pt-6">
-            {partner && (
-              <View className="mb-5 rounded-xl border-2 border-ink-900 bg-claw-100 p-4">
-                <Text style={{ fontFamily: FONTS.display, fontSize: 15, color: COLORS.ink }}>🎁 BENEFÍCIO {partner.name.toUpperCase()}</Text>
-                <Text className="mt-1 text-sm text-ink-600">
-                  Código {partner.code}: {partner.perk}. O desconto é aplicado na tela de pagamento da loja.
-                </Text>
-              </View>
-            )}
             {PRO_BENEFITS.map((b) => (
               <View key={b.title} className="mb-4 flex-row items-start">
                 <View className="h-11 w-11 items-center justify-center rounded-lg border-2 border-ink-900 bg-claw-100">
@@ -174,6 +187,17 @@ export function PaywallModal() {
             <Text className="mb-3 mt-2" style={{ fontFamily: FONTS.display, fontSize: 20, color: COLORS.ink }}>
               ESCOLHA SEU PLANO
             </Text>
+            <CouponBox
+              partner={partner}
+              value={couponInput}
+              status={couponStatus}
+              onChange={(text) => {
+                setCouponInput(text);
+                if (couponStatus === 'invalid') setCouponStatus('idle');
+              }}
+              onApply={() => void applyCoupon()}
+              onRemove={() => setPartner(null)}
+            />
             {plans.map((plan) => (
               <PlanCard key={plan.id} plan={plan} selected={plan.id === selectedId} onPress={() => setSelectedId(plan.id)} />
             ))}
@@ -200,8 +224,18 @@ export function PaywallModal() {
             loading={purchasing}
             onPress={handlePurchase}
           />
+          {selected.discount && partner && (
+            <Text className="mt-3 text-center text-sm font-bold" style={{ color: COLORS.hero }}>
+              🎁 Desconto de parceiro {partner.name} aplicado: {selected.discount.percent}% off.
+            </Text>
+          )}
           <Text className="mt-3 text-center text-xs leading-4 text-ink-400">
-            {hasTrial ? `Após o teste, ${selected.priceLabel}.` : `${selected.priceLabel}.`} Renovação automática pela {STORE_NAME}. Cancele
+            {selected.discount
+              ? `Com o cupom, ${selected.discount.termsLabel}.`
+              : hasTrial
+                ? `Após o teste, ${selected.priceLabel}.`
+                : `${selected.priceLabel}.`}{' '}
+            Renovação automática pela {STORE_NAME}. Cancele
             quando quiser nas assinaturas da loja.
           </Text>
           <Pressable onPress={handleRestore} disabled={restoring} className="mt-2 py-1">
@@ -258,10 +292,104 @@ function PlanCard({ plan, selected, onPress }: { plan: SubscriptionPlan; selecte
               </View>
             ) : null}
           </View>
-          <Text className="text-sm text-ink-600">{plan.priceLabel}</Text>
+          {plan.discount ? (
+            <View className="flex-row flex-wrap items-baseline">
+              <Text className="mr-1.5 text-sm text-ink-400 line-through">{plan.priceLabel}</Text>
+              <Text className="text-sm font-bold" style={{ color: COLORS.hero }}>
+                {plan.discount.priceLabel}
+              </Text>
+            </View>
+          ) : (
+            <Text className="text-sm text-ink-600">{plan.priceLabel}</Text>
+          )}
         </View>
-        <Text style={{ fontFamily: FONTS.display, fontSize: 17, color: COLORS.ink }}>{plan.pricePerMonthLabel}</Text>
+        {plan.discount ? (
+          <View className="items-end">
+            <Text className="text-xs text-ink-400 line-through">{plan.pricePerMonthLabel}</Text>
+            <View className="mt-0.5 rounded-md border-2 border-ink-900 px-1.5" style={{ backgroundColor: COLORS.claw }}>
+              <Text style={{ fontFamily: FONTS.display, fontSize: 17, color: COLORS.hero }}>{plan.discount.pricePerMonthLabel}</Text>
+            </View>
+          </View>
+        ) : (
+          <Text style={{ fontFamily: FONTS.display, fontSize: 17, color: COLORS.ink }}>{plan.pricePerMonthLabel}</Text>
+        )}
       </View>
     </Pressable>
+  );
+}
+
+/** Campo "Cupom de parceiro": valida o código no Supabase; aplicado, mostra o parceiro e o desconto. */
+function CouponBox({
+  partner,
+  value,
+  status,
+  onChange,
+  onApply,
+  onRemove,
+}: {
+  partner: PartnerInfo | null;
+  value: string;
+  status: 'idle' | 'checking' | 'invalid';
+  onChange: (text: string) => void;
+  onApply: () => void;
+  onRemove: () => void;
+}) {
+  if (partner) {
+    return (
+      <View className="mb-4 flex-row items-center rounded-xl border-2 border-ink-900 p-3" style={{ backgroundColor: COLORS.clawLight }}>
+        <Ticket size={20} color={COLORS.ink} />
+        <View className="ml-2.5 flex-1">
+          <Text style={{ fontFamily: FONTS.display, fontSize: 15, color: COLORS.ink }}>
+            CUPOM {partner.code}
+            {partner.discountPercent ? ` · ${partner.discountPercent}% OFF` : ''}
+          </Text>
+          <Text className="text-xs text-ink-600">
+            {partner.name}: {partner.perk}
+          </Text>
+        </View>
+        <Pressable onPress={onRemove} accessibilityRole="button" accessibilityLabel="Remover cupom" className="px-2 py-1">
+          <Text className="text-xs font-bold text-ink-400 underline">Remover</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const hasText = value.trim().length > 0;
+  return (
+    <View className="mb-4">
+      <View
+        className="flex-row items-center rounded-xl border-2 bg-white pl-3"
+        style={{ borderColor: status === 'invalid' ? '#DC2626' : '#D5D8DE' }}
+      >
+        <Ticket size={18} color={COLORS.ink} />
+        <TextInput
+          value={value}
+          onChangeText={onChange}
+          onSubmitEditing={onApply}
+          placeholder="Tem cupom de parceiro?"
+          placeholderTextColor="#9CA3AF"
+          autoCapitalize="characters"
+          autoCorrect={false}
+          returnKeyType="done"
+          accessibilityLabel="Cupom de parceiro"
+          className="ml-2 flex-1 py-3 text-base text-ink-900"
+        />
+        <Pressable
+          onPress={onApply}
+          disabled={!hasText || status === 'checking'}
+          accessibilityRole="button"
+          accessibilityLabel="Aplicar cupom"
+          className="m-1.5 rounded-lg border-2 border-ink-900 px-3 py-1.5"
+          style={{ backgroundColor: hasText ? COLORS.claw : '#F3F4F6' }}
+        >
+          {status === 'checking' ? (
+            <ActivityIndicator size="small" color={COLORS.ink} />
+          ) : (
+            <Text style={{ fontFamily: FONTS.display, fontSize: 14, color: COLORS.ink }}>APLICAR</Text>
+          )}
+        </Pressable>
+      </View>
+      {status === 'invalid' && <Text className="mt-1 text-xs font-bold text-red-600">Cupom inválido ou expirado.</Text>}
+    </View>
   );
 }

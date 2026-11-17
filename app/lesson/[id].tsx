@@ -101,9 +101,13 @@ export default function LessonScreen() {
   }
 
   // Protege contra deep links para lições ainda bloqueadas (a vitória recém-conquistada não conta).
-  // Missões especiais (ex.: fogos de fim de ano) ficam fora da trilha e sempre liberadas.
-  const access =
-    lesson.moduleId === SPECIAL_MODULE_ID ? ({ status: 'available', requiresPro: false } as const) : getLessonState(lesson, module, modules, snapshot);
+  // Missões especiais (ex.: fogos de fim de ano) ficam fora da trilha e, como o reforço, são do Pro.
+  const proOnly = (lesson.moduleId === SPECIAL_MODULE_ID || isReview) && !snapshot.isPro;
+  const access = proOnly
+    ? ({ status: 'locked', requiresPro: true } as const)
+    : lesson.moduleId === SPECIAL_MODULE_ID
+      ? ({ status: 'available', requiresPro: false } as const)
+      : getLessonState(lesson, module, modules, snapshot);
   if (access.status === 'locked' && !result) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-white px-8">

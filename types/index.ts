@@ -32,6 +32,10 @@ export interface PartnerInfo {
   name: string;
   /** Benefício exibido no app. */
   perk: string;
+  /** % de desconto na assinatura (para riscar o preço cheio). Vazio = código sem desconto. */
+  discountPercent?: number | null;
+  /** Tag da oferta de desconto nos planos base do Google Play (ex.: parceiro-15). */
+  googleOfferTag?: string | null;
 }
 
 export type TutorGender = 'male' | 'female' | 'undisclosed';
@@ -305,6 +309,15 @@ export interface ReviewItem {
 
 export type PlanPeriod = 'monthly' | 'semiannual' | 'annual';
 
+export interface PlanDiscount {
+  percent: number;
+  /** Ex.: "R$ 220,99/ano". */
+  priceLabel: string;
+  pricePerMonthLabel: string;
+  /** Quanto tempo vale o desconto e o preço depois. Ex.: "R$ 220,99 no 1º ano; depois, R$ 259,99/ano". */
+  termsLabel: string;
+}
+
 export interface SubscriptionPlan {
   id: string;
   /** Identificador do package no RevenueCat ($rc_monthly, $rc_six_month, $rc_annual). */
@@ -318,6 +331,8 @@ export interface SubscriptionPlan {
   priceLabel: string;
   pricePerMonthLabel: string;
   trialDays: number;
+  /** Preço com o cupom de parceiro aplicado (só quando a loja tem a oferta). */
+  discount?: PlanDiscount;
   /** Valor por cão adicional no mesmo período (50% do plano base). */
   extraPetPriceCents: number;
   badge?: string;

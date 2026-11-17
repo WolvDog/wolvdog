@@ -1,10 +1,11 @@
 import { Platform } from 'react-native';
-import Purchases, { type CustomerInfo, LOG_LEVEL, type PurchasesPackage } from 'react-native-purchases';
+import Purchases, { type CustomerInfo, LOG_LEVEL, type PurchasesPackage, type SubscriptionOption } from 'react-native-purchases';
 
 import { PURCHASES_MOCK, REVENUECAT_API_KEYS } from '@/constants/revenuecat';
 import { SUBSCRIPTION_PLANS } from '@/data/mockData';
-import type { PlanPeriod, SubscriptionPlan } from '@/types';
+import type { PartnerInfo, PlanDiscount, PlanPeriod, SubscriptionPlan } from '@/types';
 
+import { formatBRL } from './pricing';
 import { mockPurchases } from './purchases.mock';
 import { PRO_ENTITLEMENT_ID, type PurchaseResult, type PurchasesApi } from './purchases.types';
 
@@ -14,6 +15,7 @@ export { PRO_ENTITLEMENT_ID, type PurchaseResult } from './purchases.types';
  * Assinatura de verdade pelo RevenueCat (App Store / Google Play).
  * - Conta: o app_user_id do RevenueCat é o id do Supabase, e o webhook (supabase/functions/revenuecat-webhook) marca profiles.is_pro.
  * - Planos: oferta "default", pacotes $rc_annual, $rc_six_month e $rc_monthly; preço e teste grátis vêm da loja.
+ * - Cupom de parceiro (Android): oferta do plano base com a tag do parceiro (partners.google_offer_tag), comprada no lugar do plano cheio.
  * Sem chave para a plataforma (iPhone até a Apple ativar) ou com PURCHASES_MOCK, usa as compras simuladas.
  */
 const API_KEY = Platform.OS === 'ios' ? REVENUECAT_API_KEYS.ios : Platform.OS === 'android' ? REVENUECAT_API_KEYS.android : '';
@@ -21,12 +23,16 @@ const LIVE = !PURCHASES_MOCK && API_KEY.length > 0;
 
 const PERIOD_SUFFIX: Record<PlanPeriod, string> = { annual: 'ano', semiannual: 'semestre', monthly: 'mês' };
 const DAYS_PER_UNIT: Record<string, number> = { DAY: 1, WEEK: 7, MONTH: 30, YEAR: 365 };
+const MONTHS: Record<PlanPeriod, number> = { annual: 12, semiannual: 6, monthly: 1 };
+const PERIOD_WORDS: Record<PlanPeriod, [string, string]> = { annual: ['ano', 'anos'], semiannual: ['semestre', 'semestres'], monthly: ['mês', 'meses'] };
 
 let configured = false;
 let currentUserId: string | null = null;
 let notifyPro: (isPro: boolean) => void = () => {};
 /** Pacotes da última leitura da oferta, por identificador ($rc_annual…). */
 let packages = new Map<string, PurchasesPackage>();
+/** Oferta de desconto do cupom de parceiro, por plano (id do plano → opção da loja). */
+let discountOptions = new Map<string, SubscriptionOption>();
 
 const hasPro = (info: CustomerInfo) => info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
 
@@ -41,6 +47,34 @@ function withStoreData(plan: SubscriptionPlan, pkg: PurchasesPackage): Subscript
     priceLabel: `${product.priceString}/${PERIOD_SUFFIX[plan.period]}`,
     pricePerMonthLabel: product.pricePerMonthString ? `${product.pricePerMonthString}/mês` : plan.pricePerMonthLabel,
     trialDays,
+  };
+}
+
+/** Preço da oferta do parceiro (Android), lido da própria loja. null = a loja não tem oferta com essa tag. */
+function partnerDiscount(
+  plan: SubscriptionPlan,
+  pkg: PurchasesPackage,
+  partner: PartnerInfo | null | undefined,
+): { discount: PlanDiscount; option: SubscriptionOption } | null {
+  const tag = partner?.googleOfferTag;
+  if (!tag || Platform.OS !== 'android') return null;
+  const option = pkg.product.subscriptionOptions?.find((o) => o.tags.includes(tag));
+  const phase = option?.introPhase;
+  if (!option || !phase || phase.price.amountMicros <= 0) return null;
+
+  const cents = Math.round(phase.price.amountMicros / 10_000);
+  const percent = partner?.discountPercent ?? Math.round((1 - cents / plan.priceCents) * 100);
+  const [one, many] = PERIOD_WORDS[plan.period];
+  const cycles = phase.billingCycleCount;
+  const when = cycles === null ? 'enquanto a assinatura durar' : cycles === 1 ? `no 1º ${one}` : `nos primeiros ${cycles} ${many}`;
+  return {
+    option,
+    discount: {
+      percent,
+      priceLabel: `${phase.price.formatted}/${PERIOD_SUFFIX[plan.period]}`,
+      pricePerMonthLabel: `${formatBRL(Math.round(cents / MONTHS[plan.period]))}/mês`,
+      termsLabel: cycles === null ? `${phase.price.formatted} ${when}` : `${phase.price.formatted} ${when}; depois, ${plan.priceLabel}`,
+    },
   };
 }
 
@@ -82,12 +116,18 @@ const livePurchases: PurchasesApi = {
     }
   },
 
-  async getPlans() {
+  async getPlans(partner) {
     try {
       const byId = await loadPackages();
+      discountOptions = new Map();
       const plans = SUBSCRIPTION_PLANS.flatMap((plan) => {
         const pkg = byId.get(plan.revenueCatPackageId);
-        return pkg ? [withStoreData(plan, pkg)] : [];
+        if (!pkg) return [];
+        const storePlan = withStoreData(plan, pkg);
+        const offer = partnerDiscount(storePlan, pkg, partner);
+        if (!offer) return [storePlan];
+        discountOptions.set(plan.id, offer.option);
+        return [{ ...storePlan, discount: offer.discount }];
       });
       return plans.length > 0 ? plans : SUBSCRIPTION_PLANS;
     } catch (e) {
@@ -108,7 +148,8 @@ const livePurchases: PurchasesApi = {
     if (!pkg) return { isPro: false, error: 'Os planos não estão disponíveis na loja agora. Tente de novo em instantes.' };
 
     try {
-      const { customerInfo } = await Purchases.purchasePackage(pkg);
+      const option = plan.discount ? discountOptions.get(plan.id) : undefined;
+      const { customerInfo } = option ? await Purchases.purchaseSubscriptionOption(option) : await Purchases.purchasePackage(pkg);
       if (hasPro(customerInfo)) return { isPro: true };
       return { isPro: false, error: 'A compra foi feita, mas o Pro ainda não foi liberado. Toque em "Restaurar compras" em instantes.' };
     } catch (e) {

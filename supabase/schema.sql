@@ -192,3 +192,9 @@ grant insert (email, dog_name, source) on public.waitlist to anon, authenticated
 -- Assinatura Pro pelo RevenueCat (ver migrations/013_revenuecat_pro.sql): só o webhook escreve.
 alter table public.profiles add column if not exists pro_expires_at timestamptz;
 alter table public.profiles add column if not exists pro_event_at timestamptz;
+
+-- Cupom de parceiro com desconto (ver migrations/014_partner_discounts.sql)
+alter table public.partners add column if not exists discount_percent smallint
+  check (discount_percent is null or discount_percent between 1 and 90);
+alter table public.partners add column if not exists google_offer_tag text
+  check (google_offer_tag is null or google_offer_tag ~ '^[a-z0-9-]{1,63}$');

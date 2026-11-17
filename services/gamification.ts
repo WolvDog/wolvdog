@@ -168,7 +168,7 @@ export function registerWeekActivity(
   if (weekGoalReached) {
     const weeksInARow = streak.current + 1;
     next.longest = Math.max(next.longest, weeksInARow);
-    if (weeksInARow % FREEZE_EVERY_WEEKS[isPro ? 'pro' : 'free'] === 0) {
+    if (isPro && weeksInARow % FREEZE_EVERY_WEEKS === 0) {
       const freezesAvailable = Math.min(MAX_STREAK_FREEZES, streak.freezesAvailable + 1);
       freezesEarned = freezesAvailable - streak.freezesAvailable;
       next = { ...next, freezesAvailable };

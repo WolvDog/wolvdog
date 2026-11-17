@@ -29,8 +29,9 @@ import type { Lesson, LoganMood, Pet } from '@/types';
 
 export default function MissionMapScreen() {
   const { snapshot, modules, currentLesson, completedCount, totalLessons } = useProgression();
-  const { pet, tutorName, dailyGoal, reviews, xpHistory, lastStreakEvent, dismissStreakEvent, openPaywall } = useAppStore(
+  const { pet, tutorName, dailyGoal, reviews, xpHistory, lastStreakEvent, dismissStreakEvent, openPaywall, isPro } = useAppStore(
     useShallow((s) => ({
+      isPro: s.isPro,
       pet: s.pet,
       tutorName: s.user.name,
       dailyGoal: s.user.dailyGoalMinutes,
@@ -101,8 +102,8 @@ export default function MissionMapScreen() {
             </View>
             <ProgressBar progress={completedCount / totalLessons} height={10} color={COLORS.hero} />
           </View>
-          {dueReviews[0] ? (
-            // Reforço pendente vem antes de conteúdo novo.
+          {dueReviews[0] && isPro ? (
+            // Reforço pendente vem antes de conteúdo novo (o reforço é do Pro).
             <HeroButton
               className="mt-4"
               label="Reforço de hoje"
@@ -157,7 +158,7 @@ export default function MissionMapScreen() {
               {moduleState.requiresPro && module.phase === 2 && (
                 <View className="mx-4 mt-2 rounded-xl border-2 border-ink-900 bg-hero-500 p-4">
                   <Text className="mb-3 text-center font-bold text-white">As próximas fases fazem parte do WolvDog Pro 👑</Text>
-                  <HeroButton label="Teste grátis de 7 dias" onPress={() => openPaywall('locked_module')} />
+                  <HeroButton label="Desbloquear todas as fases" onPress={() => openPaywall('locked_module')} />
                 </View>
               )}
             </View>

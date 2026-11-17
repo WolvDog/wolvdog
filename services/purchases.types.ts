@@ -1,4 +1,4 @@
-import type { SubscriptionPlan } from '@/types';
+import type { PartnerInfo, SubscriptionPlan } from '@/types';
 
 /** Direito de acesso no RevenueCat que libera o Pro. */
 export const PRO_ENTITLEMENT_ID = 'pro';
@@ -18,7 +18,9 @@ export interface PurchasesApi {
    * onProChange recebe o estado do Pro sempre que a loja informar (compra, renovação, expiração, troca de conta).
    */
   identify(appUserId: string | null, onProChange: (isPro: boolean) => void): Promise<void>;
-  getPlans(): Promise<SubscriptionPlan[]>;
+  /** Planos com o preço da loja; com cupom de parceiro, cada plano traz o preço com desconto (discount). */
+  getPlans(partner?: PartnerInfo | null): Promise<SubscriptionPlan[]>;
+  /** Compra o plano; se ele veio com discount, compra a oferta de desconto do parceiro. */
   purchase(plan: SubscriptionPlan): Promise<PurchaseResult>;
   restore(): Promise<PurchaseResult>;
 }
