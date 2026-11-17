@@ -13,6 +13,7 @@ import { COLORS } from '@/constants/theme';
 import { useReminderSync } from '@/hooks/useReminderSync';
 import { fetchActiveExpert } from '@/services/experts';
 import { registerPushToken } from '@/services/push';
+import { PurchasesService } from '@/services/purchases';
 import { isSupabaseConfigured } from '@/services/supabase';
 import { startAuthListener, startAutoSync } from '@/services/sync';
 import { useAppStore } from '@/store/useAppStore';
@@ -58,6 +59,12 @@ export default function RootLayout() {
   useEffect(() => {
     if (hasHydrated && authUserId) void registerPushToken(authUserId);
   }, [hasHydrated, authUserId, remindersOn]);
+
+  // Assinatura: liga o RevenueCat com a conta do Supabase e deixa a loja dizer quem é Pro (compras reais).
+  useEffect(() => {
+    if (!hasHydrated || !authReady || !PurchasesService.live) return;
+    void PurchasesService.identify(authUserId, (isPro) => useAppStore.getState().setPro(isPro));
+  }, [hasHydrated, authReady, authUserId]);
 
   const needsAccount = isSupabaseConfigured && !authUserId && !authSkipped;
   // Depois de entrar numa conta existente, espera os dados da nuvem antes de decidir a tela.

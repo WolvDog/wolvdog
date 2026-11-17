@@ -372,7 +372,7 @@ export const useAppStore = create<AppState>()(
       applyCloudSnapshot: (snap) =>
         set((s) => ({
           hasOnboarded: snap.hasOnboarded,
-          // Enquanto o RevenueCat é simulado, mantém o Pro local também.
+          // Pro da nuvem (webhook do RevenueCat) ou do aparelho (loja/compra simulada); no celular, a loja confirma em seguida.
           isPro: snap.isPro || s.isPro,
           user: {
             ...s.user,

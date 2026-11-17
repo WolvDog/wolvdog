@@ -20,6 +20,9 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_PURCHASES_MOCK": "1"
       }
     },
     "production": {

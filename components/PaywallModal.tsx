@@ -43,13 +43,12 @@ const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
 
 export function PaywallModal() {
   const insets = useSafeAreaInsets();
-  const { visible, source, close, setPro, userId, partnerCode, partner, setPartner } = useAppStore(
+  const { visible, source, close, setPro, partnerCode, partner, setPartner } = useAppStore(
     useShallow((s) => ({
       visible: s.paywall.visible,
       source: s.paywall.source,
       close: s.closePaywall,
       setPro: s.setPro,
-      userId: s.user.id,
       partnerCode: s.user.partnerCode,
       partner: s.user.partnerInfo,
       setPartner: s.setPartner,
@@ -65,13 +64,15 @@ export function PaywallModal() {
     if (visible && partnerCode && !partner) void lookupPartner(partnerCode).then((p) => p && setPartner(p));
   }, [visible, partnerCode, partner, setPartner]);
 
+  // Preços e teste grátis vêm da loja (RevenueCat); sem loja, ficam os planos locais.
   useEffect(() => {
-    PurchasesService.configure(userId);
     if (visible) void PurchasesService.getPlans().then(setPlans);
-  }, [visible, userId]);
+  }, [visible]);
 
   const headline = HEADLINES[source ?? 'profile'];
   const selected = plans.find((p) => p.id === selectedId) ?? plans[0]!;
+  // A loja só oferece o teste grátis a quem ainda não usou: sem teste, o botão vira "Assinar".
+  const hasTrial = selected.trialDays > 0;
 
   // Abre a página pública no navegador e mantém o Pro aberto: quem está assinando não perde o lugar.
   const openLegal = (path: '/termos-de-uso' | '/privacidade') => void Linking.openURL(`${PUBLIC_SITE_URL}${path}`);
@@ -89,7 +90,12 @@ export function PaywallModal() {
     if (result.isPro) {
       setPro(true);
       close();
-      showAlert('Pro ativado! 🎉', `Seu teste grátis de ${selected.trialDays} dias começou. Todas as fases foram liberadas!`);
+      showAlert(
+        'Pro ativado! 🎉',
+        hasTrial
+          ? `Seu teste grátis de ${selected.trialDays} dias começou. Todas as fases foram liberadas!`
+          : 'Todas as fases foram liberadas!',
+      );
     } else if (result.error) {
       showAlert('Ops!', result.error);
     }
@@ -178,22 +184,25 @@ export function PaywallModal() {
               </Text>
             </View>
 
-            <View className="mt-2 flex-row items-center justify-center">
-              <Check size={16} color={COLORS.hero} strokeWidth={3} />
-              <Text className="ml-1.5 text-sm font-bold text-ink-600">Sem cobrança hoje · cancele quando quiser</Text>
-            </View>
+            {hasTrial && (
+              <View className="mt-2 flex-row items-center justify-center">
+                <Check size={16} color={COLORS.hero} strokeWidth={3} />
+                <Text className="ml-1.5 text-sm font-bold text-ink-600">Sem cobrança hoje · cancele quando quiser</Text>
+              </View>
+            )}
           </View>
         </ScrollView>
 
         <View className="border-t-2 border-ink-900 px-5 pt-4" style={{ paddingBottom: insets.bottom + 12 }}>
           <HeroButton
-            label={`Começar ${selected.trialDays} dias grátis`}
+            label={hasTrial ? `Começar ${selected.trialDays} dias grátis` : 'Assinar o Pro'}
             variant="primary"
             loading={purchasing}
             onPress={handlePurchase}
           />
           <Text className="mt-3 text-center text-xs leading-4 text-ink-400">
-            Após o teste, {selected.priceLabel}. Renovação automática pela {STORE_NAME}. Cancele quando quiser nas assinaturas da loja.
+            {hasTrial ? `Após o teste, ${selected.priceLabel}.` : `${selected.priceLabel}.`} Renovação automática pela {STORE_NAME}. Cancele
+            quando quiser nas assinaturas da loja.
           </Text>
           <Pressable onPress={handleRestore} disabled={restoring} className="mt-2 py-1">
             <Text className="text-center text-sm font-bold text-hero-500">

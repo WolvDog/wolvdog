@@ -188,3 +188,7 @@ revoke all on public.waitlist from anon, authenticated;
 grant insert (email, dog_name, source) on public.waitlist to anon, authenticated;
 
 -- Ver a lista (no SQL Editor):
+
+-- Assinatura Pro pelo RevenueCat (ver migrations/013_revenuecat_pro.sql): só o webhook escreve.
+alter table public.profiles add column if not exists pro_expires_at timestamptz;
+alter table public.profiles add column if not exists pro_event_at timestamptz;
