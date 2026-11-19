@@ -833,9 +833,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 ];
 
 export const PRO_BENEFITS = [
-  { icon: '📚', title: '+50 missões ilimitadas', description: 'Todas as fases e missões especiais, com conteúdo novo todo mês.' },
+  { icon: '📚', title: 'Todas as 6 fases', description: '25 missões, do Senta ao autocontrole, mais as missões especiais de época.' },
   { icon: '🔁', title: 'Reforço inteligente', description: 'O app lembra a hora certa de revisar cada comando para ele não esquecer.' },
-  { icon: '🧠', title: 'Comportamentos complexos', description: 'Reatividade, ansiedade, latidos e destruição de objetos.' },
-  { icon: '🐾', title: 'Mais de um cão', description: 'Cada cão adicional por apenas 50% do valor do plano.' },
+  { icon: '🧠', title: 'Comportamentos complexos', description: 'Ansiedade de separação, latido no interfone e tédio que destrói o sofá.' },
   { icon: '🦴', title: 'Ossos Reserva', description: 'Ganhe um Osso Reserva a cada 2 semanas de meta batida e não perca a sequência.' },
 ] as const;

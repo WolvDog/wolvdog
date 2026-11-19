@@ -9,7 +9,6 @@ import { COLORS, FONTS } from '@/constants/theme';
 import { PRO_BENEFITS, SUBSCRIPTION_PLANS } from '@/data/mockData';
 import { showAlert } from '@/services/dialog';
 import { lookupPartner, normalizePartnerCode } from '@/services/partners';
-import { extraPetLabel } from '@/services/pricing';
 import { PurchasesService } from '@/services/purchases';
 import { type PaywallSource, useAppStore } from '@/store/useAppStore';
 import type { PartnerInfo, SubscriptionPlan } from '@/types';
@@ -41,7 +40,7 @@ const HEADLINES: Record<PaywallSource, { title: string; logan: string }> = {
   },
   add_pet: {
     title: 'Mais pets, mais diversão',
-    logan: 'Tem mais de um au-au em casa? Cada um ganha sua própria trilha no Pro!',
+    logan: 'Perfis para mais de um au-au estão chegando! Enquanto isso, o Pro libera todas as fases pro seu.',
   },
 };
 
@@ -201,12 +200,6 @@ export function PaywallModal() {
             {plans.map((plan) => (
               <PlanCard key={plan.id} plan={plan} selected={plan.id === selectedId} onPress={() => setSelectedId(plan.id)} />
             ))}
-
-            <View className="mt-1 rounded-lg border-2 border-dashed px-3 py-2.5" style={{ borderColor: '#D5D8DE' }}>
-              <Text className="text-sm text-ink-600">
-                🐾 O plano inclui 1 cão. Tem mais? <Text className="font-bold text-ink-900">{extraPetLabel(selected)}</Text> (50% do plano).
-              </Text>
-            </View>
 
             {hasTrial && (
               <View className="mt-2 flex-row items-center justify-center">

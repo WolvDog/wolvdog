@@ -14,12 +14,11 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { CHALLENGE_LABELS, DIFFICULTY_LABELS, formatAge, formatWeight, PET_SEX_LABELS, PET_SIZE_LABELS } from '@/constants/labels';
 import { points, TERMS } from '@/constants/brand';
 import { COLORS, FONTS } from '@/constants/theme';
-import { getLessonById, SUBSCRIPTION_PLANS } from '@/data/mockData';
+import { getLessonById } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
 import { useWeekStatus } from '@/hooks/useWeekStatus';
 import { showAlert, showConfirm } from '@/services/dialog';
 import { addDays, toDateKey } from '@/services/gamification';
-import { extraPetLabel } from '@/services/pricing';
 import { useAppStore } from '@/store/useAppStore';
 import type { XpEvent } from '@/types';
 
@@ -247,7 +246,7 @@ export default function ProfileScreen() {
                 isPro
                   ? showAlert(
                       'Perfis para mais cães',
-                      `Cada cão adicional custa 50% do seu plano (${extraPetLabel(SUBSCRIPTION_PLANS[0]!)} no anual). Os perfis múltiplos chegam na próxima versão!`,
+                      'Os perfis para mais de um cão chegam numa próxima versão. Avisamos no app quando estiver disponível!',
                     )
                   : openPaywall('add_pet')
               }
