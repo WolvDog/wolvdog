@@ -3,6 +3,7 @@ import type { Lesson, Module, Pet, SubscriptionPlan, User } from '@/types';
 import { lesson, sequence } from './lessonBuilder';
 import {
   areaSeguraLesson,
+  cacaTesouroLesson,
   caminhaLesson,
   EXISTING_QUIZZES,
   focoLesson,
@@ -10,8 +11,10 @@ import {
   module5Lessons,
   nomeLesson,
   passeioCalorLesson,
+  passeioCheirarLesson,
   socializacaoLesson,
   soltaLesson,
+  tocaSeguraLesson,
 } from './missionsExtra';
 import { SPECIAL_LESSONS, SPECIAL_MODULE, SPECIAL_MODULE_ID } from './specials';
 
@@ -385,7 +388,7 @@ const module2Lessons: Lesson[] = [
       },
     },
     victory: {
-      loganSpeech: 'FASE 2 CONCLUÍDA! Senta, Fica, Junto e Vem: seu cão tem um arsenal de herói!',
+      loganSpeech: 'FASE 2 CONCLUÍDA! Fica, Junto e Vem: seu cão tem um arsenal de herói!',
       nextTip: 'Próxima fase: banheiro sem acidentes, no tapete ou no quintal.',
     },
   }),
@@ -684,7 +687,16 @@ export const MODULES: Module[] = [
     isFree: true,
     lessons: sequence(
       MODULE_1,
-      [pick(module1Lessons, 'm1-l1'), nomeLesson, focoLesson, pick(module5Lessons, 'm5-l1'), pick(module1Lessons, 'm1-l4'), caminhaLesson],
+      [
+        pick(module1Lessons, 'm1-l1'),
+        nomeLesson,
+        focoLesson,
+        // Senta veio da Fase 2: o Comida com calma e o Caminha já pedem "Senta".
+        pick(module2Lessons, 'm2-l1'),
+        pick(module5Lessons, 'm5-l1'),
+        pick(module1Lessons, 'm1-l4'),
+        caminhaLesson,
+      ],
       EXISTING_QUIZZES,
     ),
   },
@@ -692,12 +704,12 @@ export const MODULES: Module[] = [
     id: MODULE_2,
     phase: 2,
     title: 'Comandos Essenciais',
-    subtitle: 'Fase 2 · Senta, Fica, Junto, Vem',
+    subtitle: 'Fase 2 · Fica, Junto, Vem',
     description: 'Vitórias rápidas: comandos que funcionam em minutos, com petisco e clicker.',
     color: '#3B5CC4',
     colorDark: '#1E3A8A',
     isFree: false,
-    lessons: sequence(MODULE_2, module2Lessons, EXISTING_QUIZZES),
+    lessons: sequence(MODULE_2, module2Lessons.filter((l) => l.id !== 'm2-l1'), EXISTING_QUIZZES),
   },
   {
     id: MODULE_SANITARIO,
@@ -723,7 +735,12 @@ export const MODULES: Module[] = [
     color: '#F28C28',
     colorDark: '#D9721A',
     isFree: false,
-    lessons: sequence(MODULE_3, [...module3Lessons, passeioCalorLesson, socializacaoLesson], EXISTING_QUIZZES),
+    lessons: sequence(
+      MODULE_3,
+      // Passeio de cheirar logo depois do Virar árvore.
+      [...module3Lessons.slice(0, 2), passeioCheirarLesson, ...module3Lessons.slice(2), passeioCalorLesson, socializacaoLesson],
+      EXISTING_QUIZZES,
+    ),
   },
   {
     id: MODULE_5,
@@ -734,7 +751,12 @@ export const MODULES: Module[] = [
     color: '#60A5FA',
     colorDark: '#3B82F6',
     isFree: false,
-    lessons: sequence(MODULE_5, module5Lessons.filter((l) => l.id !== 'm5-l1'), EXISTING_QUIZZES),
+    lessons: sequence(
+      MODULE_5,
+      // Caça ao tesouro pela casa logo depois do Farejar é trabalhar.
+      module5Lessons.filter((l) => l.id !== 'm5-l1').flatMap((l) => (l.id === 'm5-l2' ? [l, cacaTesouroLesson] : [l])),
+      EXISTING_QUIZZES,
+    ),
   },
   {
     id: MODULE_4,
@@ -748,7 +770,7 @@ export const MODULES: Module[] = [
     isFree: false,
     lessons: sequence(
       MODULE_4,
-      [pick(module4Lessons, 'm4-l1'), pick(module4Lessons, 'm4-l2'), soltaLesson, interfoneLesson, pick(module4Lessons, 'm4-l3')],
+      [pick(module4Lessons, 'm4-l1'), tocaSeguraLesson, pick(module4Lessons, 'm4-l2'), soltaLesson, interfoneLesson, pick(module4Lessons, 'm4-l3')],
       EXISTING_QUIZZES,
     ),
   },
@@ -845,7 +867,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 ];
 
 export const PRO_BENEFITS = [
-  { icon: '📚', title: 'Todas as 6 fases', description: '25 missões, do Senta ao autocontrole, mais as missões especiais de época.' },
+  { icon: '📚', title: 'Todas as 6 fases', description: '28 missões, do Fica ao autocontrole, mais as missões especiais de época.' },
   { icon: '🔁', title: 'Reforço inteligente', description: 'O app lembra a hora certa de revisar cada comando para ele não esquecer.' },
   { icon: '🧠', title: 'Comportamentos complexos', description: 'Ansiedade de separação, latido no interfone e tédio que destrói o sofá.' },
   { icon: '🦴', title: 'Ossos Reserva', description: 'Ganhe um Osso Reserva a cada 2 semanas de meta batida e não perca a sequência.' },

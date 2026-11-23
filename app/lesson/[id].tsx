@@ -17,7 +17,7 @@ import { getLessonById, getModuleById } from '@/data/mockData';
 import { useProgression } from '@/hooks/useProgression';
 import { showConfirm } from '@/services/dialog';
 import { personalize } from '@/services/personalize';
-import { SPECIAL_MODULE_ID } from '@/data/specials';
+import { getSeasonalHighlight, SPECIAL_MODULE_ID } from '@/data/specials';
 import { getLessonState } from '@/services/progression';
 import { type LessonCompletionResult, useAppStore } from '@/store/useAppStore';
 import type { Lesson, LessonStep, ValidationOption } from '@/types';
@@ -102,10 +102,12 @@ export default function LessonScreen() {
 
   // Protege contra deep links para lições ainda bloqueadas (a vitória recém-conquistada não conta).
   // Missões especiais (ex.: fogos de fim de ano) ficam fora da trilha e, como o reforço, são do Pro.
-  const proOnly = (lesson.moduleId === SPECIAL_MODULE_ID || isReview) && !snapshot.isPro;
+  // A missão da estação (card da Home) abre fora da ordem da trilha para quem é Pro.
+  const outsideTrail = lesson.moduleId === SPECIAL_MODULE_ID || getSeasonalHighlight()?.lessonId === lesson.id;
+  const proOnly = (outsideTrail || isReview) && !snapshot.isPro;
   const access = proOnly
     ? ({ status: 'locked', requiresPro: true } as const)
-    : lesson.moduleId === SPECIAL_MODULE_ID
+    : outsideTrail && !snapshot.completedLessons[lesson.id]
       ? ({ status: 'available', requiresPro: false } as const)
       : getLessonState(lesson, module, modules, snapshot);
   if (access.status === 'locked' && !result) {

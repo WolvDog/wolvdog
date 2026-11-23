@@ -20,7 +20,9 @@ export function isModuleCompleted(module: Module, snap: ProgressSnapshot): boole
 function isModuleSequenceUnlocked(module: Module, modules: Module[], snap: ProgressSnapshot): boolean {
   const index = modules.findIndex((m) => m.id === module.id);
   if (index <= 0) return true;
-  return isModuleCompleted(modules[index - 1]!, snap);
+  // Quem já começou esta fase continua nela, mesmo se uma missão nova entrar na fase anterior.
+  const started = module.lessons.some((l) => snap.completedLessons[l.id] || snap.lessonDrafts[l.id] !== undefined);
+  return started || isModuleCompleted(modules[index - 1]!, snap);
 }
 
 export function getModuleState(module: Module, modules: Module[], snap: ProgressSnapshot): NodeState {

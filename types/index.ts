@@ -252,6 +252,8 @@ export interface TutorGuide {
   loganSteps: [string, string, string];
   /** Quando procurar o veterinário (destaque em vermelho). Aceita {pet}. */
   warning?: string;
+  /** Missão da trilha ligada ao guia: vira o botão "Treinar isso" no fim. */
+  missionId?: string;
 }
 
 /** Especialista parceira que assina o Guia (tabela `experts` do Supabase). */

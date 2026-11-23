@@ -177,7 +177,7 @@ export const caminhaLesson: Lesson = lesson({
   },
   victory: {
     loganSpeech: 'FASE 1 COMPLETA! Caminha dominada e boas maneiras de super-herói. Tô orgulhoso!',
-    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". Na Fase 2: Senta, Fica, Junto e Vem.',
+    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". Na Fase 2: Fica, Junto e Vem.',
   },
 });
 
@@ -619,5 +619,140 @@ export const nomeLesson: Lesson = lesson({
   victory: {
     loganSpeech: 'Nome atendido! Agora {o_pet} sabe que ouvir o próprio nome é sinal de coisa boa.',
     nextTip: 'Use o nome só para coisas boas. Para o resto, vá até {o_pet}.',
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Build 5 (insights dos conteúdos das redes): Toca segura, Caça ao tesouro pela casa,
+// Passeio de cheirar. Conteúdo técnico: revisar com o adestrador parceiro.
+// ---------------------------------------------------------------------------
+
+/** Fase 6, depois do Tapete do relaxamento: o esconderijo montado ANTES do barulho. */
+export const tocaSeguraLesson: Lesson = lesson({
+  id: 'm4-toca',
+  title: 'Toca segura',
+  summary: 'Um esconderijo que ele ama, pronto antes dos fogos, trovões e visitas barulhentas.',
+  durationMinutes: 7,
+  xpReward: 25,
+  icon: '🏕️',
+  concept: {
+    title: 'O esconderijo vem antes do barulho',
+    loganSpeech: 'Quando o mundo faz BUM, eu tenho meu esconderijo. E ele é o lugar mais gostoso da casa!',
+    body:
+      'Em dia de fogos, trovão ou visita barulhenta, o cão precisa de um lugar seguro que ele já conhece e ama. ' +
+      'Por isso a toca é montada e treinada antes, em dias tranquilos: um canto fechado e aconchegante, sempre aberto, onde só acontecem coisas boas.',
+    whyItWorks:
+      'Quando o lugar já está associado a calma e petisco, o cão vai para lá sozinho na hora do susto, em vez de fugir ou se esconder em qualquer canto.',
+  },
+  practice: {
+    title: 'Montando a toca',
+    loganSpeech: 'Separe uma coberta, a caminha e uns petiscos. Hoje a gente constrói o quartel-general!',
+    instructions: [
+      'Escolha um canto calmo: caixa de transporte aberta ou mesa com coberta por cima, com a caminha dentro.',
+      'Deixe petiscos e um brinquedo lá dentro, sem chamar {o_pet}.',
+      'Entrou sozinh{o/a}? "Isso!" e petisco lá dentro.',
+      'Fique perto, com calma, e deixe {ele} sair quando quiser.',
+      'A toca fica sempre aberta. Repita por alguns dias.',
+    ],
+    timerSeconds: 300,
+    avoid: ['Prender o cão na toca', 'Tirar o cão de lá à força', 'Usar a toca como castigo'],
+  },
+  validation: {
+    question: '{O_pet} entrou na toca sozinh{o/a}?',
+    feedback: {
+      easy: 'Toca aprovada! Deixe sempre aberta e, nos dias de barulho, com um brinquedo recheado lá dentro.',
+      medium: 'Está no caminho. Continue deixando petiscos lá dentro, sem chamar.',
+      hard: 'Tudo bem! Tente outro canto, mais escuro e silencioso, e petiscos mais gostosos.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Quartel-general pronto! Agora, quando o céu fizer barulho, {o_pet} sabe para onde ir.',
+    nextTip: 'Medo muito forte (tremor, fuga, não come)? Converse com o veterinário. O WolvDog não substitui o veterinário.',
+  },
+});
+
+/** Fase 5, depois do Farejar é trabalhar: faro pela casa antes de sair. */
+export const cacaTesouroLesson: Lesson = lesson({
+  id: 'm5-caca',
+  title: 'Caça ao tesouro pela casa',
+  summary: 'Ração escondida antes de sair: cabeça cansada, sofá em paz.',
+  durationMinutes: 6,
+  xpReward: 20,
+  icon: '🗺️',
+  concept: {
+    title: 'Antes, não depois',
+    loganSpeech: 'Sabe o que eu faço quando você sai? Se tiver tesouro pra caçar, eu caço. Se não tiver... o sofá que se cuide!',
+    body:
+      'Roer o sofá quase nunca é vingança: é energia sobrando e tédio. Gastar a cabeça com faro ANTES de sair de casa ' +
+      'diminui a bagunça enquanto você está fora. Bronca na volta não adianta, porque o cão não liga a bronca ao que fez horas antes.',
+    whyItWorks: 'Farejar cansa a mente e acalma. Começar fácil e ir dificultando mantém o jogo interessante por semanas.',
+  },
+  practice: {
+    title: 'Esconde-esconde da ração',
+    loganSpeech: 'Separe uma parte da ração de hoje. Bora esconder o tesouro!',
+    instructions: [
+      'Antes de sair, separe parte da ração do dia.',
+      'Com {o_pet} vendo, esconda 3 punhados em lugares fáceis e diga "Procura!".',
+      'Achou tudo? Festa!',
+      'Nos dias seguintes, esconda sem {ele} ver e em mais cômodos.',
+      'Saia de casa enquanto {ele} ainda está caçando.',
+    ],
+    timerSeconds: 300,
+    avoid: ['Esconder perto de fios, lixo ou em lugares altos', 'Dar ração além da do dia'],
+  },
+  validation: {
+    question: '{O_pet} achou os tesouros?',
+    feedback: {
+      easy: 'Faro de detetive! Amanhã, esconda sem ele ver.',
+      medium: 'Bom começo. Mantenha os esconderijos fáceis mais alguns dias.',
+      hard: 'Tudo bem! Esconda mais perto e deixe ele ver você escondendo.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Tesouro encontrado! Cabeça cansada, casa em paz.',
+    nextTip: 'Faça a caça todo dia antes de sair e vá aumentando a dificuldade a cada semana.',
+  },
+});
+
+/** Fase 4, depois do Virar árvore: um trecho "livre de pressa" por dia. */
+export const passeioCheirarLesson: Lesson = lesson({
+  id: 'm3-cheirar',
+  title: 'Passeio de cheirar',
+  summary: 'Um trecho do passeio só para farejar: o jornal do bairro acalma mais que correr.',
+  durationMinutes: 5,
+  xpReward: 15,
+  icon: '👃',
+  concept: {
+    title: 'Cada poste é um jornal',
+    loganSpeech: 'Cada poste é um jornal! Me deixa ler as notícias do bairro e eu volto pra casa outro cão.',
+    body:
+      'Cheirar no passeio cansa a cabeça e acalma. Um trecho combinado em que o cão pode farejar à vontade ' +
+      'equilibra os treinos de guia frouxa e deixa o passeio mais gostoso para os dois.',
+    whyItWorks: 'Com um momento garantido para cheirar, o cão puxa menos no resto do caminho.',
+  },
+  practice: {
+    title: 'Trecho livre de pressa',
+    loganSpeech: 'Hoje quem escolhe o ritmo sou eu. Guia frouxa e paciência!',
+    instructions: [
+      'Escolha um trecho do passeio sem pressa.',
+      'Diga "Pode cheirar!" e deixe a guia frouxa.',
+      'Siga o ritmo {do_pet} por 5 minutos; só interrompa se houver perigo.',
+      'Para voltar a andar, diga "Vamos!" e dê um petisco quando {ele} vier.',
+      'Repita todo dia, no mesmo trecho ou em um novo.',
+    ],
+    timerSeconds: 300,
+    avoid: ['Puxar a guia a cada cheirada', 'Deixar cheirar lixo e restos de comida'],
+  },
+  validation: {
+    question: 'Como foi o trecho de cheirar?',
+    feedback: {
+      easy: 'Leitura do jornal em dia! Mantenha o trecho todo passeio.',
+      medium: 'Bom! Se ele puxar fora do trecho, lembre do Virar árvore.',
+      hard: 'Tudo bem! Comece num lugar mais calmo, com menos distrações.',
+    },
+  },
+  victory: {
+    loganSpeech: 'Notícias do bairro lidas! Passeio com cheiro de missão cumprida.',
+    nextTip: 'Combine o trecho de cheirar com o Virar árvore no resto do caminho.',
   },
 });

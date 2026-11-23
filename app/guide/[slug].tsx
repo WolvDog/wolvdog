@@ -10,6 +10,7 @@ import { ExpertAvatar } from '@/components/guide/ExpertAvatar';
 import { Logan } from '@/components/Logan';
 import { COLORS, FONTS } from '@/constants/theme';
 import { GUIDE_CATEGORY_LABELS, GUIDE_READ_REWARD, getGuideBySlug } from '@/data/guides';
+import { getLessonById } from '@/data/mockData';
 import { showAlert } from '@/services/dialog';
 import { guideSeal } from '@/services/experts';
 import { tap } from '@/services/haptics';
@@ -32,6 +33,7 @@ export default function GuideDetailScreen() {
     return found ? personalize(found, { name: petName, sex: petSex }) : undefined;
   }, [slug, petName, petSex]);
 
+  const mission = guide?.missionId ? getLessonById(guide.missionId) : undefined;
   const close = () => (router.canGoBack() ? router.back() : router.replace('/guide'));
 
   if (!guide) {
@@ -120,6 +122,24 @@ export default function GuideDetailScreen() {
               {guide.warning}
             </Text>
           </View>
+        ) : null}
+
+        {mission ? (
+          <Pressable
+            onPress={() => router.push({ pathname: '/lesson/[id]', params: { id: mission.id } })}
+            accessibilityRole="button"
+            accessibilityLabel={`Treinar isso: ${mission.title}`}
+            className="mt-3 flex-row items-center rounded-xl border-2 border-ink-900 p-4"
+            style={{ backgroundColor: COLORS.heroLight }}
+          >
+            <Text style={{ fontSize: 26 }}>{mission.icon}</Text>
+            <View className="ml-3 flex-1">
+              <Text className="text-xs font-bold uppercase" style={{ color: COLORS.hero }}>
+                🎯 Treinar isso no app
+              </Text>
+              <Text style={{ fontFamily: FONTS.display, fontSize: 17, color: COLORS.ink }}>{mission.title.toUpperCase()}</Text>
+            </View>
+          </Pressable>
         ) : null}
 
         <HeroButton

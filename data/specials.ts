@@ -4,7 +4,7 @@ import { lesson } from './lessonBuilder';
 
 /**
  * Missões especiais: ficam fora da trilha linear e aparecem como card de destaque na Home
- * em épocas específicas (ex.: fogos de fim de ano). São gratuitas e podem ser repetidas.
+ * em épocas específicas (ex.: fogos de fim de ano). São do Pro e podem ser repetidas.
  */
 export const SPECIAL_MODULE_ID = 'especiais';
 
@@ -69,10 +69,111 @@ export const fogosLesson: Lesson = {
   order: 1,
 };
 
-export const SPECIAL_LESSONS: Lesson[] = [fogosLesson];
+export const chuvaLesson: Lesson = {
+  ...lesson({
+    id: 'esp-chuva',
+    title: 'Dia de chuva',
+    summary: 'Passeio curto e brincadeiras de faro: dia de chuva não precisa ser dia perdido.',
+    durationMinutes: 5,
+    xpReward: 15,
+    icon: '🌧️',
+    concept: {
+      title: 'A energia não tira folga',
+      loganSpeech: 'Choveu? Passeio curtinho e a festa continua dentro de casa!',
+      body:
+        'Em dia de chuva o passeio encolhe, mas a energia continua lá. Um passeio curto, brincadeiras de faro ' +
+        'e alguns minutos de treino de um comando que ele já sabe gastam a energia que sobraria para a bagunça.',
+      whyItWorks: 'Faro e treino cansam a cabeça, e cabeça cansada é cão calmo, mesmo sem um passeio longo.',
+    },
+    practice: {
+      title: 'Plano de dia chuvoso',
+      loganSpeech: 'Toalha separada, ração na mão e bora!',
+      instructions: [
+        'Passeio curto: 10 minutos bastam.',
+        'Em casa, "Procura!" com ração enrolada numa toalha.',
+        'Brinquedo recheado com parte da ração.',
+        '3 minutos de um comando que {ele} já sabe.',
+        'Seque bem as patas, inclusive entre os dedos.',
+      ],
+      timerSeconds: 300,
+      avoid: ['Passeio longo debaixo de temporal ou com raios', 'Deixar o pelo molhado'],
+    },
+    validation: {
+      question: '{O_pet} gastou a energia mesmo com chuva?',
+      feedback: {
+        easy: 'Dia de chuva vencido! Guarde esse plano para os próximos.',
+        medium: 'Bom! Se sobrar energia, faça mais uma rodada de faro.',
+        hard: 'Tudo bem! Comece pelo faro, que é a parte mais fácil, e depois o comando.',
+      },
+    },
+    victory: {
+      loganSpeech: 'Lá fora chuva, aqui dentro missão cumprida!',
+      nextTip: 'Deixe uma toalha e um brinquedo recheado sempre à mão para os dias de chuva.',
+    },
+  }),
+  moduleId: SPECIAL_MODULE_ID,
+  order: 2,
+};
 
-/** Fim de ano (novembro a janeiro): o card dos fogos aparece no topo da Home. */
-export function isFireworksSeason(date: Date = new Date()): boolean {
-  const month = date.getMonth(); // 0 = janeiro
-  return month === 10 || month === 11 || month === 0;
+export const SPECIAL_LESSONS: Lesson[] = [fogosLesson, chuvaLesson];
+
+/** Destaque da estação no topo da Home: sempre leva a uma missão que existe (da trilha ou especial). */
+export interface SeasonalHighlight {
+  lessonId: string;
+  /** Início e fim, inclusive, como [mês 1-12, dia]. Pode virar o ano (ex.: nov a jan). */
+  from: [number, number];
+  to: [number, number];
+  kicker: string;
+  text: string;
+}
+
+/** Calendário do destaque (Brasil). Ajuste as datas a cada ano, se precisar. */
+export const SEASONAL_HIGHLIGHTS: SeasonalHighlight[] = [
+  {
+    lessonId: fogosLesson.id,
+    from: [11, 1],
+    to: [1, 1],
+    kicker: 'Missão especial · fim de ano',
+    text: 'Treine com sons baixinhos e chegue ao Réveillon sem pânico.',
+  },
+  {
+    lessonId: 'm3-l4', // Passeio no calor
+    from: [1, 2],
+    to: [3, 31],
+    kicker: 'Missão da estação · verão',
+    text: 'Asfalto quente queima as patas: faça o teste da mão antes de sair.',
+  },
+  {
+    lessonId: 'm4-l3', // Saídas que não assustam
+    from: [4, 1],
+    to: [5, 31],
+    kicker: 'Missão da estação · feriados',
+    text: 'Feriadão chegando? Saídas e despedidas sem drama.',
+  },
+  {
+    lessonId: 'm5-caca', // Caça ao tesouro pela casa
+    from: [6, 1],
+    to: [8, 31],
+    kicker: 'Missão da estação · inverno',
+    text: 'Frio e mais tempo em casa: hora de caçar tesouros.',
+  },
+  {
+    lessonId: chuvaLesson.id,
+    from: [9, 1],
+    to: [10, 31],
+    kicker: 'Missão especial · temporada de chuvas',
+    text: 'Choveu? Passeio curtinho e a festa continua dentro de casa.',
+  },
+];
+
+const dayOfYear = ([month, day]: [number, number]) => month * 100 + day;
+
+/** O destaque de hoje (ou undefined, se nenhum período cobre a data). */
+export function getSeasonalHighlight(date: Date = new Date()): SeasonalHighlight | undefined {
+  const today = dayOfYear([date.getMonth() + 1, date.getDate()]);
+  return SEASONAL_HIGHLIGHTS.find((h) => {
+    const from = dayOfYear(h.from);
+    const to = dayOfYear(h.to);
+    return from <= to ? today >= from && today <= to : today >= from || today <= to;
+  });
 }
