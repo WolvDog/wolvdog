@@ -56,6 +56,12 @@ const module1Lessons: Lesson[] = [
       targetReps: 15,
       timerSeconds: 180,
       avoid: ['Usar o marcador sem dar o petisco depois', 'Repetir "Isso, isso, isso!" várias vezes seguidas'],
+      media: {
+        type: 'video',
+        source: require('@/assets/demos/isso.mp4'),
+        caption: '"Isso!" = acertou, vem petisco',
+        aspectRatio: 1,
+      },
     },
     validation: {
       question: 'Quando você disse "Isso!", seu cão virou para você?',
@@ -337,6 +343,12 @@ const module2Lessons: Lesson[] = [
       ],
       targetReps: 10,
       avoid: ['Entregar o petisco na frente do corpo (puxa ele para frente)', 'Treinar na rua antes de dominar em casa'],
+      media: {
+        type: 'video',
+        source: require('@/assets/demos/junto.mp4'),
+        caption: 'Petisco na coxa, colado na perna',
+        aspectRatio: 1,
+      },
     },
     validation: {
       feedback: {
@@ -379,6 +391,12 @@ const module2Lessons: Lesson[] = [
       targetReps: 10,
       timerSeconds: 180,
       avoid: ['Repetir o comando várias vezes', 'Correr atrás do cão (vira brincadeira de pega-pega)'],
+      media: {
+        type: 'video',
+        source: require('@/assets/demos/vem.mp4'),
+        caption: 'Chamou, chegou, ganhou',
+        aspectRatio: 1,
+      },
     },
     validation: {
       feedback: {
@@ -470,6 +488,12 @@ const module3Lessons: Lesson[] = [
       ],
       timerSeconds: 300,
       avoid: ['Dar trancos na guia', 'Seguir andando "só desta vez" quando ele puxa'],
+      media: {
+        type: 'video',
+        source: require('@/assets/demos/arvore.mp4'),
+        caption: 'Guia esticou, para. Frouxa, anda',
+        aspectRatio: 1,
+      },
     },
     validation: {
       feedback: {

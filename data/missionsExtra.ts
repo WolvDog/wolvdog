@@ -167,6 +167,12 @@ export const caminhaLesson: Lesson = lesson({
     targetReps: 10,
     timerSeconds: 240,
     avoid: ['Empurrar o cão para a caminha', 'Usar a caminha para castigo', 'Esquecer de liberar com "Livre!"'],
+    media: {
+      type: 'video',
+      source: require('@/assets/demos/caminha.mp4'),
+      caption: 'Subiu no tapete, ganhou!',
+      aspectRatio: 1,
+    },
   },
   validation: {
     feedback: {
