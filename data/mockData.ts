@@ -238,6 +238,12 @@ const module2Lessons: Lesson[] = [
       targetReps: 10,
       timerSeconds: 240,
       avoid: ['Empurrar o bumbum para baixo', 'Repetir "senta, senta, SENTA"', 'Mão alta demais (ele vai pular)'],
+      media: {
+        type: 'video',
+        source: require('@/assets/demos/senta.mp4'),
+        caption: 'Petisco do focinho para trás das orelhas',
+        aspectRatio: 1,
+      },
     },
     validation: {
       feedback: {
@@ -281,6 +287,12 @@ const module2Lessons: Lesson[] = [
       timerSeconds: 15,
       targetReps: 8,
       avoid: ['Chamar o cão para você no fim do "Fica"', 'Aumentar duração e distância ao mesmo tempo'],
+      media: {
+        type: 'video',
+        source: require('@/assets/demos/fica.mp4'),
+        caption: 'Um D de cada vez: hoje, só duração',
+        aspectRatio: 1,
+      },
     },
     validation: {
       feedback: {

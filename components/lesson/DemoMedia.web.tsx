@@ -16,7 +16,7 @@ export function DemoMedia({ media }: { media: DemoMediaData }) {
     );
   }
   return (
-    <View className="mt-5 overflow-hidden rounded-xl border-2 border-ink-900 bg-white">
+    <View className="mt-5 overflow-hidden rounded-xl border-2 border-ink-900 bg-white" style={{ width: '100%', maxWidth: 420, alignSelf: 'center' }}>
       <View style={{ width: '100%', aspectRatio: media.aspectRatio ?? 16 / 9 }}>
         <LoopingVideo source={media.source} />
       </View>
