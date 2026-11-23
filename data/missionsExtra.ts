@@ -176,8 +176,8 @@ export const caminhaLesson: Lesson = lesson({
     },
   },
   victory: {
-    loganSpeech: 'FASE 1 COMPLETA! Caminha dominada e boas maneiras de super-herói. Tô orgulhoso!',
-    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". Na Fase 2: Fica, Junto e Vem.',
+    loganSpeech: 'Caminha dominada! Agora a campainha pode tocar que {o_pet} sabe o que fazer.',
+    nextTip: 'Treine 3x ao dia, aumentando aos poucos o tempo deitado antes do "Livre!". A seguir: o Fica.',
   },
 });
 

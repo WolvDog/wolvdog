@@ -198,8 +198,8 @@ const module1Lessons: Lesson[] = [
       },
     },
     victory: {
-      loganSpeech: 'Quatro patas no chão, cumprimento de herói! As chegadas em casa nunca mais vão ser um caos.',
-      nextTip: 'Combine com a família: ninguém dá atenção para pulos, nem as visitas. A seguir: a Caminha, o cantinho de calma {do_pet}.',
+      loganSpeech: 'FASE 1 COMPLETA! Quatro patas no chão e boas maneiras de super-herói. Tô orgulhoso!',
+      nextTip: 'Combine com a família: ninguém dá atenção para pulos, nem as visitas. Na Fase 2: a Caminha, o cantinho de calma {do_pet}.',
     },
   }),
 ];
@@ -388,7 +388,7 @@ const module2Lessons: Lesson[] = [
       },
     },
     victory: {
-      loganSpeech: 'FASE 2 CONCLUÍDA! Fica, Junto e Vem: seu cão tem um arsenal de herói!',
+      loganSpeech: 'FASE 2 CONCLUÍDA! Caminha, Fica, Junto e Vem: seu cão tem um arsenal de herói!',
       nextTip: 'Próxima fase: banheiro sem acidentes, no tapete ou no quintal.',
     },
   }),
@@ -691,11 +691,10 @@ export const MODULES: Module[] = [
         pick(module1Lessons, 'm1-l1'),
         nomeLesson,
         focoLesson,
-        // Senta veio da Fase 2: o Comida com calma e o Caminha já pedem "Senta".
+        // Senta veio da Fase 2: o Comida com calma e o Caminha (que abre a Fase 2) pedem "Senta".
         pick(module2Lessons, 'm2-l1'),
         pick(module5Lessons, 'm5-l1'),
         pick(module1Lessons, 'm1-l4'),
-        caminhaLesson,
       ],
       EXISTING_QUIZZES,
     ),
@@ -704,12 +703,13 @@ export const MODULES: Module[] = [
     id: MODULE_2,
     phase: 2,
     title: 'Comandos Essenciais',
-    subtitle: 'Fase 2 · Fica, Junto, Vem',
+    subtitle: 'Fase 2 · Caminha, Fica, Junto, Vem',
     description: 'Vitórias rápidas: comandos que funcionam em minutos, com petisco e clicker.',
     color: '#3B5CC4',
     colorDark: '#1E3A8A',
     isFree: false,
-    lessons: sequence(MODULE_2, module2Lessons.filter((l) => l.id !== 'm2-l1'), EXISTING_QUIZZES),
+    // Caminha abre a Fase 2: é a primeira missão do Pro, logo depois da fase grátis.
+    lessons: sequence(MODULE_2, [caminhaLesson, ...module2Lessons.filter((l) => l.id !== 'm2-l1')], EXISTING_QUIZZES),
   },
   {
     id: MODULE_SANITARIO,
@@ -867,7 +867,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 ];
 
 export const PRO_BENEFITS = [
-  { icon: '📚', title: 'Todas as 6 fases', description: '28 missões, do Fica ao autocontrole, mais as missões especiais de época.' },
+  { icon: '📚', title: 'Todas as 6 fases', description: '28 missões, do básico ao autocontrole, mais as missões especiais de época.' },
   { icon: '🔁', title: 'Reforço inteligente', description: 'O app lembra a hora certa de revisar cada comando para ele não esquecer.' },
   { icon: '🧠', title: 'Comportamentos complexos', description: 'Ansiedade de separação, latido no interfone e tédio que destrói o sofá.' },
   { icon: '🦴', title: 'Ossos Reserva', description: 'Ganhe um Osso Reserva a cada 2 semanas de meta batida e não perca a sequência.' },
