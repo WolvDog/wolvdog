@@ -1,10 +1,35 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/privacidade", "destination": "https://wolvdog.expo.app/privacidade", "permanent": false },
-    { "source": "/termos-de-uso", "destination": "https://wolvdog.expo.app/termos-de-uso", "permanent": false },
-    { "source": "/termos", "destination": "https://wolvdog.expo.app/termos-de-uso", "permanent": false },
-    { "source": "/excluir-conta", "destination": "https://wolvdog.expo.app/excluir-conta", "permanent": false },
-    { "source": "/app", "destination": "https://wolvdog.expo.app", "permanent": false }
+    {
+      "source": "/privacidade",
+      "destination": "https://wolvdog.expo.app/privacidade",
+      "permanent": false
+    },
+    {
+      "source": "/termos-de-uso",
+      "destination": "https://wolvdog.expo.app/termos-de-uso",
+      "permanent": false
+    },
+    {
+      "source": "/termos",
+      "destination": "https://wolvdog.expo.app/termos-de-uso",
+      "permanent": false
+    },
+    {
+      "source": "/excluir-conta",
+      "destination": "https://wolvdog.expo.app/excluir-conta",
+      "permanent": false
+    },
+    {
+      "source": "/app",
+      "destination": "https://wolvdog.expo.app",
+      "permanent": false
+    },
+    {
+      "source": "/android",
+      "destination": "https://play.google.com/store/apps/details?id=com.wolvdog.app",
+      "permanent": false
+    }
   ]
 }
