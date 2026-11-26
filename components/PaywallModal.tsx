@@ -219,7 +219,7 @@ export function PaywallModal() {
           />
           {selected.discount && partner && (
             <Text className="mt-3 text-center text-sm font-bold" style={{ color: COLORS.hero }}>
-              🎁 Desconto de parceiro {partner.name} aplicado: {selected.discount.percent}% off.
+              🎁 Cupom {partner.code} aplicado: {selected.discount.percent}% off.
             </Text>
           )}
           <Text className="mt-3 text-center text-xs leading-4 text-ink-400">
@@ -359,7 +359,7 @@ function CouponBox({
           value={value}
           onChangeText={onChange}
           onSubmitEditing={onApply}
-          placeholder="Tem cupom de parceiro?"
+          placeholder="Tem cupom de desconto?"
           placeholderTextColor="#9CA3AF"
           autoCapitalize="characters"
           autoCorrect={false}

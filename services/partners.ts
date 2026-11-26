@@ -30,7 +30,7 @@ export async function lookupPartner(input: string): Promise<Partner | null> {
 
   const { data, error } = await supabase
     .from('partners')
-    .select('code, name, perk, discount_percent, google_offer_tag')
+    .select('code, name, perk, discount_percent, google_offer_tag, offering_id')
     .eq('code', code)
     .maybeSingle();
   if (error) {
@@ -44,5 +44,6 @@ export async function lookupPartner(input: string): Promise<Partner | null> {
     perk: data.perk,
     discountPercent: data.discount_percent ?? null,
     googleOfferTag: data.google_offer_tag ?? null,
+    offeringId: data.offering_id ?? null,
   };
 }

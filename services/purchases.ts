@@ -15,7 +15,8 @@ export { PRO_ENTITLEMENT_ID, type PurchaseResult } from './purchases.types';
  * Assinatura de verdade pelo RevenueCat (App Store / Google Play).
  * - Conta: o app_user_id do RevenueCat é o id do Supabase, e o webhook (supabase/functions/revenuecat-webhook) marca profiles.is_pro.
  * - Planos: oferta "default", pacotes $rc_annual, $rc_six_month e $rc_monthly; preço e teste grátis vêm da loja.
- * - Cupom de parceiro (Android): oferta do plano base com a tag do parceiro (partners.google_offer_tag), comprada no lugar do plano cheio.
+ * - Cupom vitalício: oferta do RevenueCat com planos de preço menor (partners.offering_id), comprada no lugar do plano cheio.
+ * - Cupom só na 1ª cobrança (Android): oferta do plano base com a tag do cupom (partners.google_offer_tag).
  * Sem chave para a plataforma (iPhone até a Apple ativar) ou com PURCHASES_MOCK, usa as compras simuladas.
  */
 const API_KEY = Platform.OS === 'ios' ? REVENUECAT_API_KEYS.ios : Platform.OS === 'android' ? REVENUECAT_API_KEYS.android : '';
@@ -31,8 +32,12 @@ let currentUserId: string | null = null;
 let notifyPro: (isPro: boolean) => void = () => {};
 /** Pacotes da última leitura da oferta, por identificador ($rc_annual…). */
 let packages = new Map<string, PurchasesPackage>();
-/** Oferta de desconto do cupom de parceiro, por plano (id do plano → opção da loja). */
+/** Todas as ofertas do RevenueCat (para os cupons de desconto vitalício). */
+let allOfferings: Record<string, { availablePackages: PurchasesPackage[] }> = {};
+/** Cupom só na 1ª cobrança (Android): plano → opção da loja com a tag do cupom. */
 let discountOptions = new Map<string, SubscriptionOption>();
+/** Cupom vitalício: plano → pacote de preço menor da oferta do cupom. */
+let discountPackages = new Map<string, PurchasesPackage>();
 
 const hasPro = (info: CustomerInfo) => info.entitlements.active[PRO_ENTITLEMENT_ID] !== undefined;
 
@@ -78,8 +83,35 @@ function partnerDiscount(
   };
 }
 
+/** Cupom vitalício: o mesmo plano na oferta do cupom (preço menor, renovado com desconto). */
+function offeringDiscount(
+  plan: SubscriptionPlan,
+  partner: PartnerInfo | null | undefined,
+): { discount: PlanDiscount; pkg: PurchasesPackage } | null {
+  const offeringId = partner?.offeringId;
+  if (!offeringId) return null;
+  const pkg = allOfferings[offeringId]?.availablePackages.find((p) => p.identifier === plan.revenueCatPackageId);
+  if (!pkg) return null;
+  const { product } = pkg;
+  const cents = Math.round(product.price * 100);
+  const percent = partner?.discountPercent ?? Math.round((1 - cents / plan.priceCents) * 100);
+  const priceLabel = `${product.priceString}/${PERIOD_SUFFIX[plan.period]}`;
+  return {
+    pkg,
+    discount: {
+      percent,
+      priceLabel,
+      pricePerMonthLabel: product.pricePerMonthString
+        ? `${product.pricePerMonthString}/mês`
+        : `${formatBRL(Math.round(cents / MONTHS[plan.period]))}/mês`,
+      termsLabel: `${priceLabel} enquanto a assinatura estiver ativa`,
+    },
+  };
+}
+
 async function loadPackages(): Promise<Map<string, PurchasesPackage>> {
   const offerings = await Purchases.getOfferings();
+  allOfferings = offerings.all;
   packages = new Map((offerings.current?.availablePackages ?? []).map((p) => [p.identifier, p]));
   return packages;
 }
@@ -120,10 +152,16 @@ const livePurchases: PurchasesApi = {
     try {
       const byId = await loadPackages();
       discountOptions = new Map();
+      discountPackages = new Map();
       const plans = SUBSCRIPTION_PLANS.flatMap((plan) => {
         const pkg = byId.get(plan.revenueCatPackageId);
         if (!pkg) return [];
         const storePlan = withStoreData(plan, pkg);
+        const lifetime = offeringDiscount(storePlan, partner);
+        if (lifetime) {
+          discountPackages.set(plan.id, lifetime.pkg);
+          return [{ ...storePlan, discount: lifetime.discount }];
+        }
         const offer = partnerDiscount(storePlan, pkg, partner);
         if (!offer) return [storePlan];
         discountOptions.set(plan.id, offer.option);
@@ -148,8 +186,13 @@ const livePurchases: PurchasesApi = {
     if (!pkg) return { isPro: false, error: 'Os planos não estão disponíveis na loja agora. Tente de novo em instantes.' };
 
     try {
-      const option = plan.discount ? discountOptions.get(plan.id) : undefined;
-      const { customerInfo } = option ? await Purchases.purchaseSubscriptionOption(option) : await Purchases.purchasePackage(pkg);
+      const lifetimePkg = plan.discount ? discountPackages.get(plan.id) : undefined;
+      const option = plan.discount && !lifetimePkg ? discountOptions.get(plan.id) : undefined;
+      const { customerInfo } = lifetimePkg
+        ? await Purchases.purchasePackage(lifetimePkg)
+        : option
+          ? await Purchases.purchaseSubscriptionOption(option)
+          : await Purchases.purchasePackage(pkg);
       if (hasPro(customerInfo)) return { isPro: true };
       return { isPro: false, error: 'A compra foi feita, mas o Pro ainda não foi liberado. Toque em "Restaurar compras" em instantes.' };
     } catch (e) {

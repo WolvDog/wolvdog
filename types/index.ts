@@ -34,8 +34,10 @@ export interface PartnerInfo {
   perk: string;
   /** % de desconto na assinatura (para riscar o preço cheio). Vazio = código sem desconto. */
   discountPercent?: number | null;
-  /** Tag da oferta de desconto nos planos base do Google Play (ex.: parceiro-15). */
+  /** Tag da oferta de desconto só na 1ª cobrança, nos planos base do Google Play (ex.: promo-20). */
   googleOfferTag?: string | null;
+  /** Oferta do RevenueCat com os planos de preço menor: desconto vitalício (ex.: desconto30). */
+  offeringId?: string | null;
 }
 
 export type TutorGender = 'male' | 'female' | 'undisclosed';
